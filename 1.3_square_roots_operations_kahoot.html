@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Square Roots Operations — Classroom (60s Locked, SFX)</title>
+<style>
+  :root{ --bg:#0f172a; --card:#111827; --ink:#e5e7eb; --muted:#9ca3af; --accent:#7c3aed; --good:#16a34a; --bad:#dc2626; --warn:#f59e0b; }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(135deg,#0b1226,#0e1630 40%,#0d1b2a);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  .wrap{max-width:900px;margin:auto;padding:24px}
+  .card{background:rgba(17,24,39,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;box-shadow:0 10px 25px rgba(0,0,0,.35)}
+  h1{font-size:clamp(24px,3.2vw,34px);margin:0 0 8px}
+  .sub{color:var(--muted);margin:0 0 18px}
+  .row{display:flex;gap:16px;flex-wrap:wrap}
+  .row>label{flex:1 1 220px;display:flex;flex-direction:column;gap:6px}
+  input{background:#0b1020;color:var(--ink);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;font-size:16px;outline:none}
+  .btn{cursor:pointer;border:0;border-radius:12px;padding:12px 18px;font-weight:700;letter-spacing:.3px}
+  .btn.primary{background:var(--accent);color:white}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--ink)}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:12px;margin-top:18px}
+  .choice{display:flex;align-items:center;justify-content:center;text-align:center;background:#0c1328;border:1px solid rgba(255,255,255,.08);color:var(--ink);border-radius:14px;min-height:72px;padding:12px;font-weight:700;cursor:pointer;transition:.15s transform,.15s box-shadow,.15s background}
+  .choice:hover{transform:translateY(-2px);box-shadow:0 10px 15px rgba(0,0,0,.25)}
+  .choice.correct{background:rgba(22,163,74,.18);border-color:rgba(22,163,74,.45)}
+  .choice.wrong{background:rgba(220,38,38,.18);border-color:rgba(220,38,38,.45)}
+  .hud{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 10px}
+  .timer{height:10px;background:#0a1022;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+  .bar{height:100%;width:100%;background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444);transition:width .2s linear}
+  .pill{font-weight:800;padding:6px 10px;border-radius:999px;background:#0b1020;border:1px solid rgba(255,255,255,.12);color:var(--muted)}
+  .math{font-size:clamp(18px,2.6vw,28px);font-weight:800;text-align:center;margin:12px 0}
+  .qnum{color:var(--muted);font-weight:700}
+  .footer{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+  .lead{font-size:18px}
+  .note{font-size:13px;color:var(--muted);margin-top:10px}
+  .lock{display:inline-block;padding:6px 10px;border-radius:999px;background:#0b1020;border:1px solid rgba(255,255,255,.12);color:#eab308;font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="screen-start" class="card">
+    <h1>Square Roots Operations</h1>
+    <p class="sub">Kahoot!-style practice — 60 seconds per question, locked.</p>
+    <div class="row">
+      <label>Player name
+        <input id="player" placeholder="e.g., Jordan A." autocomplete="off">
+      </label>
+      <label>Timer
+        <div class="lock">60 seconds per question (locked)</div>
+      </label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <label style="flex:0 1 220px"><input id="shuffle" type="checkbox" checked> Shuffle questions</label>
+      <label style="flex:0 1 220px"><input id="shuffleChoices" type="checkbox" checked> Shuffle answer choices</label>
+      <label style="flex:0 1 220px"><input id="streaks" type="checkbox" checked> Streak bonus</label>
+    </div>
+    <div class="note" id="diag"></div>
+    <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn primary" id="start">Start Game</button>
+    </div>
+  </div>
+
+  <div id="screen-game" class="card" style="display:none">
+    <div class="hud">
+      <div><span class="qnum" id="qnum">Q1/22</span></div>
+      <div class="pill">Score: <span id="score">0</span></div>
+      <div class="pill">Streak: <span id="streak">0</span></div>
+    </div>
+    <div class="timer"><div class="bar" id="bar" style="width:100%"></div></div>
+    <div class="math" id="prompt">…</div>
+    <div class="grid" id="choices"></div>
+    <div class="footer">
+      <button class="btn ghost" id="skip">Skip</button>
+      <button class="btn primary" id="next" disabled>Next</button>
+    </div>
+  </div>
+
+  <div id="screen-done" class="card" style="display:none">
+    <h1>Results</h1>
+    <p class="lead">Great work, <span id="who"></span>! You got <b><span id="right"></span>/<span id="total"></span></b> correct.</p>
+    <p class="sub">Final score: <b><span id="final"></span></b></p>
+    <div class="list" id="review"></div>
+    <div class="footer" style="margin-top:18px">
+      <button class="btn success" id="csv">Export CSV</button>
+      <button class="btn warn" id="json">Export JSON</button>
+      <button class="btn ghost" id="again">Play Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  window.addEventListener('DOMContentLoaded', init);
+  function init(){
+    const $ = s=>document.querySelector(s);
+    const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+    const FIXED_SECS = 60;
+
+    // Sounds (Web Audio beeps with safe fallback)
+    const snd = (() => {
+      let ctx;
+      const safe = fn => { try{ fn(); } catch(e){} };
+      function beep(type="sine", freq=880, dur=0.12, vol=0.05){
+        ctx = ctx || new (window.AudioContext||window.webkitAudioContext||function(){})();
+        if(typeof ctx === 'function') return; // no audio available
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = type; o.frequency.value = freq; g.gain.value = vol;
+        o.connect(g); g.connect(ctx.destination);
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+        o.stop(ctx.currentTime + dur);
+      }
+      return {
+        correct(){ safe(()=>{beep("triangle",880,.11,.06); setTimeout(()=>beep("triangle",1320,.12,.05),90)}); },
+        wrong(){ safe(()=>beep("sawtooth",180,.18,.06)); },
+        tick(){ safe(()=>beep("sine",880,.05,.03)); },
+        end(){ safe(()=>beep("square",660,.2,.06)); }
+      };
+    })();
+
+    const BANK = [{"prompt": "6√3 + 2√3", "correct": "8√3", "choices": ["6√3 + 2√3", "8√(2)3", "16√3"]}, {"prompt": "5√8 − 2√18", "correct": "4√2", "choices": ["4√(2)2", "8√2", "5√8 − 2√18"]}, {"prompt": "2√18 − 2√50", "correct": "-4√2", "choices": ["2√18 − 2√50", "-4√(2)2", "-8√2"]}, {"prompt": "−2√24 − 3√6 − 3√54", "correct": "-16√6", "choices": ["-32√6", "−2√24 − 3√6 − 3√54", "-16√(2)6"]}, {"prompt": "4√3 − √27 + 6√2 − 5√18", "correct": "√3 - 9√2", "choices": ["√(2)3 - 9√2", "4√3 − √27 + 6√2 − 5√18", "√3 + 9√2"]}, {"prompt": "8√27 − 9√12 − 10√24 + 5√6", "correct": "6√3 - 15√6", "choices": ["8√27 − 9√12 − 10√24 + 5√6", "6√(2)3 - 15√6", "6√3 + 15√6"]}, {"prompt": "√2 · √2", "correct": "2", "choices": ["√2 · √2", "4", "6"]}, {"prompt": "−3√6 · 5√3", "correct": "-45√2", "choices": ["−3√6 · 5√3", "-90√2", "-45√(2)2"]}, {"prompt": "2√5 · 3√8", "correct": "12√10", "choices": ["12√(2)10", "2√5 · 3√8", "24√10"]}, {"prompt": "√2(√6 + √10)", "correct": "2√3 + 2√5", "choices": ["√2(√6 + √10)", "2√3 - 2√5", "2√(2)3 + 2√5"]}, {"prompt": "√(25/16)", "correct": "5/4", "choices": ["10/4", "√(25/16)", "15/4"]}, {"prompt": "√18 / √2", "correct": "3", "choices": ["6", "√18 / √2", "9"]}, {"prompt": "√(72/18)", "correct": "2", "choices": ["√(72/18)", "4", "6"]}, {"prompt": "√(80/4)", "correct": "2√5", "choices": ["4√5", "√(80/4)", "2√(2)5"]}, {"prompt": "√108 / √3", "correct": "6", "choices": ["12", "√108 / √3", "18"]}, {"prompt": "√125 / √5", "correct": "5", "choices": ["10", "√125 / √5", "15"]}, {"prompt": "√3 / √2", "correct": "√6/2", "choices": ["√(2)6/2", "√3 / √2", "2√6/2"]}, {"prompt": "3 / √5", "correct": "(3√5)/5", "choices": ["3 / √5", "(3√(2)5)/5", "2(3√5)/5"]}, {"prompt": "√(16/3)", "correct": "(4√3)/3", "choices": ["√(16/3)", "(4√(2)3)/3", "2(4√3)/3"]}, {"prompt": "(3√5) / √7", "correct": "(3√35)/7", "choices": ["(3√(2)35)/7", "(3√5) / √7", "2(3√35)/7"]}, {"prompt": "(4√3) / √2", "correct": "2√6", "choices": ["(4√3) / √2", "2√(2)6", "4√6"]}, {"prompt": "(4√6) / (3√12)", "correct": "(2√2)/3", "choices": ["(4√6) / (3√12)", "2(2√2)/3", "(2√(2)2)/3"]}];
+
+    const S = {
+      start: $("#screen-start"),
+      game:  $("#screen-game"),
+      done:  $("#screen-done"),
+      player: $("#player"),
+      shuffle: $("#shuffle"),
+      shuffleChoices: $("#shuffleChoices"),
+      streaks: $("#streaks"),
+      startBtn: $("#start"),
+      qnum: $("#qnum"),
+      score: $("#score"),
+      streak: $("#streak"),
+      bar: $("#bar"),
+      prompt: $("#prompt"),
+      choices: $("#choices"),
+      next: $("#next"),
+      skip: $("#skip"),
+      who: $("#who"),
+      right: $("#right"),
+      total: $("#total"),
+      final: $("#final"),
+      review: $("#review"),
+      diag: $("#diag"),
+    };
+
+    let Q=[], i=0, score=0, streak=0, secs=FIXED_SECS, shuf=true, shufC=true, streakOn=true;
+    let tLeft=0, tId=null, locked=false, history=[];
+
+    function buildQs(){
+      const base = BANK.map((q,idx)=>{
+        const all = [q.correct, ...q.choices];
+        const opts = (shufC?shuffle(all):all).slice(0,4);
+        return { idx: idx+1, prompt:q.prompt, correct:q.correct, opts, choice:null, ok:null, ms:0, gained:0 };
+      });
+      Q = (shuf? shuffle(base) : base);
+    }
+
+    function startGame(){
+      secs = FIXED_SECS; shuf = S.shuffle.checked; shufC = S.shuffleChoices.checked; streakOn = S.streaks.checked;
+      buildQs(); i=0; score=0; streak=0; history=[];
+      S.score.textContent = score; S.streak.textContent = streak;
+      S.start.style.display="none"; S.done.style.display="none"; S.game.style.display="block";
+      nextQuestion();
+    }
+
+    function renderMath(txt){
+      let s = txt.replace(/\^(-?\d+)/g, (_,exp)=>`<sup>${exp}</sup>`);
+      s = s.replace(/−/g, '&minus;').replace(/·/g,'&middot;');
+      return s;
+    }
+
+    function renderQuestion(q){
+      S.qnum.textContent = `Q${i+1}/${Q.length}`;
+      S.prompt.innerHTML = renderMath(q.prompt);
+      S.choices.innerHTML = "";
+      S.next.disabled = true; S.skip.disabled = false; locked = false;
+      q.renderStart = performance.now();
+      q.opts.forEach(opt=>{
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.dataset.raw = opt;
+        b.innerHTML = renderMath(opt);
+        b.addEventListener("click", ()=> pick(b, q, opt));
+        S.choices.appendChild(b);
+      });
+      clearInterval(tId);
+      tLeft = secs; S.bar.style.width="100%";
+      tId = setInterval(()=>{
+        tLeft -= .1;
+        if (Math.ceil(tLeft) <= 5 && Math.abs(tLeft - Math.round(tLeft)) < 0.06) snd.tick();
+        const pct = Math.max(0, tLeft / secs) * 100;
+        S.bar.style.width = pct + "%";
+        if(tLeft <= 0){ clearInterval(tId); lockQuestion(null, q, false); }
+      }, 100);
+    }
+
+    function pick(btn, q, opt){
+      if(locked) return;
+      const correct = (opt === q.correct);
+      q.choice = opt;
+      lockQuestion(btn, q, correct);
+    }
+
+    function lockQuestion(btn, q, correct){
+      locked = true; clearInterval(tId);
+      const ms = Math.max(0, (performance.now() - q.renderStart)|0); q.ms = ms;
+      let gained = 0;
+      if (correct){
+        const timeBonus = Math.max(0, Math.floor(800 * (tLeft/Math.max(1,secs))));
+        const base = 200;
+        streak = (streakOn ? streak+1 : 0);
+        const streakBonus = (streakOn ? Math.min(300, (streak-1)*60) : 0);
+        gained = base + timeBonus + streakBonus; score += gained; q.ok = true; q.gained = gained;
+        snd.correct();
+      }else{
+        if(streakOn) streak = 0; q.ok = false; q.gained = 0;
+        snd.wrong();
+      }
+      [...S.choices.children].forEach(el=>{
+        const isC = el.dataset.raw === q.correct;
+        if(isC) el.classList.add("correct");
+        if(el===btn && !q.ok) el.classList.add("wrong");
+        el.disabled = true;
+      });
+      S.score.textContent = score; S.streak.textContent = streak;
+      S.next.disabled = false; S.skip.disabled = true;
+      history.push(q);
+    }
+
+    function nextQuestion(){ if(i >= Q.length){ finish(); } else { renderQuestion(Q[i++]); } }
+
+    function finish(){
+      S.game.style.display="none"; S.done.style.display="block";
+      S.who.textContent = S.player.value || "Player";
+      const right = history.filter(h=>h.ok).length;
+      S.right.textContent = right; S.total.textContent = Q.length; S.final.textContent = score;
+      S.review.innerHTML = history.map((h,k)=>`
+        <div class="item">
+          <div><b>Q${k+1}.</b> <span class="${h.ok?'good':'bad'}">${h.ok?'Correct':'Wrong'}</span></div>
+          <div>Prompt: <span class="math">${renderMath(h.prompt)}</span></div>
+          <div>Your answer: <span class="math">${h.choice?renderMath(h.choice):'<i>No answer</i>'}</span></div>
+          <div>Correct answer: <span class="math">${renderMath(h.correct)}</span></div>
+          <div>Points: <b>${h.gained}</b> — Time: ${(h.ms/1000).toFixed(1)}s</div>
+        </div>
+      `).join("");
+      snd.end();
+    }
+
+    function download(data, name, type){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([data],{type}));
+      a.download = name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+    }
+    function exportCSV(){
+      const rows = [["Player","Seconds","Question #","Prompt","Your Answer","Correct Answer","Correct?","Points","Time (s)","Final Score"]];
+      history.forEach((h,idx)=>{ rows.push([S.player.value||"Player", secs, idx+1, h.prompt, h.choice||"", h.correct, h.ok?"TRUE":"FALSE", h.gained, (h.ms/1000).toFixed(2), score]); });
+      const csv = rows.map(r=>r.map(v=>String(v).includes(',')?`"${String(v).replace(/"/g,'""')}"`:v).join(',')).join('\n');
+      download(csv, `square_roots_ops_results_${Date.now()}.csv`, "text/csv");
+    }
+    function exportJSON(){
+      const payload = { player:S.player.value||"Player", seconds:secs, score,
+        results: history.map((h,idx)=>({ number:idx+1, prompt:h.prompt, answer:h.choice||null, correct:h.correct, ok:!!h.ok, points:h.gained, time_sec:+(h.ms/1000).toFixed(2) })) };
+      download(JSON.stringify(payload,null,2), `square_roots_ops_results_${Date.now()}.json`, "application/json");
+    }
+
+    document.getElementById("start").addEventListener("click", startGame);
+    document.getElementById("next").addEventListener("click", nextQuestion);
+    document.getElementById("skip").addEventListener("click", ()=>lockQuestion(null, Q[i-1], false));
+    document.getElementById("again").addEventListener("click", ()=>{ S.done.style.display="none"; S.start.style.display="block"; });
+    document.getElementById("csv").addEventListener("click", exportCSV);
+    document.getElementById("json").addEventListener("click", exportJSON);
+
+    S.diag.textContent = `Ready: ${BANK.length} questions loaded. Timer locked at ${FIXED_SECS}s. SFX on.`;
+  }
+})();
+</script>
+</body>
+</html>
