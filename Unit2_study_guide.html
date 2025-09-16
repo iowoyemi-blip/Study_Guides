@@ -449,6 +449,11 @@
             q36: '2 ≤ x < 4'
         };
 
+        // Function to normalize answers by removing spaces and converting to lowercase
+        function normalizeAnswer(answer) {
+            return answer.replace(/\s+/g, '').toLowerCase();
+        }
+
         function checkSingle(questionId) {
             const userAnswer = document.querySelector(`[name="${questionId}"]`).value.trim();
             const feedbackDiv = document.getElementById(`feedback-${questionId}`);
@@ -456,7 +461,8 @@
             
             feedbackDiv.style.display = 'block';
             
-            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+            // Compare normalized versions (without spaces)
+            if (normalizeAnswer(userAnswer) === normalizeAnswer(correctAnswer)) {
                 feedbackDiv.className = 'feedback correct';
                 feedbackDiv.innerHTML = '✓ Correct!';
             } else {
@@ -472,7 +478,8 @@
 
             for (let key in answers) {
                 const userAnswer = document.querySelector(`[name="${key}"]`).value.trim();
-                if (userAnswer.toLowerCase() === answers[key].toLowerCase()) {
+                // Use normalized comparison for final scoring too
+                if (normalizeAnswer(userAnswer) === normalizeAnswer(answers[key])) {
                     score++;
                     resultsDiv.innerHTML += `<p style="color: green;">✓ ${key}: Correct!</p>`;
                 } else {
