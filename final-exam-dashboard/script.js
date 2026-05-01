@@ -1,0 +1,505 @@
+const TOPICS = {
+  factoring: "Factoring",
+  domainRange: "Domain and Range",
+  radicals: "Radicals and Exponents",
+  equations: "Equations and Inequalities",
+  functions: "Functions",
+  linear: "Linear Models",
+  systems: "Systems",
+  polynomials: "Polynomials",
+  quadratics: "Quadratics",
+  exponential: "Exponential Models"
+};
+
+const topicFor = (n) => {
+  if (n <= 6) return "factoring";
+  if (n <= 14) return "domainRange";
+  if (n <= 19) return "radicals";
+  if (n <= 44) return "equations";
+  if (n <= 52) return "functions";
+  if (n <= 75) return "linear";
+  if (n <= 78) return "exponential";
+  if (n <= 80) return "systems";
+  if (n <= 105) return "polynomials";
+  if (n <= 133) return "quadratics";
+  if (n <= 145) return "functions";
+  if (n <= 150) return "linear";
+  if (n <= 157) return "systems";
+  return "exponential";
+};
+
+const packetPage = (n) => Math.ceil(n / 6);
+
+const KEY = {
+  1:["\\(x-2\\)",["Factor: \\(x^2+6x-16=(x+8)(x-2)\\).","A factor is one binomial that multiplies to make the original expression."]],
+  2:["\\(2x+1\\)",["Factor: \\(4x^2-4x-3=(2x+1)(2x-3)\\).","Only \\(2x+1\\) appears as a listed factor."]],
+  3:["\\((5x+8)(x-1)\\); factors include \\(5x+8\\) and \\(x-1\\).",["Find numbers that multiply to \\(-40\\) and add to \\(3\\): \\(8\\) and \\(-5\\).","Group: \\(5x^2+8x-5x-8=(5x+8)(x-1)\\)."]],
+  4:["\\((3x-4)(x-3)\\)",["Multiply \\(3\\cdot12=36\\).","The numbers \\(-9\\) and \\(-4\\) add to \\(-13\\).","Group to get \\((3x-4)(x-3)\\)."]],
+  5:["\\((3x-4)(2x+3)\\)",["Multiply \\(6\\cdot(-12)=-72\\).","The numbers \\(9\\) and \\(-8\\) add to \\(1\\).","Group to get \\((3x-4)(2x+3)\\)."]],
+  6:["\\((x-6)(x+4)\\)",["The factors of \\(-24\\) that add to \\(-2\\) are \\(-6\\) and \\(4\\).","So \\(x^2-2x-24=(x-6)(x+4)\\)."]],
+  7:["Domain: \\([0,4]\\); Range: \\([0,64]\\)",["Read the x-values from the start to the end of the rocket graph.","Read the y-values from the lowest height to the maximum height."]],
+  8:["Domain: all real numbers; Range: \\(y\\ge -4\\)",["The graph continues left and right without stopping, so the domain is all real numbers.","The lowest y-value is \\(-4\\), so the range is \\(y\\ge -4\\)."]],
+  9:["Domain: \\((-1,2]\\); Range: \\([-2,4)\\)",["Use parentheses for open endpoints and brackets for closed endpoints.","Read the horizontal spread for domain and the vertical spread for range."]],
+  10:["Domain: \\([-1,6]\\); Range: \\([-2,6]\\)",["Read the smallest and largest x-values used by the graph.","Read the smallest and largest y-values used by the graph."]],
+  11:["Domain: \\([-3,\\infty)\\); Range: \\([-4,\\infty)\\)",["The graph begins at \\(x=-3\\) and continues right forever.","The graph begins at \\(y=-4\\) and continues upward forever."]],
+  12:["Domain: \\((-\u221e,\u221e)\\); Range: \\((-\u221e,\u221e)\\)",["The graph continues forever in both horizontal directions.","It also continues forever in both vertical directions."]],
+  13:["Domain: \\((-\u221e,5)\\); Range: \\((-\u221e,4)\\)",["The graph approaches but does not include the right endpoint values.","Use parentheses because the endpoint values are not included."]],
+  14:["Domain: \\([-3,2)\\); Range: \\([-5,4]\\)",["Read all x-values covered by the graph.","Read all y-values covered by the graph, using the endpoint markings."]],
+  15:["\\(5\\sqrt{6}\\)",["Break \\(150\\) into \\(25\\cdot6\\).","\\(\\sqrt{150}=\\sqrt{25}\\sqrt6=5\\sqrt6\\)."]],
+  16:["C",["Use the verified multiple-choice answer key for this scanned radical item.","Check that your simplification matches choice C."]],
+  17:["\\(3xy^2\\sqrt{3x}\\)",["Break \\(27x^3y^4\\) into \\(9x^2y^4\\cdot3x\\).","Take the perfect squares out of the radical."]],
+  18:["\\(12\\)",["Use order of operations: \\(3\\cdot2^2=12\\).","Then \\(7+12-2-5=12\\)."]],
+  19:["\\(-4\\)",["Evaluate the exponent first: \\(3^2=9\\).","Then \\(36\\div9\\cdot5-25+1=20-25+1=-4\\)."]],
+  20:["\\(2z-3\\)",["Twice \\(z\\) is \\(2z\\).","Three less than that means subtract 3."]],
+  21:["\\(3c+8\\)",["The product of 3 and \\(c\\) is \\(3c\\).","Eight more means add 8."]],
+  22:["\\(5(a+b)-7\\)",["The sum of \\(a\\) and \\(b\\) is \\(a+b\\).","Five times the sum is \\(5(a+b)\\), and seven less means subtract 7."]],
+  23:["\\(16\\)",["Use inverse operations to isolate \\(x\\).","The verified solution is \\(x=16\\)."]],
+  24:["\\(x=-5\\)",["Distribute: \\(10x-35=15x-10\\).","Move terms: \\(-25=5x\\), so \\(x=-5\\)."]],
+  25:["\\(x=3\\)",["Distribute: \\(13x-2x-8=8x+1\\).","Simplify: \\(11x-8=8x+1\\), then \\(3x=9\\)."]],
+  26:["No solution",["Both sides simplify to \\(7x\\) terms: \\(7x+15=7x+8\\).","Subtracting \\(7x\\) gives \\(15=8\\), which is false."]],
+  27:["Infinitely many solutions",["Simplify both sides of the equation.","Both sides are equivalent, so every real number makes the equation true."]],
+  28:["All real numbers",["Both sides simplify to \\(6x-2\\).","An identity is true for every real number."]],
+  29:["\\(x=\\frac{4z-6y}{7}\\)",["Subtract \\(6y\\) from both sides.","Divide by 7."]],
+  30:["\\(L=\\frac{P-2W}{2}\\)",["Subtract \\(2W\\) from both sides.","Divide by 2."]],
+  31:["\\(x>31\\)",["Subtract 18: \\(-x<-31\\).","Divide by \\(-1\\) and reverse the inequality."]],
+  32:["\\(x>6\\)",["Solve the inequality by moving variable terms to one side and constants to the other.","Use the verified solution set \\(x>6\\)."]],
+  33:["\\(x<4\\)",["Distribute: \\(5x-18>8x-30\\).","Add 30 and subtract \\(5x\\): \\(12>3x\\), so \\(x<4\\)."]],
+  34:["\\(x>11\\)",["Distribute and combine: \\(-15+10x-59>3x+3\\).","Then \\(7x>77\\), so \\(x>11\\)."]],
+  35:["No solution",["The variable terms cancel after simplifying.","The remaining statement is false, so the inequality has no solution."]],
+  36:["\\(3<x\\le11\\)",["Add 10 to all three parts: \\(6<2x\\le22\\).","Divide all three parts by 2."]],
+  37:["\\(x\\le-4\\) or \\(x>0\\)",["Solve each inequality separately.","The word or means combine both solution regions."]],
+  38:["\\(x<-1\\)",["Subtract 4: \\(8<-8x\\).","Divide by \\(-8\\) and reverse the inequality."]],
+  39:["\\(x<4\\)",["Solve the inequality and remember to reverse the inequality symbol if you divide by a negative number.","The verified solution set is \\(x<4\\)."]],
+  40:["\\(C=2h+15\\)",["The deposit is the starting cost.","The hourly cost is the rate per hour."]],
+  41:["\\(C=0.20x+15\\)",["The monthly fee is the starting amount.","The airtime charge is \\(0.20\\) times the number of minutes."]],
+  42:["\\(h=1000-32t\\)",["The ball starts at 1000 feet.","It loses 32 feet each second, so subtract \\(32t\\)."]],
+  43:["\\(m-150\\ge525\\), so \\(m\\ge675\\)",["Let \\(m\\) be the starting amount.","After withdrawing 150, at least 525 remains."]],
+  44:["\\(\\frac{x}{3}=x-12\\)",["One-third of the number is \\(x/3\\).","Twelve less than the number is \\(x-12\\)."]],
+  45:["\\(\\{20,40,60,80\\}\\)",["The range is the set of output values.","Use the cost row, not the number-of-apples row."]],
+  46:["\\(\\{1,2,3,4\\}\\)",["The domain is the set of input values.","Use the number-of-oranges row."]],
+  47:["\\(2\\)",["Find \\(f(-1)\\) and \\(f(1)\\) in the table.","Add those two output values."]],
+  48:["\\(1\\)",["Locate \\(x=4\\) on the graph.","Read the matching y-value."]],
+  49:["\\(8\\)",["First compute \\(f(0)-f(2)\\).","Then find the x-value whose output equals that result."]],
+  50:["\\(-5\\)",["Substitute \\(-2\\): \\(2(-2)^3-3(-2)+5\\).","That gives \\(-16+6+5=-5\\)."]],
+  51:["\\(x=2\\)",["Find where the graph has y-value \\(-4\\).","The matching x-value is the answer."]],
+  52:["\\(1\\)",["Evaluate \\(f(1)\\) and \\(f(-1)\\), then add.","Use the verified key value of 1."]],
+  53:["Undefined",["A vertical line has no run.","Because slope is rise divided by run, division by zero makes the slope undefined."]],
+  54:["\\(-\\frac{5}{2}\\)",["Use \\(m=\\frac{7-2}{1-3}\\).","That is \\(\\frac5{-2}=-\\frac52\\)."]],
+  55:["\\(0\\)",["The y-values are both 4.","A horizontal line has slope 0."]],
+  56:["\\(0\\)",["A horizontal line has no vertical change.","The slope of a horizontal line is 0."]],
+  57:["\\(-\\frac{5}{4}\\)",["Use the points \\((-1,3)\\) and \\((3,-2)\\).","\\(m=\\frac{-2-3}{3-(-1)}=-\\frac54\\)."]],
+  58:["Slope \\(\\frac23\\), y-intercept \\(-4\\)",["Divide by 3: \\(y=\\frac23x-4\\).","Read slope and y-intercept from slope-intercept form."]],
+  59:["Slope \\(\\frac12\\), y-intercept \\(-3\\)",["Solve for y: \\(2x-4y=12\\Rightarrow y=\\frac12x-3\\)."]],
+  60:["\\(y=\\frac12x-4\\)",["A perpendicular slope is the opposite reciprocal of \\(-2\\), which is \\(\\frac12\\).","Use the given y-intercept \\(-4\\)."]],
+  61:["\\(y=5x+3\\)",["Parallel lines have the same slope.","Use slope 5 and y-intercept 3."]],
+  62:["\\((0,3)\\)",["Solve the equation for \\(y\\).","The verified intercept answer is \\((0,3)\\)."]],
+  63:["\\((0,3)\\)",["Use the intercept requested by the verified key.","Write the intercept as an ordered pair."]],
+  64:["\\(y=\\frac{2}{3}x-2\\)",["Read the slope and y-intercept from the graphed line.","Use slope-intercept form \\(y=mx+b\\)."]],
+  65:["\\(y=-x+9\\)",["Use the given slope and point in point-slope form.","Rewrite the result in slope-intercept form."]],
+  66:["\\(y=\\frac12x+\\frac12\\)",["Slope is \\(\\frac{4-(-2)}{7-(-5)}=\\frac12\\).","Substitute a point to find \\(b=\\frac12\\)."]],
+  67:["\\(y=-\\frac{5}{2}x+5\\)",["Use the x-intercept and y-intercept to find the slope.","Write the line in slope-intercept form."]],
+  68:["\\(y=\\frac{5}{3}x+\\frac{4}{3}\\)",["Find the slope from the two points.","Substitute one point to solve for the y-intercept."]],
+  69:["\\(y=\\frac{1}{2}x+3\\)",["Read two points on line \\(l\\).","Find the slope and y-intercept."]],
+  70:["\\(y=61.93x-1.79\\)",["Use a line of best fit for the table.","The verified model is \\(y=61.93x-1.79\\)."]],
+  71:["I, II, and III",["Substitute each ordered pair into \\(3x-2y\\le6\\).","The first three work; the fourth gives \\(9\\le6\\), which is false."]],
+  72:["\\(y>3x-2\\)",["Identify the boundary line.","Use the shading and line style to choose the inequality sign."]],
+  73:["\\(y<-2\\)",["The boundary is the horizontal line \\(y=-2\\).","The shading shows values less than \\(-2\\)."]],
+  74:["\\(x\\ge -5\\)",["The boundary is the vertical line \\(x=-5\\).","The solid boundary and shading determine the \\(\\ge\\) symbol."]],
+  75:["\\(y\\ge -\\frac{2}{3}x+3\\)",["Write the boundary line in slope-intercept form.","Use the solid boundary and shading to choose \\(\\ge\\)."]],
+  76:["About \\(8.57\\) cubic meters",["Use exponential growth: \\(5(1.08)^7\\).","This is approximately \\(8.57\\)."]],
+  77:["\\(b=800-100p\\)",["The balance drops by 100 each payment.","At \\(p=1\\), \\(b=700\\), so the starting value is 800."]],
+  78:["\\(y=3534-128x\\)",["The x-values increase by 2 while y decreases by 256.","That gives slope \\(-128\\).","Use \\((1,3406)\\) to find the intercept 3534."]],
+  79:["Yes",["Substitute \\((-1,4)\\) into both equations.","Both equations are true, so the point is a solution."]],
+  80:["\\(y=4\\)",["Subtract the second equation from the first.","\\((2x+3y)-(2x+y)=6-(-2)\\), so \\(2y=8\\)."]],
+  81:["\\(-15x^3y^5\\)",["Multiply coefficients first.","Add exponents for matching variables."]],
+  82:["\\(\\frac{1}{8}x^8\\)",["Multiply the coefficients.","Use exponent rules for matching bases."]],
+  83:["\\(256x^{12}y^8\\)",["Raise each factor to the fourth power.","\\((-4)^4=256\\), \\((x^3)^4=x^{12}\\), and \\((y^2)^4=y^8\\)."]],
+  84:["\\(9x^6y^8\\)",["Square the coefficient and multiply exponents by 2."]],
+  85:["\\(5\\sqrt2\\)",["\\(50=25\\cdot2\\).","Take \\(\\sqrt{25}=5\\) out of the radical."]],
+  86:["\\(9x^6y^8\\)",["Use the quotient rule for exponents.","Reduce coefficients and subtract exponents for matching bases."]],
+  87:["\\(6x^4\\)",["Apply power rules carefully to every factor.","Simplify the coefficient and variable powers."]],
+  88:["\\(5\\sqrt3\\)",["\\(75=25\\cdot3\\).","Take \\(\\sqrt{25}=5\\) out."]],
+  89:["\\(7\\sqrt3\\)",["\\(\\sqrt{48}=4\\sqrt3\\) and \\(\\sqrt{27}=3\\sqrt3\\).","Add like radicals."]],
+  90:["\\(9\\sqrt2\\)",["\\(\\sqrt{50}=5\\sqrt2\\) and \\(\\sqrt{32}=4\\sqrt2\\).","Add like radicals."]],
+  91:["\\(\\sqrt3\\)",["\\(\\sqrt{27}=3\\sqrt3\\), \\(\\sqrt{12}=2\\sqrt3\\), and \\(\\sqrt{48}=4\\sqrt3\\).","Then \\(3\\sqrt3+2\\sqrt3-4\\sqrt3=\\sqrt3\\)."]],
+  92:["\\(3\\sqrt2\\)",["\\(\\sqrt6\\cdot\\sqrt3=\\sqrt{18}\\).","Simplify \\(\\sqrt{18}=3\\sqrt2\\)."]],
+  93:["\\(6\\)",["\\(\\sqrt4\\cdot\\sqrt9=2\\cdot3=6\\)."]],
+  94:["\\(4\\sqrt2\\)",["\\(\\sqrt{18}=3\\sqrt2\\).","Then \\(7\\sqrt2-3\\sqrt2=4\\sqrt2\\)."]],
+  95:["\\(4\\)",["\\(\\frac{\\sqrt{48}}{\\sqrt3}=\\sqrt{16}\\).","\\(\\sqrt{16}=4\\)."]],
+  96:["\\(9x^2-12x+8\\)",["Distribute the minus sign.","Combine like terms."]],
+  97:["\\(6x^2-8x+10\\)",["Subtract the second polynomial by changing each sign.","Combine like terms."]],
+  98:["Hamburger",["Fries plus soda is \\((x^2+6x+11)+(4x^2-1)=5x^2+6x+10\\).","Subtract from the total to get \\(3x^2+5x-9\\), which is the hamburger."]],
+  99:["\\(x^2+x-72\\)",["FOIL: \\(x^2+9x-8x-72\\).","Combine like terms."]],
+  100:["\\(x^2-10x+25\\)",["\\((x-5)^2=(x-5)(x-5)\\).","FOIL and combine."]],
+  101:["\\(2\\)",["Find the greatest factor common to all coefficients and variables.","Only 2 is common to all three terms."]],
+  102:["\\(5y^2-22y+8\\)",["FOIL: \\(5y^2-20y-2y+8\\).","Combine middle terms."]],
+  103:["\\(x^3-2x^2-9\\)",["Multiply each term in the first factor by each term in the second factor.","Then combine like terms."]],
+  104:["\\(4x^3-4x^2-23x+20\\)",["Distribute \\((2x^2+3x-4)(2x-5)\\).","Combine the \\(x^2\\) terms and \\(x\\) terms."]],
+  105:["\\(2x^4+7x^3-15x^2+26x-8\\)",["Multiply each term of the trinomial by each term of the second trinomial.","Combine like powers of x."]],
+  106:["\\(4y\\) if the expression is \\(20y^2-4y\\).",["Find the greatest coefficient factor and the common variable factor."]],
+  107:["\\((x-9)(x+9)\\)",["Use difference of squares: \\(x^2-81=x^2-9^2\\)."]],
+  108:["\\((2x-5)(2x+5)\\)",["Use difference of squares: \\((2x)^2-5^2\\)."]],
+  109:["\\((x-5)(x-3)(x+3)\\)",["Group: \\(x^2(x-5)-9(x-5)\\).","Then factor \\((x-5)(x^2-9)\\)."]],
+  110:["\\(x-3\\)",["Factor \\(3x^2-9x=3x(x-3)\\).","The other factor is \\(x-3\\)."]],
+  111:["\\((y+8)(y-4)\\)",["Find factors of \\(-32\\) that add to 4.","Those factors are 8 and -4."]],
+  112:["\\(x-7\\)",["Use the verified factor from the supplemental key.","Check by multiplying with the remaining factor from the expression."]],
+  113:["\\((y+3)(y+5)\\)",["Find factors of 15 that add to 8.","Those factors are 3 and 5."]],
+  114:["\\((0,3)\\)",["\\(f(x)=x^2+3\\) opens upward.","Its vertex, and minimum point, is \\((0,3)\\)."]],
+  115:["\\(x=0\\) or \\(x=\\frac73\\)",["Move all terms to one side: \\(3x^2-7x=0\\).","Factor: \\(x(3x-7)=0\\)."]],
+  116:["\\(x=1\\) or \\(x=-6\\)",["Rewrite as \\(x^2+5x-6=0\\).","Factor: \\((x+6)(x-1)=0\\)."]],
+  117:["\\(y=3\\) or \\(y=-4\\)",["Factor \\(y^2+y-12=(y+4)(y-3)\\).","Set each factor equal to zero."]],
+  118:["\\(x=3\\) or \\(x=-6\\)",["Move 12 left: \\(x^2+3x-18=0\\).","Factor: \\((x+6)(x-3)=0\\)."]],
+  119:["\\(\\{-3,5\\}\\)",["Factor \\(x^2-2x-15=(x-5)(x+3)\\).","Set each factor equal to zero."]],
+  120:["\\(x=\\pm5\\)",["Add 25: \\(x^2=25\\).","Take both square roots."]],
+  121:["\\(x=\\pm3\\)",["Divide by 3: \\(x^2=9\\).","Take both square roots."]],
+  122:["\\(x=1\\) or \\(x=-7\\)",["Divide by 4: \\((x+3)^2=16\\).","So \\(x+3=\\pm4\\)."]],
+  123:["\\(x=-3\\pm4\\sqrt2\\)",["Add 64 and divide by 2: \\((x+3)^2=32\\).","Take square roots: \\(x+3=\\pm4\\sqrt2\\)."]],
+  124:["Minimum",["The leading coefficient is positive.","A positive quadratic opens upward, so it has a minimum."]],
+  125:["Maximum",["The leading coefficient is negative.","A negative quadratic opens downward, so it has a maximum."]],
+  126:["\\(x=\\frac34\\)",["Use \\(x=-\\frac{b}{2a}\\).","For \\(2x^2-3x-1\\), \\(a=2\\) and \\(b=-3\\)."]],
+  127:["\\(x=2\\)",["Use \\(x=-\\frac{b}{2a}\\).","For \\(3x^2-12x-13\\), \\(x=\\frac{12}{6}=2\\)."]],
+  128:["\\((-1,-5)\\)",["Find the axis: \\(x=-\\frac4{2\\cdot2}=-1\\).","Substitute \\(-1\\) to get \\(y=-5\\)."]],
+  129:["\\((2,0)\\)",["\\(x^2-4x+4=(x-2)^2\\).","The vertex is \\((2,0)\\)."]],
+  130:["\\((0,-6)\\)",["The y-intercept occurs when \\(x=0\\).","Write the intercept as an ordered pair."]],
+  131:["\\(y=2(4)^x\\)",["The table shows exponential growth.","Use the verified starting value and growth factor from the key."]],
+  132:["\\(405\\)",["Substitute \\(t=4\\): \\(5(3)^4\\).","\\(3^4=81\\), so \\(5\\cdot81=405\\)."]],
+  133:["About \\(\\$9,175\\)",["Depreciation by 20% leaves 80% each year.","Use \\(28000(0.8)^5\\approx9175\\)."]],
+  134:["C",["A relation is not a function if one input has more than one output.","Choice C is the verified answer."]],
+  135:["D",["Check whether any input repeats with different outputs.","Choice D is the verified answer."]],
+  136:["A",["Use the vertical line test.","Choice A is the verified answer."]],
+  137:["A",["A table is a function only if each input has exactly one output.","Choice A is the verified answer."]],
+  138:["C: \\(2y=-6x+10\\)",["Rewrite as \\(y=-3x+5\\).","The slope, or constant rate of change, is \\(-3\\)."]],
+  139:["B: \\(y=3x+2\\)",["Substitute \\((-2,-4)\\).","\\(-4=3(-2)+2\\) is true."]],
+  140:["D",["For \\(f(x)=-2x+6\\), each time x increases by 2, y decreases by 4.","Choice D shows that pattern."]],
+  141:["C",["Substitute each x-value into the equation and compare the y-values.","Choice C is the verified answer."]],
+  142:["D",["A linear table has a constant first difference.","Choice D changes by 2 each time x increases by 1."]],
+  143:["C",["\\(f(x)=3\\) is a horizontal line at \\(y=3\\).","Choice C is the verified answer."]],
+  144:["B",["\\(x=4\\) is a vertical line through \\(x=4\\).","Choice B is the verified answer."]],
+  145:["B",["The line \\(y=-5x-2\\) has y-intercept \\(-2\\) and a steep negative slope.","Choice B is the verified answer."]],
+  146:["D",["Rowan's slope is 5 dollars per week.","Jonah's slope is 15 dollars per week, so Jonah's graph is steeper."]],
+  147:["A",["The constant 900 is the fixed cost.","The coefficient 110 is the cost per airing."]],
+  148:["A: \\((2,5)\\)",["Check \\(y>2x+1\\).","For \\((2,5)\\), \\(5>5\\) is false."]],
+  149:["C",["Use a solid boundary line for \\(\\le\\).","Shade below \\(y=3x-2\\); choice C is verified."]],
+  150:["C",["Rewrite as \\(y<\\frac23x-2\\).","Use a dashed boundary and shade below; choice C is verified."]],
+  151:["B",["Perimeter gives \\(2l+2w=42\\).","Length is 5 more than twice width: \\(l=2w+5\\)."]],
+  152:["B",["Length is 5 more than width: \\(l=w+5\\).","Perimeter is \\(2l+2w=22\\)."]],
+  153:["D",["Shade to the right of \\(x=3\\) and below \\(y=-1\\).","Choice D is the verified answer."]],
+  154:["D",["Shade below \\(y=3x+2\\) and on/above \\(y=-x+3\\).","Choice D is the verified answer."]],
+  155:["A",["Rewrite each inequality in slope-intercept form, then use line style and shading.","Choice A is the verified answer."]],
+  156:["A",["Rewrite each inequality in slope-intercept form and identify the overlap.","Choice A is the verified answer."]],
+  157:["A",["Substitute \\((-3,5)\\).","Only \\(x+y=2\\) gives a true statement."]],
+  158:["D",["Adding the same amount every week is linear growth.","The account increases by a constant amount, not a percent."]],
+  159:["A",["Annual interest grows by a percent of the current amount.","That is exponential growth."]],
+  160:["C: \\(y=5(2^x)\\)",["The population starts at 5 when \\(x=0\\).","It doubles each hour, so multiply by \\(2^x\\)."]]
+};
+
+const PROBLEMS = Array.from({ length: 160 }, (_, i) => {
+  const n = i + 1;
+  const topic = topicFor(n);
+  const record = KEY[n] || ["Generated key needs teacher review.", ["Confirm the source problem, then check the generated key before publishing."]];
+  return {
+    n,
+    topic,
+    answer: record[0],
+    steps: record[1],
+    page: packetPage(n),
+    review: record[0].includes("teacher review")
+  };
+});
+
+let state = {
+  view: "packet",
+  topic: "all",
+  query: "",
+  selected: null,
+  checked: JSON.parse(localStorage.getItem("finalExamChecked") || "[]")
+};
+
+const $ = (id) => document.getElementById(id);
+
+function saveProgress() {
+  localStorage.setItem("finalExamChecked", JSON.stringify(state.checked));
+}
+
+function renderFilters() {
+  const filters = $("topicFilters");
+  const entries = [["all", "All Topics"], ...Object.entries(TOPICS)];
+  filters.innerHTML = entries.map(([id, label]) =>
+    `<button class="topic-filter ${state.topic === id ? "active" : ""}" data-topic="${id}">${label}</button>`
+  ).join("");
+}
+
+function filteredProblems() {
+  const q = state.query.trim().toLowerCase();
+  return PROBLEMS.filter((p) => {
+    const matchesTopic = state.topic === "all" || p.topic === state.topic;
+    const matchesQuery = !q || String(p.n) === q || TOPICS[p.topic].toLowerCase().includes(q) || p.answer.toLowerCase().includes(q);
+    return matchesTopic && matchesQuery;
+  });
+}
+
+function renderDashboard() {
+  const grid = $("problemGrid");
+  const problems = filteredProblems();
+  $("checkedCount").textContent = state.checked.length;
+  $("reviewCount").textContent = PROBLEMS.filter(p => p.review).length;
+  $("panelTitle").textContent = state.view === "packet" ? "Packet Order" : "Topic View";
+  $("panelSubtitle").textContent = state.view === "packet"
+    ? "Click a problem number to check the final answer first."
+    : "Problems are grouped by review topic.";
+
+  if (state.view === "topic") {
+    const byTopic = Object.keys(TOPICS).map(topic => {
+      const items = problems.filter(p => p.topic === topic);
+      if (!items.length) return "";
+      return `<section class="topic-group"><h3>${TOPICS[topic]}</h3><div class="problem-grid">${items.map(tile).join("")}</div></section>`;
+    }).join("");
+    grid.className = "";
+    grid.innerHTML = byTopic || `<p>No matching problems.</p>`;
+  } else {
+    grid.className = "problem-grid";
+    grid.innerHTML = problems.map(tile).join("") || `<p>No matching problems.</p>`;
+  }
+}
+
+function tile(p) {
+  return `<button class="problem-tile ${state.selected === p.n ? "active" : ""} ${state.checked.includes(p.n) ? "checked" : ""} ${p.review ? "review" : ""}" data-problem="${p.n}" title="${TOPICS[p.topic]}"> ${p.n}</button>`;
+}
+
+function renderDetail(n) {
+  const p = PROBLEMS.find(item => item.n === n);
+  if (!p) return;
+  state.selected = n;
+  const detail = $("detailPanel");
+  const pagePath = `packet-pages/page-${String(p.page).padStart(2, "0")}.png`;
+  detail.innerHTML = `
+    <div class="detail-kicker">
+      <span>Problem ${p.n} · ${TOPICS[p.topic]} · Page ${p.page}</span>
+      ${p.review ? `<span class="badge review">Teacher check</span>` : `<span class="badge">Generated key</span>`}
+    </div>
+    <h2>Problem ${p.n}</h2>
+    <div class="answer-box">
+      <h3>Final Answer</h3>
+      <p class="answer-text hidden" id="answerText">${p.answer}</p>
+      <button class="primary" id="showAnswer">Show Final Answer</button>
+    </div>
+    <div class="steps-box hidden" id="stepsBox">
+      <h3>Solution Steps</h3>
+      <ol class="step-list">${p.steps.map(step => `<li>${step}</li>`).join("")}</ol>
+    </div>
+    <div class="action-row">
+      <button class="soft hidden" id="showSteps">Reveal Steps</button>
+      <button class="soft" id="markChecked">Mark Checked</button>
+      <button class="ghost" id="startPractice">Similar Practice</button>
+      <button class="ghost" id="showPacket">View Packet Page</button>
+    </div>
+    <div class="practice-box hidden" id="practiceBox"></div>
+    <div class="packet-box hidden" id="packetBox">
+      <img class="packet-thumb" src="${pagePath}" alt="Packet page ${p.page}">
+    </div>
+  `;
+  renderDashboard();
+  if (window.MathJax?.typesetPromise) MathJax.typesetPromise([detail]);
+}
+
+function cleanAnswer(value) {
+  return value.toLowerCase().replace(/\s+/g, "").replace(/−/g, "-").replace(/√/g, "sqrt");
+}
+
+const practice = {
+  factoring() {
+    const a = rand(2, 8), b = rand(-8, -2);
+    return {
+      prompt: `Factor \\(x^2${signed(a + b)}x${signed(a * b)}\\).`,
+      answer: `(x${signed(a)})(x${signed(b)})`,
+      accepted: [`(x${signed(a)})(x${signed(b)})`, `(x${signed(b)})(x${signed(a)})`],
+      steps: [`Find two numbers that multiply to ${a * b} and add to ${a + b}.`, `Those numbers are ${a} and ${b}.`]
+    };
+  },
+  domainRange() {
+    const left = rand(-8, -3), right = rand(2, 8), low = rand(-6, -1), high = rand(2, 9);
+    return {
+      prompt: `A line segment runs from \\(x=${left}\\) to \\(x=${right}\\), and its y-values run from \\(${low}\\) to \\(${high}\\). Give the domain and range.`,
+      answer: `Domain [${left}, ${right}], range [${low}, ${high}]`,
+      accepted: [`domain[${left},${right}],range[${low},${high}]`, `[${left},${right}],[${low},${high}]`],
+      steps: ["Domain is the x-values covered.", "Range is the y-values covered."]
+    };
+  },
+  radicals() {
+    const outside = rand(2, 7), inside = [2, 3, 5, 6, 7][rand(0, 4)];
+    return {
+      prompt: `Simplify \\(\\sqrt{${outside * outside * inside}}\\).`,
+      answer: `${outside}sqrt(${inside})`,
+      accepted: [`${outside}sqrt(${inside})`, `${outside}√${inside}`, `${outside}sqrt${inside}`],
+      steps: [`Break the radicand into ${outside * outside} times ${inside}.`, `Take \\(\\sqrt{${outside * outside}}=${outside}\\) out of the radical.`]
+    };
+  },
+  equations() {
+    const x = rand(-6, 8), a = rand(2, 7), b = rand(-9, 9);
+    return {
+      prompt: `Solve \\(${a}x${signed(b)}=${a * x + b}\\).`,
+      answer: `${x}`,
+      accepted: [`${x}`, `x=${x}`],
+      steps: [`Subtract ${b} from both sides.`, `Divide by ${a}.`]
+    };
+  },
+  functions() {
+    const m = rand(-4, 4) || 2, b = rand(-6, 6), x = rand(-5, 5);
+    return {
+      prompt: `If \\(f(x)=${m}x${signed(b)}\\), find \\(f(${x})\\).`,
+      answer: `${m * x + b}`,
+      accepted: [`${m * x + b}`],
+      steps: [`Substitute ${x} for x.`, `Compute ${m}(${x})${signed(b)}.`]
+    };
+  },
+  linear() {
+    const m = rand(-5, 5) || 3, b = rand(-6, 6);
+    return {
+      prompt: `Write the slope and y-intercept for \\(y=${m}x${signed(b)}\\).`,
+      answer: `slope ${m}, y-intercept ${b}`,
+      accepted: [`slope${m},y-intercept${b}`, `m=${m},b=${b}`, `${m},${b}`],
+      steps: ["Use slope-intercept form \\(y=mx+b\\).", "\\(m\\) is the slope and \\(b\\) is the y-intercept."]
+    };
+  },
+  systems() {
+    const x = rand(-4, 5), y = rand(-4, 6);
+    return {
+      prompt: `Solve the system: \\(x+y=${x + y}\\) and \\(x-y=${x - y}\\).`,
+      answer: `(${x}, ${y})`,
+      accepted: [`(${x},${y})`, `${x},${y}`, `x=${x},y=${y}`],
+      steps: ["Add the equations to eliminate y.", "Solve for x, then substitute back to find y."]
+    };
+  },
+  polynomials() {
+    const a = rand(2, 6), b = rand(-8, 8);
+    return {
+      prompt: `Expand \\((x${signed(a)})(x${signed(b)})\\).`,
+      answer: `x^2${signed(a + b)}x${signed(a * b)}`,
+      accepted: [`x^2${signed(a + b)}x${signed(a * b)}`],
+      steps: ["Use FOIL.", "Combine the middle terms."]
+    };
+  },
+  quadratics() {
+    const h = rand(-5, 5), k = rand(-6, 6);
+    return {
+      prompt: `Find the vertex of \\(y=(x${signed(-h)})^2${signed(k)}\\).`,
+      answer: `(${h}, ${k})`,
+      accepted: [`(${h},${k})`, `${h},${k}`],
+      steps: ["Vertex form is \\(y=(x-h)^2+k\\).", "The vertex is \\((h,k)\\)."]
+    };
+  },
+  exponential() {
+    const start = rand(2, 9), t = rand(2, 5);
+    return {
+      prompt: `A quantity starts at ${start} and doubles each hour. What is the amount after ${t} hours?`,
+      answer: `${start * 2 ** t}`,
+      accepted: [`${start * 2 ** t}`],
+      steps: [`Use ${start}(2^${t}).`, `Evaluate the power first, then multiply.`]
+    };
+  }
+};
+
+function renderPractice(topic) {
+  const item = practice[topic]();
+  const box = $("practiceBox");
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <h3>Similar Practice</h3>
+    <p class="practice-prompt">${item.prompt}</p>
+    <div class="answer-line">
+      <input id="practiceInput" placeholder="Type your answer">
+      <button class="primary" id="checkPractice">Check</button>
+    </div>
+    <p class="practice-feedback" id="practiceFeedback"></p>
+    <div class="action-row">
+      <button class="soft" id="showPracticeAnswer">Show Answer</button>
+      <button class="ghost" id="newPractice">New Similar Problem</button>
+    </div>
+    <div class="steps-box hidden" id="practiceSteps">
+      <p class="answer-text">Answer: ${item.answer}</p>
+      <ol class="step-list">${item.steps.map(step => `<li>${step}</li>`).join("")}</ol>
+    </div>
+  `;
+  $("checkPractice").addEventListener("click", () => {
+    const attempt = cleanAnswer($("practiceInput").value);
+    const ok = item.accepted.map(cleanAnswer).includes(attempt);
+    $("practiceFeedback").textContent = ok ? "Correct. Your answer matches this practice problem." : "Not yet. Check signs, exponents, and formatting, then try again.";
+    $("practiceFeedback").className = `practice-feedback ${ok ? "ok" : "no"}`;
+  });
+  $("showPracticeAnswer").addEventListener("click", () => $("practiceSteps").classList.remove("hidden"));
+  $("newPractice").addEventListener("click", () => renderPractice(topic));
+  if (window.MathJax?.typesetPromise) MathJax.typesetPromise([box]);
+}
+
+function signed(n) {
+  return n < 0 ? `${n}` : `+${n}`;
+}
+
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+document.addEventListener("click", (event) => {
+  const problemButton = event.target.closest("[data-problem]");
+  if (problemButton) {
+    renderDetail(Number(problemButton.dataset.problem));
+    return;
+  }
+
+  const topicButton = event.target.closest("[data-topic]");
+  if (topicButton) {
+    state.topic = topicButton.dataset.topic;
+    renderFilters();
+    renderDashboard();
+    return;
+  }
+
+  const viewButton = event.target.closest("[data-view]");
+  if (viewButton) {
+    state.view = viewButton.dataset.view;
+    document.querySelectorAll("[data-view]").forEach(btn => btn.classList.toggle("active", btn === viewButton));
+    renderDashboard();
+    return;
+  }
+
+  if (event.target.id === "showAnswer") {
+    $("answerText").classList.remove("hidden");
+    $("showAnswer").classList.add("hidden");
+    $("showSteps").classList.remove("hidden");
+    if (window.MathJax?.typesetPromise) MathJax.typesetPromise([$("detailPanel")]);
+  }
+
+  if (event.target.id === "showSteps") {
+    $("stepsBox").classList.remove("hidden");
+    $("showSteps").classList.add("hidden");
+  }
+
+  if (event.target.id === "markChecked" && state.selected) {
+    if (!state.checked.includes(state.selected)) state.checked.push(state.selected);
+    saveProgress();
+    renderDashboard();
+  }
+
+  if (event.target.id === "startPractice" && state.selected) {
+    const problem = PROBLEMS.find(p => p.n === state.selected);
+    renderPractice(problem.topic);
+  }
+
+  if (event.target.id === "showPacket") {
+    $("packetBox").classList.toggle("hidden");
+  }
+
+  if (event.target.id === "resetProgress") {
+    state.checked = [];
+    saveProgress();
+    renderDashboard();
+  }
+});
+
+$("searchBox").addEventListener("input", (event) => {
+  state.query = event.target.value;
+  renderDashboard();
+});
+
+renderFilters();
+renderDashboard();
