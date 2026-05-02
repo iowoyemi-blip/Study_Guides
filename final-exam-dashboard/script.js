@@ -200,6 +200,7 @@ const PROBLEMS = Array.from({ length: 160 }, (_, i) => {
   return {
     n,
     topic,
+    practiceType: practiceTypeFor(n),
     answer: record[0],
     steps: record[1],
     page: packetPage(n),
@@ -274,7 +275,7 @@ function renderDetail(n) {
   const pagePath = `packet-pages/page-${String(p.page).padStart(2, "0")}.png`;
   detail.innerHTML = `
     <div class="detail-kicker">
-      <span>Problem ${p.n} · ${TOPICS[p.topic]} · Page ${p.page}</span>
+      <span>Problem ${p.n} · ${TOPICS[p.topic]} · ${PRACTICE_LABELS[p.practiceType]} · Page ${p.page}</span>
       ${p.review ? `<span class="badge review">Teacher check</span>` : `<span class="badge">Generated key</span>`}
     </div>
     <h2>Problem ${p.n}</h2>
@@ -306,26 +307,89 @@ function cleanAnswer(value) {
   return value.toLowerCase().replace(/\s+/g, "").replace(/−/g, "-").replace(/√/g, "sqrt");
 }
 
+function practiceTypeFor(n) {
+  if (n <= 6) return "factorQuadratic";
+  if (n <= 14) return "domainRange";
+  if (n <= 17) return "radicalSimplify";
+  if (n <= 19) return "orderOperations";
+  if (n <= 22) return "verbalExpression";
+  if (n <= 28) return "linearEquation";
+  if (n <= 30) return "literalEquation";
+  if (n <= 39) return "inequality";
+  if (n <= 44) return "wordEquation";
+  if (n <= 52) return "functionEvaluation";
+  if (n <= 57) return "slope";
+  if (n <= 70) return "linearEquationWriting";
+  if (n <= 75) return "linearInequalityGraph";
+  if (n === 76) return "exponentialPercent";
+  if (n <= 78) return "linearModelTable";
+  if (n <= 80) return "systems";
+  if (n <= 87) return "exponentRules";
+  if (n <= 95) return "radicalSimplify";
+  if (n <= 105) return "polynomialOperations";
+  if (n <= 113) return "factorQuadratic";
+  if (n <= 115) return "quadraticFeatures";
+  if (n <= 123) return "quadraticSolving";
+  if (n <= 130) return "quadraticFeatures";
+  if (n <= 133) return "exponentialModel";
+  if (n <= 137) return "functionIdentification";
+  if (n <= 145) return "linearRepresentations";
+  if (n <= 147) return "linearModelTable";
+  if (n <= 150) return "linearInequalityGraph";
+  if (n <= 156) return "systems";
+  if (n === 157) return "linearRepresentations";
+  return "growthModel";
+}
+
+const PRACTICE_LABELS = {
+  factorQuadratic: "factoring quadratics",
+  domainRange: "domain and range",
+  radicalSimplify: "simplifying radicals",
+  orderOperations: "order of operations",
+  verbalExpression: "writing expressions",
+  linearEquation: "solving equations",
+  literalEquation: "literal equations",
+  inequality: "solving inequalities",
+  wordEquation: "writing equations from words",
+  functionEvaluation: "function notation and values",
+  slope: "slope",
+  linearEquationWriting: "writing linear equations",
+  linearInequalityGraph: "linear inequalities",
+  exponentialPercent: "percent growth",
+  linearModelTable: "linear models",
+  systems: "systems",
+  exponentRules: "exponent rules",
+  polynomialOperations: "polynomial operations",
+  quadraticFeatures: "quadratic features",
+  quadraticSolving: "solving quadratics",
+  exponentialModel: "exponential models",
+  functionIdentification: "identifying functions",
+  linearRepresentations: "linear representations",
+  growthModel: "linear vs. exponential growth"
+};
+
 const practice = {
-  factoring() {
-    const a = rand(2, 8), b = rand(-8, -2);
+  factorQuadratic() {
+    const r = rand(2, 8), s = rand(-9, -2);
     return {
-      prompt: `Factor \\(x^2${signed(a + b)}x${signed(a * b)}\\).`,
-      answer: `(x${signed(a)})(x${signed(b)})`,
-      accepted: [`(x${signed(a)})(x${signed(b)})`, `(x${signed(b)})(x${signed(a)})`],
-      steps: [`Find two numbers that multiply to ${a * b} and add to ${a + b}.`, `Those numbers are ${a} and ${b}.`]
+      prompt: `Factor \\(x^2${signed(r + s)}x${signed(r * s)}\\).`,
+      answer: `(x${signed(r)})(x${signed(s)})`,
+      accepted: [`(x${signed(r)})(x${signed(s)})`, `(x${signed(s)})(x${signed(r)})`],
+      steps: [`Find two numbers that multiply to ${r * s} and add to ${r + s}.`, `Those numbers are ${r} and ${s}.`]
     };
   },
   domainRange() {
-    const left = rand(-8, -3), right = rand(2, 8), low = rand(-6, -1), high = rand(2, 9);
+    const left = rand(-6, -1), right = rand(2, 8), low = rand(-5, -1), high = rand(2, 8);
+    const openLeft = Math.random() < 0.5, openRight = Math.random() < 0.5;
+    const dl = openLeft ? "(" : "[", dr = openRight ? ")" : "]";
     return {
-      prompt: `A line segment runs from \\(x=${left}\\) to \\(x=${right}\\), and its y-values run from \\(${low}\\) to \\(${high}\\). Give the domain and range.`,
-      answer: `Domain [${left}, ${right}], range [${low}, ${high}]`,
-      accepted: [`domain[${left},${right}],range[${low},${high}]`, `[${left},${right}],[${low},${high}]`],
-      steps: ["Domain is the x-values covered.", "Range is the y-values covered."]
+      prompt: `A graphed segment covers x-values from ${openLeft ? "just after" : "including"} \\(${left}\\) to ${openRight ? "just before" : "including"} \\(${right}\\). Its y-values run from \\(${low}\\) to \\(${high}\\), both included. Give the domain and range.`,
+      answer: `Domain ${dl}${left}, ${right}${dr}; range [${low}, ${high}]`,
+      accepted: [`domain${dl}${left},${right}${dr};range[${low},${high}]`, `${dl}${left},${right}${dr};[${low},${high}]`, `${dl}${left},${right}${dr},[${low},${high}]`],
+      steps: ["Domain is the x-values covered by the graph.", "Range is the y-values covered by the graph.", "Use brackets for included endpoints and parentheses for open endpoints."]
     };
   },
-  radicals() {
+  radicalSimplify() {
     const outside = rand(2, 7), inside = [2, 3, 5, 6, 7][rand(0, 4)];
     return {
       prompt: `Simplify \\(\\sqrt{${outside * outside * inside}}\\).`,
@@ -334,7 +398,26 @@ const practice = {
       steps: [`Break the radicand into ${outside * outside} times ${inside}.`, `Take \\(\\sqrt{${outside * outside}}=${outside}\\) out of the radical.`]
     };
   },
-  equations() {
+  orderOperations() {
+    const a = rand(2, 8), b = rand(2, 5), c = rand(2, 4), d = rand(1, 9);
+    const ans = a + b * c ** 2 - d;
+    return {
+      prompt: `Evaluate \\(${a}+${b}\\cdot${c}^2-${d}\\).`,
+      answer: `${ans}`,
+      accepted: [`${ans}`],
+      steps: ["Evaluate the exponent first.", "Multiply next.", "Add and subtract from left to right."]
+    };
+  },
+  verbalExpression() {
+    const coeff = rand(2, 8), sub = rand(2, 10);
+    return {
+      prompt: `Write an algebraic expression for: ${sub} less than ${coeff} times the sum of a and b.`,
+      answer: `${coeff}(a+b)-${sub}`,
+      accepted: [`${coeff}(a+b)-${sub}`, `${coeff}*(a+b)-${sub}`],
+      steps: ["The sum of a and b is \\(a+b\\).", `Multiply by ${coeff}.`, `${sub} less than means subtract ${sub}.`]
+    };
+  },
+  linearEquation() {
     const x = rand(-6, 8), a = rand(2, 7), b = rand(-9, 9);
     return {
       prompt: `Solve \\(${a}x${signed(b)}=${a * x + b}\\).`,
@@ -343,7 +426,35 @@ const practice = {
       steps: [`Subtract ${b} from both sides.`, `Divide by ${a}.`]
     };
   },
-  functions() {
+  literalEquation() {
+    const a = rand(2, 6), b = rand(2, 6);
+    return {
+      prompt: `Solve for x: \\(${a}x+${b}y=z\\).`,
+      answer: `(z-${b}y)/${a}`,
+      accepted: [`(z-${b}y)/${a}`, `x=(z-${b}y)/${a}`, `(z-${b}*y)/${a}`],
+      steps: [`Subtract \\(${b}y\\) from both sides.`, `Divide every term by ${a}.`]
+    };
+  },
+  inequality() {
+    const boundary = rand(-4, 8), a = -rand(2, 6), b = rand(-8, 8);
+    const c = a * boundary + b;
+    return {
+      prompt: `Solve \\(${a}x${signed(b)}<${c}\\).`,
+      answer: `x>${boundary}`,
+      accepted: [`x>${boundary}`, `${boundary}<x`],
+      steps: [`Subtract ${b} from both sides.`, `Divide by ${a}; because it is negative, reverse the inequality sign.`]
+    };
+  },
+  wordEquation() {
+    const start = rand(10, 30), rate = rand(2, 8), hours = rand(3, 9);
+    return {
+      prompt: `A rental costs $${start} plus $${rate} per hour. Write the cost equation and find the cost for ${hours} hours.`,
+      answer: `C=${rate}h+${start}; ${rate * hours + start}`,
+      accepted: [`c=${rate}h+${start};${rate * hours + start}`, `${rate}h+${start};${rate * hours + start}`, `${rate * hours + start}`],
+      steps: ["The fixed cost is the y-intercept or starting value.", "The hourly cost is the rate.", `Substitute h=${hours}.`]
+    };
+  },
+  functionEvaluation() {
     const m = rand(-4, 4) || 2, b = rand(-6, 6), x = rand(-5, 5);
     return {
       prompt: `If \\(f(x)=${m}x${signed(b)}\\), find \\(f(${x})\\).`,
@@ -352,13 +463,52 @@ const practice = {
       steps: [`Substitute ${x} for x.`, `Compute ${m}(${x})${signed(b)}.`]
     };
   },
-  linear() {
-    const m = rand(-5, 5) || 3, b = rand(-6, 6);
+  slope() {
+    const x1 = rand(-5, 1), y1 = rand(-4, 4), dx = rand(2, 6), dy = rand(-6, 6) || 3;
+    const x2 = x1 + dx, y2 = y1 + dy;
+    return {
+      prompt: `Find the slope through \\((${-0 + x1},${y1})\\) and \\(${`(${x2},${y2})`}\\).`,
+      answer: `${dy}/${dx}`,
+      accepted: [`${dy}/${dx}`, `${dy / dx}`],
+      steps: ["Use rise over run: \\(m=\\frac{y_2-y_1}{x_2-x_1}\\).", `The rise is ${dy} and the run is ${dx}.`]
+    };
+  },
+  linearEquationWriting() {
+    const m = rand(-4, 4) || 2, b = rand(-6, 6);
     return {
       prompt: `Write the slope and y-intercept for \\(y=${m}x${signed(b)}\\).`,
       answer: `slope ${m}, y-intercept ${b}`,
       accepted: [`slope${m},y-intercept${b}`, `m=${m},b=${b}`, `${m},${b}`],
       steps: ["Use slope-intercept form \\(y=mx+b\\).", "\\(m\\) is the slope and \\(b\\) is the y-intercept."]
+    };
+  },
+  linearInequalityGraph() {
+    const m = rand(-3, 3) || 2, b = rand(-5, 5), above = Math.random() < 0.5;
+    const sign = above ? ">" : "<";
+    return {
+      prompt: `For \\(y${sign}${m}x${signed(b)}\\), should the graph be shaded above or below the boundary line?`,
+      answer: above ? "above" : "below",
+      accepted: [above ? "above" : "below"],
+      steps: ["Graph the boundary line first.", "Use > or >= to shade above; use < or <= to shade below."]
+    };
+  },
+  exponentialPercent() {
+    const start = rand(4, 12), pct = [5, 8, 10, 20][rand(0, 3)], years = rand(3, 7);
+    const ans = (start * (1 + pct / 100) ** years).toFixed(2);
+    return {
+      prompt: `A value starts at ${start} and increases ${pct}% each year. What is it after ${years} years?`,
+      answer: `${ans}`,
+      accepted: [`${ans}`],
+      steps: [`Use ${start}(1.${String(pct).padStart(2, "0")})^${years}.`, "Round as directed by the problem."]
+    };
+  },
+  linearModelTable() {
+    const b = rand(20, 100), m = rand(-12, 12) || 5, x = rand(3, 8);
+    return {
+      prompt: `A table has starting value ${b} and changes by ${m} each time x increases by 1. Write a model and find y when x=${x}.`,
+      answer: `y=${m}x+${b}; ${m * x + b}`,
+      accepted: [`y=${m}x+${b};${m * x + b}`, `${m}x+${b};${m * x + b}`, `${m * x + b}`],
+      steps: ["The constant change is the slope.", "The starting value is the y-intercept.", `Substitute x=${x}.`]
     };
   },
   systems() {
@@ -370,7 +520,16 @@ const practice = {
       steps: ["Add the equations to eliminate y.", "Solve for x, then substitute back to find y."]
     };
   },
-  polynomials() {
+  exponentRules() {
+    const a = rand(2, 5), b = rand(2, 5), c = rand(2, 4);
+    return {
+      prompt: `Simplify \\((x^${a}y^${b})^${c}\\).`,
+      answer: `x^${a * c}y^${b * c}`,
+      accepted: [`x^${a * c}y^${b * c}`, `x${a * c}y${b * c}`],
+      steps: ["Power to a power means multiply exponents.", "Apply the outside exponent to every factor inside parentheses."]
+    };
+  },
+  polynomialOperations() {
     const a = rand(2, 6), b = rand(-8, 8);
     return {
       prompt: `Expand \\((x${signed(a)})(x${signed(b)})\\).`,
@@ -379,7 +538,7 @@ const practice = {
       steps: ["Use FOIL.", "Combine the middle terms."]
     };
   },
-  quadratics() {
+  quadraticFeatures() {
     const h = rand(-5, 5), k = rand(-6, 6);
     return {
       prompt: `Find the vertex of \\(y=(x${signed(-h)})^2${signed(k)}\\).`,
@@ -388,23 +547,57 @@ const practice = {
       steps: ["Vertex form is \\(y=(x-h)^2+k\\).", "The vertex is \\((h,k)\\)."]
     };
   },
-  exponential() {
-    const start = rand(2, 9), t = rand(2, 5);
+  quadraticSolving() {
+    const r = rand(2, 8), s = rand(-8, -2);
     return {
-      prompt: `A quantity starts at ${start} and doubles each hour. What is the amount after ${t} hours?`,
-      answer: `${start * 2 ** t}`,
-      accepted: [`${start * 2 ** t}`],
-      steps: [`Use ${start}(2^${t}).`, `Evaluate the power first, then multiply.`]
+      prompt: `Solve \\(x^2${signed(-(r + s))}x${signed(r * s)}=0\\).`,
+      answer: `x=${r} or x=${s}`,
+      accepted: [`x=${r}orx=${s}`, `x=${s}orx=${r}`, `${r},${s}`, `${s},${r}`],
+      steps: ["Factor the quadratic.", "Set each factor equal to zero."]
+    };
+  },
+  exponentialModel() {
+    const start = rand(2, 9), base = rand(2, 4), t = rand(2, 5);
+    return {
+      prompt: `A population follows \\(y=${start}(${base})^t\\). Find y when t=${t}.`,
+      answer: `${start * base ** t}`,
+      accepted: [`${start * base ** t}`],
+      steps: ["Evaluate the exponent first.", "Multiply by the starting value."]
+    };
+  },
+  functionIdentification() {
+    return {
+      prompt: "A relation contains (2, 5), (2, 7), and (4, 9). Is it a function?",
+      answer: "no",
+      accepted: ["no", "notafunction"],
+      steps: ["A function cannot assign one input to two different outputs.", "The input 2 appears twice with different outputs."]
+    };
+  },
+  linearRepresentations() {
+    const m = rand(-5, 5) || -2, b = rand(-6, 6), x = rand(-4, 5);
+    return {
+      prompt: `Does the point \\(${`(${x},${m * x + b})`}\\) lie on \\(y=${m}x${signed(b)}\\)?`,
+      answer: "yes",
+      accepted: ["yes", "y"],
+      steps: ["Substitute the x-value into the equation.", "If the result equals the y-value, the point is on the line."]
+    };
+  },
+  growthModel() {
+    return {
+      prompt: "A savings account increases by $5 each week. Is this linear or exponential growth?",
+      answer: "linear",
+      accepted: ["linear"],
+      steps: ["Adding the same amount each time is linear.", "Multiplying by the same factor or percent each time is exponential."]
     };
   }
 };
-
-function renderPractice(topic) {
-  const item = practice[topic]();
+function renderPractice(problem) {
+  const generator = practice[problem.practiceType] || practice[problem.topic] || practice.functionEvaluation;
+  const item = generator();
   const box = $("practiceBox");
   box.classList.remove("hidden");
   box.innerHTML = `
-    <h3>Similar Practice</h3>
+    <h3>Similar Practice: ${PRACTICE_LABELS[problem.practiceType] || TOPICS[problem.topic]}</h3>
     <p class="practice-prompt">${item.prompt}</p>
     <div class="answer-line">
       <input id="practiceInput" placeholder="Type your answer">
@@ -427,7 +620,7 @@ function renderPractice(topic) {
     $("practiceFeedback").className = `practice-feedback ${ok ? "ok" : "no"}`;
   });
   $("showPracticeAnswer").addEventListener("click", () => $("practiceSteps").classList.remove("hidden"));
-  $("newPractice").addEventListener("click", () => renderPractice(topic));
+  $("newPractice").addEventListener("click", () => renderPractice(problem));
   if (window.MathJax?.typesetPromise) MathJax.typesetPromise([box]);
 }
 
@@ -482,7 +675,7 @@ document.addEventListener("click", (event) => {
 
   if (event.target.id === "startPractice" && state.selected) {
     const problem = PROBLEMS.find(p => p.n === state.selected);
-    renderPractice(problem.topic);
+    renderPractice(problem);
   }
 
   if (event.target.id === "showPacket") {
