@@ -396,6 +396,14 @@ function practiceTypeFor(n) {
   if (n === 145) return "graphSlantLine";
   if (n <= 137) return "functionIdentification";
   if (n <= 145) return "linearRepresentations";
+  if (n === 147) return "equationPairsGivenPoint";
+  if (n === 148) return "pointSatisfiesInequalityChoice";
+  if (n === 149 || n === 150) return "inequalityGraphChoice";
+  if (n === 151 || n === 152) return "systemsWordProblemChoice";
+  if (n >= 153 && n <= 156) return "systemInequalityGraphChoice";
+  if (n === 158) return "linearGrowthContextChoice";
+  if (n === 159) return "exponentialGrowthContextChoice";
+  if (n === 160) return "growthEquationFromTableChoice";
   if (n <= 147) return "linearModelTable";
   if (n <= 150) return "linearInequalityGraph";
   if (n <= 156) return "systems";
@@ -487,6 +495,14 @@ const PRACTICE_LABELS = {
   graphHorizontalLine: "horizontal lines",
   graphVerticalLine: "vertical lines",
   graphSlantLine: "slant lines",
+  equationPairsGivenPoint: "systems satisfied by a point",
+  pointSatisfiesInequalityChoice: "points satisfying inequalities",
+  inequalityGraphChoice: "matching inequality graphs",
+  systemsWordProblemChoice: "systems from word problems",
+  systemInequalityGraphChoice: "systems of inequalities graphs",
+  linearGrowthContextChoice: "linear growth contexts",
+  exponentialGrowthContextChoice: "exponential growth contexts",
+  growthEquationFromTableChoice: "equations from growth tables",
   functionIdentification: "identifying functions",
   linearRepresentations: "linear representations",
   growthModel: "linear vs. exponential growth"
@@ -1479,6 +1495,147 @@ const practice = {
       steps: ["Start at the y-intercept.", "Use the slope as rise over run to locate another point.", "Draw a straight line through the points."]
     };
   },
+  equationPairsGivenPoint() {
+    const x = rand(-3, 4), y = rand(-4, 5);
+    const m1 = rand(-3, 3) || 2, m2 = rand(-3, 3) || -1;
+    const b1 = y - m1 * x, b2 = y - m2 * x;
+    const correct = [`y=${m1}x${signed(b1)}`, `y=${m2}x${signed(b2)}`];
+    const choices = shuffleChoices([
+      { label: "", lines: correct, correct: true },
+      { label: "", lines: [`y=${m1}x${signed(b1 + 2)}`, correct[1]], correct: false },
+      { label: "", lines: [correct[0], `y=${m2}x${signed(b2 - 3)}`], correct: false },
+      { label: "", lines: [`y=${m1 + 1}x${signed(b1)}`, `y=${m2 - 1}x${signed(b2)}`], correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: `Which system of equations is satisfied by the point \\((${x},${y})\\)?`,
+      visual: choiceListHtml(choices.map(choice => ({ label: choice.label, text: `\\(${choice.lines[0]}\\) and \\(${choice.lines[1]}\\)` }))),
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Substitute the point into both equations in each choice.", "Both equations in the correct system must be true.", "Eliminate any choice where either equation is false."]
+    };
+  },
+  pointSatisfiesInequalityChoice() {
+    const m = [-2, -1, 1, 2][rand(0, 3)], b = rand(-3, 4);
+    const correctPoint = [rand(-3, 4), 0];
+    correctPoint[1] = m * correctPoint[0] + b + rand(1, 4);
+    const choices = shuffleChoices([
+      { label: "", point: correctPoint, correct: true },
+      { label: "", point: [correctPoint[0], m * correctPoint[0] + b], correct: false },
+      { label: "", point: [rand(-4, 4), m * rand(-4, 4) + b - 2], correct: false },
+      { label: "", point: [rand(-4, 4), m * rand(-4, 4) + b - 5], correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: `Which ordered pair satisfies \\(y>${m}x${signed(b)}\\)?`,
+      visual: choiceListHtml(choices.map(choice => ({ label: choice.label, text: `\\((${choice.point[0]},${choice.point[1]})\\)` }))),
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Substitute each ordered pair into the inequality.", "Compare the y-value to the expression on the right.", "The point works only when the inequality statement is true."]
+    };
+  },
+  inequalityGraphChoice() {
+    const m = [-2, -1, 1, 2][rand(0, 3)], b = rand(-3, 3), above = Math.random() < 0.5, inclusive = Math.random() < 0.5;
+    const sign = above ? (inclusive ? "\\ge" : ">") : (inclusive ? "\\le" : "\\lt");
+    const choices = shuffleChoices([
+      { label: "", m, b, dashed: !inclusive, shade: above ? "above" : "below", correct: true },
+      { label: "", m, b, dashed: inclusive, shade: above ? "above" : "below", correct: false },
+      { label: "", m, b, dashed: !inclusive, shade: above ? "below" : "above", correct: false },
+      { label: "", m: -m, b, dashed: !inclusive, shade: above ? "above" : "below", correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: `Which graph represents \\(y${sign}${m}x${signed(b)}\\)?`,
+      visual: `<div class="choice-grid graph-choice-grid">${choices.map(choice => graphChoiceHtml(choice.label, graphSvg({ m: choice.m, b: choice.b, dashed: choice.dashed, shade: choice.shade }))).join("")}</div>`,
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Match the boundary line first.", "Use dashed for < or > and solid for ≤ or ≥.", "Use the inequality sign to decide whether the shading should be above or below."]
+    };
+  },
+  systemsWordProblemChoice() {
+    const total = rand(20, 44), diff = rand(4, 12);
+    const choices = shuffleChoices([
+      { label: "", text: `\\(x+y=${total}\\) and \\(x-y=${diff}\\)`, correct: true },
+      { label: "", text: `\\(x+y=${diff}\\) and \\(x-y=${total}\\)`, correct: false },
+      { label: "", text: `\\(2x+2y=${total}\\) and \\(x-y=${diff}\\)`, correct: false },
+      { label: "", text: `\\(x+y=${total}\\) and \\(y-x=${diff}\\)`, correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: `Two numbers have a sum of ${total}. The first number is ${diff} more than the second number. Which system matches the situation?`,
+      visual: choiceListHtml(choices.map(choice => ({ label: choice.label, text: choice.text }))),
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Let x be the first number and y be the second number.", "A sum translates to x + y.", "First is more than second translates to x - y."]
+    };
+  },
+  systemInequalityGraphChoice() {
+    const choices = shuffleChoices([
+      { label: "", variant: "correct", correct: true },
+      { label: "", variant: "wrongShade", correct: false },
+      { label: "", variant: "wrongVertical", correct: false },
+      { label: "", variant: "wrongLine", correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: "Which graph represents the system \\(y\\lt x+2\\) and \\(x\\ge-2\\)?",
+      visual: `<div class="choice-grid graph-choice-grid">${choices.map(choice => graphChoiceHtml(choice.label, systemInequalitySvg(choice.variant))).join("")}</div>`,
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Graph each boundary line.", "Use dashed for the strict inequality and solid for the inclusive inequality.", "Choose the graph where the overlap is below the slant line and to the right of the vertical line."]
+    };
+  },
+  linearGrowthContextChoice() {
+    const choices = shuffleChoices([
+      { label: "", text: "A savings account increases by $15 each week.", correct: true },
+      { label: "", text: "A population doubles every hour.", correct: false },
+      { label: "", text: "A car loses 12% of its value each year.", correct: false },
+      { label: "", text: "A bacteria culture triples every day.", correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: "Which situation is an example of linear growth?",
+      visual: choiceListHtml(choices),
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Linear growth adds the same amount each time.", "Exponential growth multiplies by the same factor or percent.", "Choose the situation with repeated addition."]
+    };
+  },
+  exponentialGrowthContextChoice() {
+    const choices = shuffleChoices([
+      { label: "", text: "A population doubles every hour.", correct: true },
+      { label: "", text: "A runner adds 2 miles to training each week.", correct: false },
+      { label: "", text: "A tank fills by 4 gallons each minute.", correct: false },
+      { label: "", text: "A worker earns $18 for each hour worked.", correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: "Which situation is an example of exponential growth?",
+      visual: choiceListHtml(choices),
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Exponential growth multiplies by the same factor each time.", "Linear growth adds the same amount each time.", "Choose the situation with repeated multiplication."]
+    };
+  },
+  growthEquationFromTableChoice() {
+    const a = rand(2, 6), b = [2, 3][rand(0, 1)];
+    const xs = [0, 1, 2, 3];
+    const ys = xs.map(x => a * b ** x);
+    const choices = shuffleChoices([
+      { label: "", text: `\\(y=${a}(${b})^x\\)`, correct: true },
+      { label: "", text: `\\(y=${a}x+${b}\\)`, correct: false },
+      { label: "", text: `\\(y=${b}(${a})^x\\)`, correct: false },
+      { label: "", text: `\\(y=${a + b}x\\)`, correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: `Which equation matches the table? x: ${xs.join(", ")}; y: ${ys.join(", ")}.`,
+      visual: choiceListHtml(choices),
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Use the y-value at x = 0 as the starting value.", "Find the common multiplier between y-values.", "Choose the equation with that starting value and multiplier."]
+    };
+  },
   functionIdentification() {
     return {
       prompt: "A relation contains (2, 5), (2, 7), and (4, 9). Is it a function?",
@@ -1539,6 +1696,21 @@ function relationGraphChoiceHtml(label, points) {
   `;
 }
 
+function choiceListHtml(choices) {
+  return `<div class="choice-list">${choices.map(choice => `
+    <div class="choice-option"><strong>${choice.label})</strong><span>${choice.text}</span></div>
+  `).join("")}</div>`;
+}
+
+function graphChoiceHtml(label, svg) {
+  return `
+    <div class="choice-card graph-card">
+      <strong>${label})</strong>
+      ${svg}
+    </div>
+  `;
+}
+
 function relationGraphSvg(points) {
   const size = 150;
   const pad = 18;
@@ -1556,6 +1728,38 @@ function relationGraphSvg(points) {
       <line x1="${pad}" y1="${yToPx(0)}" x2="${size - pad}" y2="${yToPx(0)}" class="axis-line"></line>
       <line x1="${xToPx(0)}" y1="${pad}" x2="${xToPx(0)}" y2="${size - pad}" class="axis-line"></line>
       ${points.map(([x, y]) => `<circle cx="${xToPx(x)}" cy="${yToPx(y)}" r="4.5" class="relation-point"></circle>`).join("")}
+    </svg>
+  `;
+}
+
+function systemInequalitySvg(variant) {
+  const size = 240;
+  const pad = 22;
+  const scale = (size - pad * 2) / 12;
+  const xToPx = (x) => pad + (x + 6) * scale;
+  const yToPx = (y) => pad + (6 - y) * scale;
+  const grid = Array.from({ length: 13 }, (_, i) => i - 6).map(v => `
+    <line x1="${xToPx(v)}" y1="${pad}" x2="${xToPx(v)}" y2="${size - pad}" class="grid-line"></line>
+    <line x1="${pad}" y1="${yToPx(v)}" x2="${size - pad}" y2="${yToPx(v)}" class="grid-line"></line>
+  `).join("");
+  const verticalX = variant === "wrongVertical" ? 2 : -2;
+  const lineM = variant === "wrongLine" ? -1 : 1;
+  const lineB = 2;
+  const shadeBelow = variant !== "wrongShade";
+  const x1 = -6, x2 = 6, y1 = lineM * x1 + lineB, y2 = lineM * x2 + lineB;
+  const lineShade = shadeBelow
+    ? `<polygon points="${xToPx(x1)},${yToPx(y1)} ${xToPx(x2)},${yToPx(y2)} ${xToPx(6)},${yToPx(-6)} ${xToPx(-6)},${yToPx(-6)}" class="shade-region"></polygon>`
+    : `<polygon points="${xToPx(x1)},${yToPx(y1)} ${xToPx(x2)},${yToPx(y2)} ${xToPx(6)},${yToPx(6)} ${xToPx(-6)},${yToPx(6)}" class="shade-region"></polygon>`;
+  const verticalShade = `<rect x="${xToPx(verticalX)}" y="${pad}" width="${size - pad - xToPx(verticalX)}" height="${size - pad * 2}" class="shade-region shade-second"></rect>`;
+  return `
+    <svg class="practice-graph" viewBox="0 0 ${size} ${size}" role="img" aria-label="System of inequalities graph">
+      <rect x="${pad}" y="${pad}" width="${size - pad * 2}" height="${size - pad * 2}" class="graph-bg"></rect>
+      ${grid}
+      <line x1="${pad}" y1="${yToPx(0)}" x2="${size - pad}" y2="${yToPx(0)}" class="axis-line"></line>
+      <line x1="${xToPx(0)}" y1="${pad}" x2="${xToPx(0)}" y2="${size - pad}" class="axis-line"></line>
+      <g>${lineShade}${verticalShade}</g>
+      <line x1="${xToPx(x1)}" y1="${yToPx(y1)}" x2="${xToPx(x2)}" y2="${yToPx(y2)}" class="boundary-line" stroke-dasharray="7 5"></line>
+      <line x1="${xToPx(verticalX)}" y1="${pad}" x2="${xToPx(verticalX)}" y2="${size - pad}" class="boundary-line"></line>
     </svg>
   `;
 }

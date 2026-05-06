@@ -379,6 +379,10 @@ h1 {
   fill: rgba(35, 87, 164, 0.18);
 }
 
+.shade-second {
+  fill: rgba(31, 122, 77, 0.16);
+}
+
 .axis-label {
   fill: #647184;
   font-size: 12px;
@@ -398,6 +402,37 @@ h1 {
   align-items: start;
   gap: 8px;
   min-width: 0;
+}
+
+.graph-card {
+  display: block;
+}
+
+.graph-card strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.graph-card .practice-graph {
+  width: min(100%, 160px);
+  margin: 0;
+}
+
+.choice-list {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 12px;
+}
+
+.choice-option {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
 }
 
 .mini-table {
