@@ -388,6 +388,12 @@ function practiceTypeFor(n) {
   if (n === 131) return "exponentialFromTable";
   if (n === 133) return "depreciationValue";
   if (n <= 133) return "exponentialModel";
+  if (n === 134 || n === 135 || n === 137) return "functionChoiceTablesGraphs";
+  if (n === 140 || n === 141) return "tableMatchesEquation";
+  if (n === 142) return "linearTableCheck";
+  if (n === 143) return "graphHorizontalLine";
+  if (n === 144) return "graphVerticalLine";
+  if (n === 145) return "graphSlantLine";
   if (n <= 137) return "functionIdentification";
   if (n <= 145) return "linearRepresentations";
   if (n <= 147) return "linearModelTable";
@@ -475,6 +481,12 @@ const PRACTICE_LABELS = {
   exponentialFromTable: "exponential equations from tables",
   depreciationValue: "percent depreciation",
   exponentialModel: "exponential models",
+  functionChoiceTablesGraphs: "identifying functions from choices",
+  tableMatchesEquation: "matching tables to equations",
+  linearTableCheck: "linear relationships from tables",
+  graphHorizontalLine: "horizontal lines",
+  graphVerticalLine: "vertical lines",
+  graphSlantLine: "slant lines",
   functionIdentification: "identifying functions",
   linearRepresentations: "linear representations",
   growthModel: "linear vs. exponential growth"
@@ -1367,6 +1379,106 @@ const practice = {
       steps: [`Depreciating by ${rate}% means the car keeps ${100 - rate}% each year.`, `Use \\(${start}(1-${rate / 100})^${years}\\).`, "Round the result to the nearest dollar."]
     };
   },
+  functionChoiceTablesGraphs() {
+    return Math.random() < 0.5 ? practice.functionChoiceTables() : practice.functionChoiceGraphs();
+  },
+  functionChoiceTables() {
+    const correct = { label: "", xs: [1, 2, 3, 4], ys: [3, 5, 7, 9], isFunction: true };
+    const choices = shuffleChoices([
+      correct,
+      { label: "", xs: [0, 1, 0, 2], ys: [4, 5, 6, 7], isFunction: false },
+      { label: "", xs: [-2, -1, -2, 0], ys: [1, 3, 5, 7], isFunction: false },
+      { label: "", xs: [3, 4, 3, 5], ys: [2, 2, 9, 6], isFunction: false }
+    ]);
+    const answer = choices.find(choice => choice.isFunction).label;
+    return {
+      prompt: "Which table represents a function?",
+      visual: `<div class="choice-grid">${choices.map(choice => tableChoiceHtml(choice.label, choice.xs, choice.ys)).join("")}</div>`,
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["A relation is a function when each input has only one output.", "Check the x-row in each table.", "The correct table has no repeated x-value with a different output."]
+    };
+  },
+  functionChoiceGraphs() {
+    const choices = shuffleChoices([
+      { label: "", points: [[-3, -1], [-1, 0], [1, 2], [3, 4]], isFunction: true },
+      { label: "", points: [[-2, -3], [-2, 0], [1, 2], [3, 3]], isFunction: false },
+      { label: "", points: [[0, -2], [0, 1], [2, -1], [4, 2]], isFunction: false },
+      { label: "", points: [[-4, 1], [-1, 2], [-1, -2], [2, 3]], isFunction: false }
+    ]);
+    const answer = choices.find(choice => choice.isFunction).label;
+    return {
+      prompt: "Which graphed relation represents a function?",
+      visual: `<div class="choice-grid">${choices.map(choice => relationGraphChoiceHtml(choice.label, choice.points)).join("")}</div>`,
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Use the vertical line test.", "A graph is a function when no vertical line touches more than one point.", "The correct graph has no repeated x-value."]
+    };
+  },
+  tableMatchesEquation() {
+    const m = [-3, -2, 2, 3][rand(0, 3)], b = rand(-4, 8), xs = [0, 2, 4, 6];
+    const correctYs = xs.map(x => m * x + b);
+    const choices = shuffleChoices([
+      { label: "", xs, ys: correctYs, correct: true },
+      { label: "", xs, ys: xs.map(x => -m * x + b), correct: false },
+      { label: "", xs, ys: xs.map(x => m * x + b + 2), correct: false },
+      { label: "", xs, ys: xs.map(x => (m + 1) * x + b), correct: false }
+    ]);
+    const answer = choices.find(choice => choice.correct).label;
+    return {
+      prompt: `Which table could represent the function \\(f(x)=${m}x${signed(b)}\\)?`,
+      visual: `<div class="choice-grid">${choices.map(choice => tableChoiceHtml(choice.label, choice.xs, choice.ys)).join("")}</div>`,
+      answer,
+      accepted: [answer.toLowerCase(), answer],
+      steps: ["Substitute each x-value into the equation.", "Compare the computed outputs to each table.", "The correct table matches every ordered pair."]
+    };
+  },
+  linearTableCheck() {
+    const isLinear = Math.random() < 0.5;
+    const xs = [0, 1, 2, 3, 4];
+    const start = rand(-4, 6), rate = rand(-4, 5) || 2;
+    const ys = isLinear ? xs.map(x => start + rate * x) : [start, start + rate, start + rate + 2, start + rate + 6, start + rate + 11];
+    return {
+      prompt: `Does the table represent a linear relationship? x: ${xs.join(", ")}; y: ${ys.join(", ")}. Answer yes or no.`,
+      answer: isLinear ? "yes" : "no",
+      accepted: isLinear ? ["yes", "y"] : ["no", "n"],
+      steps: ["Check whether the x-values change by a constant amount.", "Compare the changes in y-values.", "A linear relationship has a constant rate of change."]
+    };
+  },
+  graphHorizontalLine() {
+    const y = rand(-5, 5);
+    return {
+      prompt: `Graph the line \\(y=${y}\\).`,
+      visual: graphSvg({ horizontal: y }),
+      answer: `horizontal line through y=${y}`,
+      displayAnswer: `Horizontal line through \\(y=${y}\\)`,
+      accepted: [`y=${y}`, `${y}`, `horizontal`],
+      steps: ["Every point on the line has the same y-value.", "Draw a horizontal line through that y-value.", "The line crosses the y-axis at the given constant."]
+    };
+  },
+  graphVerticalLine() {
+    const x = rand(-5, 5);
+    return {
+      prompt: `Graph the line \\(x=${x}\\).`,
+      visual: graphSvg({ vertical: x }),
+      answer: `vertical line through x=${x}`,
+      displayAnswer: `Vertical line through \\(x=${x}\\)`,
+      accepted: [`x=${x}`, `${x}`, `vertical`],
+      steps: ["Every point on the line has the same x-value.", "Draw a vertical line through that x-value.", "The line crosses the x-axis at the given constant."]
+    };
+  },
+  graphSlantLine() {
+    const m = [-2, -1, 1, 2][rand(0, 3)], b = rand(-4, 4);
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: `Graph the line \\(${equation}\\).`,
+      visual: graphSvg({ m, b }),
+      answer: equation,
+      displayAnswer: `\\(${equation}\\)`,
+      accepted: [equation],
+      steps: ["Start at the y-intercept.", "Use the slope as rise over run to locate another point.", "Draw a straight line through the points."]
+    };
+  },
   functionIdentification() {
     return {
       prompt: "A relation contains (2, 5), (2, 7), and (4, 9). Is it a function?",
@@ -1398,6 +1510,54 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+function shuffleChoices(choices) {
+  const letters = ["A", "B", "C", "D"];
+  const shuffled = [...choices].sort(() => Math.random() - 0.5);
+  return shuffled.map((choice, index) => ({ ...choice, label: letters[index] }));
+}
+
+function tableChoiceHtml(label, xs, ys) {
+  return `
+    <div class="choice-card">
+      <strong>${label})</strong>
+      <table class="mini-table">
+        <tr><th>x</th>${xs.map(x => `<td>${x}</td>`).join("")}</tr>
+        <tr><th>f(x)</th>${ys.map(y => `<td>${y}</td>`).join("")}</tr>
+      </table>
+    </div>
+  `;
+}
+
+function relationGraphChoiceHtml(label, points) {
+  return `
+    <div class="choice-card">
+      <strong>${label})</strong>
+      ${relationGraphSvg(points)}
+    </div>
+  `;
+}
+
+function relationGraphSvg(points) {
+  const size = 150;
+  const pad = 18;
+  const scale = (size - pad * 2) / 10;
+  const xToPx = (x) => pad + (x + 5) * scale;
+  const yToPx = (y) => pad + (5 - y) * scale;
+  const grid = Array.from({ length: 11 }, (_, i) => i - 5).map(v => `
+    <line x1="${xToPx(v)}" y1="${pad}" x2="${xToPx(v)}" y2="${size - pad}" class="grid-line"></line>
+    <line x1="${pad}" y1="${yToPx(v)}" x2="${size - pad}" y2="${yToPx(v)}" class="grid-line"></line>
+  `).join("");
+  return `
+    <svg class="choice-graph" viewBox="0 0 ${size} ${size}" role="img" aria-label="Relation graph">
+      <rect x="${pad}" y="${pad}" width="${size - pad * 2}" height="${size - pad * 2}" class="graph-bg"></rect>
+      ${grid}
+      <line x1="${pad}" y1="${yToPx(0)}" x2="${size - pad}" y2="${yToPx(0)}" class="axis-line"></line>
+      <line x1="${xToPx(0)}" y1="${pad}" x2="${xToPx(0)}" y2="${size - pad}" class="axis-line"></line>
+      ${points.map(([x, y]) => `<circle cx="${xToPx(x)}" cy="${yToPx(y)}" r="4.5" class="relation-point"></circle>`).join("")}
+    </svg>
+  `;
 }
 
 function graphSvg({ m = null, b = 0, vertical = null, horizontal = null, dashed = false, shade = null }) {
