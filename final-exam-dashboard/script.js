@@ -308,17 +308,30 @@ function cleanAnswer(value) {
 }
 
 function practiceTypeFor(n) {
-  if (n <= 6) return "factorQuadratic";
+  if (n === 1 || n === 6) return "factorQuadratic";
+  if (n >= 2 && n <= 5) return "factorQuadraticA";
   if (n <= 14) return "domainRange";
+  if (n === 16 || n === 17) return "radicalVariables";
   if (n <= 17) return "radicalSimplify";
   if (n <= 19) return "orderOperations";
   if (n <= 22) return "verbalExpression";
-  if (n <= 28) return "linearEquation";
+  if (n <= 28) return "distributiveBothSidesEquation";
   if (n <= 30) return "literalEquation";
-  if (n <= 39) return "inequality";
+  if (n === 32) return "fractionalBothSidesInequality";
+  if (n >= 33 && n <= 35) return "distributiveBothSidesInequality";
+  if (n === 36) return "compoundBetweenInequality";
+  if (n === 37) return "compoundOrInequality";
+  if (n === 38 || n === 39) return "fractionalCoefficientInequality";
   if (n <= 44) return "wordEquation";
+  if (n === 45) return "dataTableRange";
+  if (n === 46) return "dataTableDomain";
+  if (n === 47 || n === 49) return "tableFunctionValues";
+  if (n === 48) return "graphFindYValue";
+  if (n === 51) return "graphFindXValue";
   if (n <= 52) return "functionEvaluation";
   if (n <= 57) return "slope";
+  if (n === 60) return "perpendicularLineThroughPoint";
+  if (n === 61) return "parallelLineThroughPoint";
   if (n <= 70) return "linearEquationWriting";
   if (n <= 75) return "linearInequalityGraph";
   if (n === 76) return "exponentialPercent";
@@ -343,16 +356,29 @@ function practiceTypeFor(n) {
 
 const PRACTICE_LABELS = {
   factorQuadratic: "factoring quadratics",
+  factorQuadraticA: "factoring trinomials with a leading coefficient",
   domainRange: "domain and range",
   radicalSimplify: "simplifying radicals",
+  radicalVariables: "simplifying radicals with variables",
   orderOperations: "order of operations",
   verbalExpression: "writing expressions",
-  linearEquation: "solving equations",
+  distributiveBothSidesEquation: "equations with distribution on both sides",
   literalEquation: "literal equations",
-  inequality: "solving inequalities",
+  fractionalBothSidesInequality: "fractional-coefficient inequalities",
+  distributiveBothSidesInequality: "inequalities with distribution on both sides",
+  compoundBetweenInequality: "compound inequalities",
+  compoundOrInequality: "compound OR inequalities",
+  fractionalCoefficientInequality: "fractional-coefficient inequalities",
   wordEquation: "writing equations from words",
+  dataTableRange: "range from data tables",
+  dataTableDomain: "domain from data tables",
+  tableFunctionValues: "function values from tables",
+  graphFindYValue: "function values from graphs",
+  graphFindXValue: "finding inputs from graph outputs",
   functionEvaluation: "function notation and values",
   slope: "slope",
+  perpendicularLineThroughPoint: "perpendicular lines through a point",
+  parallelLineThroughPoint: "parallel lines through a point",
   linearEquationWriting: "writing linear equations",
   linearInequalityGraph: "linear inequalities",
   exponentialPercent: "percent growth",
@@ -378,6 +404,18 @@ const practice = {
       steps: [`Find two numbers that multiply to ${r * s} and add to ${r + s}.`, `Those numbers are ${r} and ${s}.`]
     };
   },
+  factorQuadraticA() {
+    const m = rand(2, 5), n = rand(2, 5), p = rand(-6, -2), q = rand(1, 6);
+    const a = m * n;
+    const b = m * q + n * p;
+    const c = p * q;
+    return {
+      prompt: `Factor \\(${a}x^2${signed(b)}x${signed(c)}\\).`,
+      answer: `(${m}x${signed(p)})(${n}x${signed(q)})`,
+      accepted: [`(${m}x${signed(p)})(${n}x${signed(q)})`, `(${n}x${signed(q)})(${m}x${signed(p)})`],
+      steps: ["The leading coefficient is not 1, so look for binomial factors with coefficients on x.", "Multiply the first terms to get the leading term and the last terms to get the constant.", "Check the middle term by multiplying outer plus inner terms."]
+    };
+  },
   domainRange() {
     const left = rand(-6, -1), right = rand(2, 8), low = rand(-5, -1), high = rand(2, 8);
     const openLeft = Math.random() < 0.5, openRight = Math.random() < 0.5;
@@ -396,6 +434,20 @@ const practice = {
       answer: `${outside}sqrt(${inside})`,
       accepted: [`${outside}sqrt(${inside})`, `${outside}√${inside}`, `${outside}sqrt${inside}`],
       steps: [`Break the radicand into ${outside * outside} times ${inside}.`, `Take \\(\\sqrt{${outside * outside}}=${outside}\\) out of the radical.`]
+    };
+  },
+  radicalVariables() {
+    const outside = rand(2, 5), xPower = [2, 3, 4, 5][rand(0, 3)], yPower = [2, 4, 6][rand(0, 2)], inside = [2, 3, 5, 6][rand(0, 3)];
+    const radicand = outside * outside * inside;
+    const xOut = Math.floor(xPower / 2);
+    const xIn = xPower % 2 ? "x" : "";
+    const yOut = yPower / 2;
+    const outsideVariables = `${powerText("x", xOut)}${powerText("y", yOut)}`;
+    return {
+      prompt: `Simplify \\(\\sqrt{${radicand}x^${xPower}y^${yPower}}\\).`,
+      answer: `${outside}${outsideVariables}sqrt(${inside}${xIn})`,
+      accepted: [`${outside}${outsideVariables}sqrt(${inside}${xIn})`, `${outside}x^${xOut}y^${yOut}sqrt(${inside}${xIn})`, `${outside}x${xOut}y${yOut}sqrt(${inside}${xIn})`, `${outside}${outsideVariables}√${inside}${xIn}`],
+      steps: ["Break the radicand into perfect-square factors and leftover factors.", "Take pairs of variables out of the radical.", "Leave any unpaired variable factor inside the radical."]
     };
   },
   orderOperations() {
@@ -426,6 +478,17 @@ const practice = {
       steps: [`Subtract ${b} from both sides.`, `Divide by ${a}.`]
     };
   },
+  distributiveBothSidesEquation() {
+    const x = rand(-5, 7);
+    const a = rand(2, 5), b = rand(-6, 6), c = rand(2, 5), d = rand(-6, 6), e = rand(2, 6);
+    const rightConstant = a * (x + b) - c * (x + d) - e * x;
+    return {
+      prompt: `Solve \\(${a}(x${signed(b)})=${c}(x${signed(d)})+${e}x${signed(rightConstant)}\\).`,
+      answer: `x=${x}`,
+      accepted: [`x=${x}`, `${x}`],
+      steps: ["Distribute on both sides first.", "Combine like terms on each side.", "Move variable terms to one side and constants to the other."]
+    };
+  },
   literalEquation() {
     const a = rand(2, 6), b = rand(2, 6);
     return {
@@ -445,6 +508,59 @@ const practice = {
       steps: [`Subtract ${b} from both sides.`, `Divide by ${a}; because it is negative, reverse the inequality sign.`]
     };
   },
+  fractionalBothSidesInequality() {
+    const k = [-4, -2, 0, 2, 4, 6][rand(0, 5)];
+    const rightConst = 0.5 * k + 3 - 2 * k;
+    return {
+      prompt: `Solve \\(\\frac{1}{2}x+3>2x${signed(rightConst)}\\).`,
+      answer: `x<${k}`,
+      accepted: [`x<${k}`, `${k}>x`],
+      steps: ["Clear the fraction by multiplying every term by 2, or move terms carefully with the fraction in place.", "Move variable terms to one side and constants to the other.", "If you divide by a negative number, reverse the inequality sign."]
+    };
+  },
+  distributiveBothSidesInequality() {
+    const boundary = rand(-3, 6);
+    const a = rand(2, 5), b = rand(-5, 5), c = rand(2, 5), d = rand(-5, 5), e = rand(1, 5);
+    const rightConstant = a * (boundary + b) - c * (boundary + d) - e * boundary - 1;
+    return {
+      prompt: `Solve \\(${a}(x${signed(b)})>${c}(x${signed(d)})+${e}x${signed(rightConstant)}\\).`,
+      answer: `x>${boundary}`,
+      accepted: [`x>${boundary}`, `${boundary}<x`],
+      steps: ["Distribute on both sides first.", "Combine like terms.", "Move variables and constants to opposite sides, reversing the sign if you divide by a negative."]
+    };
+  },
+  compoundBetweenInequality() {
+    const coeff = rand(2, 4), add = rand(6, 12), low = rand(-3, 3), high = low + rand(4, 8);
+    const left = coeff * low - add;
+    const right = coeff * high - add;
+    return {
+      prompt: `Solve \\(${left}<${coeff}x-${add}\\le${right}\\).`,
+      answer: `${low}<x<=${high}`,
+      accepted: [`${low}<x<=${high}`, `${low}<x≤${high}`, `x>${low}andx<=${high}`, `x>${low}andx≤${high}`],
+      steps: ["Add the same value to all three parts.", "Divide all three parts by the coefficient.", "Keep both inequality statements connected."]
+    };
+  },
+  compoundOrInequality() {
+    const a = rand(2, 4), b = rand(1, 6), leftBoundary = rand(2, 6), c = -rand(2, 5), d = rand(-4, 4), rightBoundary = rand(-8, -2);
+    const leftTarget = a * leftBoundary + b;
+    const rightTarget = c * rightBoundary + d;
+    return {
+      prompt: `Solve \\(${a}x${signed(b)}>${leftTarget}\\) or \\(${c}x${signed(d)}\\ge${rightTarget}\\).`,
+      answer: `x>${leftBoundary} or x<=${rightBoundary}`,
+      accepted: [`x>${leftBoundary}orx<=${rightBoundary}`, `x>${leftBoundary}orx≤${rightBoundary}`, `x<=${rightBoundary}orx>${leftBoundary}`],
+      steps: ["Solve each inequality separately.", "Reverse the inequality sign if you divide by a negative.", "The word or means either solution region works."]
+    };
+  },
+  fractionalCoefficientInequality() {
+    const constant = rand(5, 9), delta = [3, 6][rand(0, 1)], target = constant - delta;
+    const boundary = delta * 4 / 3;
+    return {
+      prompt: `Solve \\(-\\frac{3}{4}x+${constant}>${target}\\).`,
+      answer: `x<${boundary}`,
+      accepted: [`x<${boundary}`, `${boundary}>x`],
+      steps: ["Subtract the constant from both sides.", "Divide by the negative fractional coefficient, so reverse the inequality sign.", "You can also multiply by the reciprocal after isolating the variable term."]
+    };
+  },
   wordEquation() {
     const start = rand(10, 30), rate = rand(2, 8), hours = rand(3, 9);
     return {
@@ -452,6 +568,54 @@ const practice = {
       answer: `C=${rate}h+${start}; ${rate * hours + start}`,
       accepted: [`c=${rate}h+${start};${rate * hours + start}`, `${rate}h+${start};${rate * hours + start}`, `${rate * hours + start}`],
       steps: ["The fixed cost is the y-intercept or starting value.", "The hourly cost is the rate.", `Substitute h=${hours}.`]
+    };
+  },
+  dataTableRange() {
+    const start = 20 + 5 * rand(0, 3), step = 15 + 5 * rand(0, 2);
+    const values = [0, 1, 2, 3].map(i => start + step * i);
+    return {
+      prompt: `A store sells notebooks. Number of notebooks: 1, 2, 3, 4. Cost in cents: ${values.join(", ")}. What is the range as a set?`,
+      answer: `{${values.join(", ")}}`,
+      accepted: [`{${values.join(",")}}`, values.join(",")],
+      steps: ["The range is the set of output values.", "Use the cost row, not the input row.", "Write each output once inside braces."]
+    };
+  },
+  dataTableDomain() {
+    const inputs = [2, 4, 6, 8];
+    const costs = inputs.map(v => (v * 0.35).toFixed(2));
+    return {
+      prompt: `A table gives cost as a function of number of oranges. Number of oranges: ${inputs.join(", ")}. Cost: ${costs.join(", ")}. What is the domain as a set?`,
+      answer: `{${inputs.join(", ")}}`,
+      accepted: [`{${inputs.join(",")}}`, inputs.join(",")],
+      steps: ["The domain is the set of input values.", "Use the number-of-oranges row.", "Write each input once inside braces."]
+    };
+  },
+  tableFunctionValues() {
+    const rows = [[-1, rand(-4, 6)], [0, rand(-4, 6)], [2, rand(-4, 6)], [4, rand(-4, 6)]];
+    const ans = rows[2][1] + rows[1][1];
+    return {
+      prompt: `From the table, x: ${rows.map(r => r[0]).join(", ")}; f(x): ${rows.map(r => r[1]).join(", ")}. What is \\(f(2)+f(0)\\)?`,
+      answer: `${ans}`,
+      accepted: [`${ans}`],
+      steps: ["Find the output paired with x = 2.", "Find the output paired with x = 0.", "Add the two function values."]
+    };
+  },
+  graphFindYValue() {
+    const m = rand(-3, 3) || 2, b = rand(-4, 4), x = rand(-3, 5);
+    return {
+      prompt: `A line graph represents \\(f(x)=${m}x${signed(b)}\\). From the graph, what is \\(f(${x})\\)?`,
+      answer: `${m * x + b}`,
+      accepted: [`${m * x + b}`],
+      steps: ["Find the given x-value on the horizontal axis.", "Move to the graph and read the corresponding y-value.", "In function notation, that y-value is the function value."]
+    };
+  },
+  graphFindXValue() {
+    const m = rand(1, 4), x = rand(-3, 5), b = rand(-4, 4), y = m * x + b;
+    return {
+      prompt: `A line graph represents \\(f(x)=${m}x${signed(b)}\\). What value of x makes \\(f(x)=${y}\\)?`,
+      answer: `${x}`,
+      accepted: [`${x}`, `x=${x}`],
+      steps: ["Find the given y-value on the vertical axis.", "Move across to the graph, then down to the x-axis.", "That x-value is the input that gives the stated output."]
     };
   },
   functionEvaluation() {
@@ -480,6 +644,33 @@ const practice = {
       answer: `slope ${m}, y-intercept ${b}`,
       accepted: [`slope${m},y-intercept${b}`, `m=${m},b=${b}`, `${m},${b}`],
       steps: ["Use slope-intercept form \\(y=mx+b\\).", "\\(m\\) is the slope and \\(b\\) is the y-intercept."]
+    };
+  },
+  perpendicularLineThroughPoint() {
+    const givenSlope = [-3, -2, 2, 3][rand(0, 3)];
+    const m = -1 / givenSlope;
+    const x = rand(-4, 5), y = rand(-5, 6);
+    const b = y - m * x;
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: `Write an equation of a line perpendicular to \\(y=${givenSlope}x+4\\) that passes through \\((${x},${y})\\).`,
+      answer: equation,
+      displayAnswer: `\(${equation}\)`,
+      accepted: [equation, `y-${y}=${formatNumber(m)}(x${signed(-x)})`],
+      steps: ["Perpendicular slopes are opposite reciprocals.", "Use the point and new slope in point-slope form.", "Rewrite in slope-intercept form if needed."]
+    };
+  },
+  parallelLineThroughPoint() {
+    const m = [-5, -4, -3, -2, 2, 3, 4, 5][rand(0, 7)];
+    const x = rand(-4, 5), y = rand(-5, 6);
+    const b = y - m * x;
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: `Write an equation of a line parallel to \\(y=${m}x-2\\) that passes through \\((${x},${y})\\).`,
+      answer: equation,
+      displayAnswer: `\(${equation}\)`,
+      accepted: [equation, `y-${y}=${m}(x${signed(-x)})`],
+      steps: ["Parallel lines have the same slope.", "Use the given point with that slope.", "Rewrite in slope-intercept form if needed."]
     };
   },
   linearInequalityGraph() {
@@ -591,6 +782,13 @@ const practice = {
     };
   }
 };
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 function renderPractice(problem) {
   const generator = practice[problem.practiceType] || practice[problem.topic] || practice.functionEvaluation;
   const item = generator();
@@ -609,7 +807,7 @@ function renderPractice(problem) {
       <button class="ghost" id="newPractice">New Similar Problem</button>
     </div>
     <div class="steps-box hidden" id="practiceSteps">
-      <p class="answer-text">Answer: ${item.answer}</p>
+      <p class="answer-text">Answer: ${item.displayAnswer || escapeHtml(item.answer)}</p>
       <ol class="step-list">${item.steps.map(step => `<li>${step}</li>`).join("")}</ol>
     </div>
   `;
@@ -622,6 +820,36 @@ function renderPractice(problem) {
   $("showPracticeAnswer").addEventListener("click", () => $("practiceSteps").classList.remove("hidden"));
   $("newPractice").addEventListener("click", () => renderPractice(problem));
   if (window.MathJax?.typesetPromise) MathJax.typesetPromise([box]);
+}
+
+function powerText(base, exponent) {
+  if (exponent === 0) return "";
+  if (exponent === 1) return base;
+  return `${base}^${exponent}`;
+}
+
+function formatNumber(n) {
+  if (Number.isInteger(n)) return `${n}`;
+  const abs = Math.abs(n);
+  const denominators = [2, 3, 4, 5];
+  for (const d of denominators) {
+    const numerator = abs * d;
+    if (Math.abs(numerator - Math.round(numerator)) < 1e-9) {
+      const sign = n < 0 ? "-" : "";
+      return `${sign}\\frac{${Math.round(numerator)}}{${d}}`;
+    }
+  }
+  return `${Number(n.toFixed(2))}`;
+}
+
+function signedNumber(n) {
+  if (n < 0) return `-${formatNumber(Math.abs(n))}`;
+  return `+${formatNumber(n)}`;
+}
+
+function linearEquationText(m, b) {
+  if (b === 0) return `y=${formatNumber(m)}x`;
+  return `y=${formatNumber(m)}x${signedNumber(b)}`;
 }
 
 function signed(n) {
