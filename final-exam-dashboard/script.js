@@ -356,12 +356,37 @@ function practiceTypeFor(n) {
   if (n === 91) return "radicalSumThree";
   if (n === 92 || n === 93) return "radicalProduct";
   if (n === 94) return "radicalCoeffTwoTerm";
+  if (n === 95) return "radicalQuotient";
   if (n <= 95) return "radicalSimplify";
+  if (n === 96 || n === 97) return "subtractTrinomials";
+  if (n === 98) return "subtractSumOfTrinomials";
+  if (n === 99 || n === 102) return "multiplyBinomials";
+  if (n === 100) return "squaredBinomial";
+  if (n === 101) return "gcfTrinomial";
+  if (n === 103 || n === 104) return "binomialTimesTrinomial";
+  if (n === 105) return "multiplyTrinomials";
+  if (n === 106 || n === 110) return "gcfBinomial";
+  if (n === 107) return "diffSquaresSimple";
+  if (n === 108) return "diffSquaresCoefficient";
+  if (n === 109 || n === 112) return "cubicGrouping";
+  if (n === 111 || n === 113) return "factorTrinomialA1";
   if (n <= 105) return "polynomialOperations";
   if (n <= 113) return "factorQuadratic";
+  if (n === 114) return "quadraticMinimumAx2C";
+  if (n === 115) return "solveAx2EqualsBx";
+  if (n >= 116 && n <= 119) return "solveX2BxEqualsC";
+  if (n === 120) return "solveX2MinusC";
+  if (n === 121) return "solveAx2EqualsC";
+  if (n === 122) return "solveVertexRational";
+  if (n === 123) return "solveVertexIrrational";
+  if (n === 124 || n === 125) return "minMaxStatement";
+  if (n === 126 || n === 127) return "axisSymmetry";
+  if (n === 129 || n === 130) return "vertexStandard";
   if (n <= 115) return "quadraticFeatures";
   if (n <= 123) return "quadraticSolving";
   if (n <= 130) return "quadraticFeatures";
+  if (n === 131) return "exponentialFromTable";
+  if (n === 133) return "depreciationValue";
   if (n <= 133) return "exponentialModel";
   if (n <= 137) return "functionIdentification";
   if (n <= 145) return "linearRepresentations";
@@ -421,9 +446,34 @@ const PRACTICE_LABELS = {
   radicalSumThree: "three-term radical sums",
   radicalCoeffTwoTerm: "radical sums with coefficients",
   radicalProduct: "products of square roots",
+  radicalQuotient: "quotients of square roots",
+  subtractTrinomials: "subtracting trinomials",
+  subtractSumOfTrinomials: "subtracting a sum of trinomials",
+  multiplyBinomials: "multiplying binomials",
+  squaredBinomial: "expanding squared binomials",
+  gcfTrinomial: "GCF of a trinomial",
+  binomialTimesTrinomial: "binomial times trinomial",
+  multiplyTrinomials: "multiplying trinomials",
+  gcfBinomial: "GCF of a binomial",
+  diffSquaresSimple: "simple difference of squares",
+  diffSquaresCoefficient: "difference of squares with coefficients",
+  cubicGrouping: "factoring by grouping",
+  factorTrinomialA1: "factoring trinomials with a = 1",
   polynomialOperations: "polynomial operations",
   quadraticFeatures: "quadratic features",
   quadraticSolving: "solving quadratics",
+  quadraticMinimumAx2C: "minimum point of ax^2 + c",
+  solveAx2EqualsBx: "solving ax^2 = bx",
+  solveX2BxEqualsC: "solving quadratics by factoring",
+  solveX2MinusC: "solving x^2 - c = 0",
+  solveAx2EqualsC: "solving ax^2 = c",
+  solveVertexRational: "solving vertex-form quadratics",
+  solveVertexIrrational: "irrational vertex-form solutions",
+  minMaxStatement: "minimum or maximum",
+  axisSymmetry: "axis of symmetry",
+  vertexStandard: "vertex from standard form",
+  exponentialFromTable: "exponential equations from tables",
+  depreciationValue: "percent depreciation",
   exponentialModel: "exponential models",
   functionIdentification: "identifying functions",
   linearRepresentations: "linear representations",
@@ -985,6 +1035,172 @@ const practice = {
       steps: ["Multiply the radicands together.", "Simplify the resulting square root.", "If both radicals are perfect squares, multiply their square roots."]
     };
   },
+  radicalQuotient() {
+    const options = [
+      ["\\frac{\\sqrt{48}}{\\sqrt3}", "4", "4"],
+      ["\\frac{\\sqrt{75}}{\\sqrt3}", "5", "5"],
+      ["\\frac{\\sqrt{98}}{\\sqrt2}", "7", "7"],
+      ["\\frac{\\sqrt{180}}{\\sqrt5}", "6", "6"]
+    ];
+    const [prompt, answer, display] = options[rand(0, options.length - 1)];
+    return {
+      prompt: `Simplify \\(${prompt}\\).`,
+      answer,
+      displayAnswer: `\\(${display}\\)`,
+      accepted: [answer],
+      steps: ["Divide the radicands because both expressions are square roots.", "Simplify the resulting square root.", "Check whether the quotient is a perfect square."]
+    };
+  },
+  subtractTrinomials() {
+    const first = [rand(3, 8), rand(-7, 7), rand(-9, 9)];
+    const second = [rand(1, 5), rand(-7, 7), rand(-9, 9)];
+    const result = first.map((value, index) => value - second[index]);
+    const answer = polyText(result);
+    return {
+      prompt: `Subtract \\((${polyText(first)})-(${polyText(second)})\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer],
+      steps: ["Distribute the subtraction sign to every term in the second trinomial.", "Combine like terms by degree.", "Write the result in descending powers."]
+    };
+  },
+  subtractSumOfTrinomials() {
+    const total = [rand(12, 20), rand(-8, 8), rand(-8, 8)];
+    const parts = Array.from({ length: 4 }, () => [rand(1, 3), rand(-3, 3), rand(-3, 3)]);
+    const sum = parts.reduce((acc, part) => acc.map((value, index) => value + part[index]), [0, 0, 0]);
+    const result = total.map((value, index) => value - sum[index]);
+    const answer = polyText(result);
+    return {
+      prompt: `Add the four trinomials \\((${parts.map(polyText).join("), (")})\\), then subtract that result from \\(${polyText(total)}\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer],
+      steps: ["First add the four trinomials by combining like terms.", "Subtract that sum from the larger trinomial.", "Distribute the subtraction sign before combining final like terms."]
+    };
+  },
+  multiplyBinomials() {
+    const a = rand(1, 5), b = rand(-8, 8) || 3, c = rand(1, 5), d = rand(-8, 8) || -2;
+    const result = [a * c, a * d + b * c, b * d];
+    const answer = polyText(result);
+    return {
+      prompt: `Multiply \\((${linearFactorText(a, b)})(${linearFactorText(c, d)})\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer],
+      steps: ["Multiply first, outer, inner, and last terms.", "Combine the two middle terms.", "Write the product as a trinomial."]
+    };
+  },
+  squaredBinomial() {
+    const a = rand(1, 4), b = rand(-7, 7) || 5;
+    const result = [a * a, 2 * a * b, b * b];
+    const answer = polyText(result);
+    return {
+      prompt: `Expand \\((${linearFactorText(a, b)})^2\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer],
+      steps: ["Rewrite the squared binomial as the binomial multiplied by itself.", "Use FOIL or the square pattern.", "Combine like terms."]
+    };
+  },
+  gcfTrinomial() {
+    const g = [2, 3, 5, 6][rand(0, 3)];
+    const coefficients = [g * rand(3, 8), g * rand(1, 6), -g];
+    return {
+      prompt: `Find the greatest common factor of \\(${polyText(coefficients)}\\).`,
+      answer: `${g}`,
+      accepted: [`${g}`],
+      steps: ["Find the largest number that divides all three coefficients.", "Only include a variable if every term contains that variable.", "The GCF is the common factor shared by every term."]
+    };
+  },
+  binomialTimesTrinomial() {
+    const a = rand(1, 4), b = rand(-5, 5) || 2;
+    const tri = [rand(1, 4), rand(-5, 5), rand(-6, 6)];
+    const result = [
+      a * tri[0],
+      a * tri[1] + b * tri[0],
+      a * tri[2] + b * tri[1],
+      b * tri[2]
+    ];
+    const answer = cubicText(result);
+    return {
+      prompt: `Multiply \\((${linearFactorText(a, b)})(${polyText(tri)})\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer],
+      steps: ["Distribute the binomial to every term of the trinomial.", "Multiply each pair of terms.", "Combine like terms and write in descending powers."]
+    };
+  },
+  multiplyTrinomials() {
+    const first = [rand(1, 3), rand(-4, 4), rand(-3, 3)];
+    const second = [rand(1, 3), rand(-4, 4), rand(-3, 3)];
+    const result = multiplyPoly(first, second);
+    const answer = quarticText(result);
+    return {
+      prompt: `Multiply \\((${polyText(first)})(${polyText(second)})\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer],
+      steps: ["Multiply each term in the first trinomial by each term in the second trinomial.", "Group like powers of x.", "Combine like terms carefully."]
+    };
+  },
+  gcfBinomial() {
+    const g = [2, 3, 5, 6, 10][rand(0, 4)];
+    const xPower = rand(1, 3);
+    const a = g * rand(2, 6), b = g * rand(1, 6);
+    const answer = `${g}x${xPower === 1 ? "" : `^${xPower}`}`;
+    return {
+      prompt: `Find the greatest common factor of \\(${a}x^${xPower + 1}+${b}x^${xPower}\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer],
+      steps: ["Find the greatest common factor of the coefficients.", "Use the lowest power of x that appears in every term.", "Multiply those common pieces together."]
+    };
+  },
+  diffSquaresSimple() {
+    const n = rand(3, 12);
+    const answer = `(x-${n})(x+${n})`;
+    return {
+      prompt: `Factor \\(x^2-${n * n}\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer, `(x+${n})(x-${n})`],
+      steps: ["Recognize a difference of squares.", `Rewrite ${n * n} as \\(${n}^2\\).`, "Use \\(a^2-b^2=(a-b)(a+b)\\)."]
+    };
+  },
+  diffSquaresCoefficient() {
+    const n = [3, 5, 7, 9][rand(0, 3)];
+    const answer = `(2x-${n})(2x+${n})`;
+    return {
+      prompt: `Factor \\(4x^2-${n * n}\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer, `(2x+${n})(2x-${n})`],
+      steps: ["Recognize both terms as perfect squares.", `Rewrite as \\((2x)^2-${n}^2\\).`, "Use the difference-of-squares pattern."]
+    };
+  },
+  cubicGrouping() {
+    const a = rand(1, 4), b = rand(1, 5), c = rand(-5, 5) || -3;
+    const quadraticFactor = `${a === 1 ? "" : a}x^2${signed(b)}`;
+    const answer = `(${quadraticFactor})(${linearFactorText(1, c)})`;
+    return {
+      prompt: `Factor by grouping: \\(${cubicText([a, a * c, b, b * c])}\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer, `(${linearFactorText(1, c)})(${quadraticFactor})`],
+      steps: ["Group the first two terms and the last two terms.", "Factor the GCF from each group.", "Factor out the common binomial factor."]
+    };
+  },
+  factorTrinomialA1() {
+    const r = rand(2, 9), s = -rand(2, 9);
+    const answer = `(x${signed(r)})(x${signed(s)})`;
+    return {
+      prompt: `Factor \\(${polyText([1, r + s, r * s])}\\).`,
+      answer,
+      displayAnswer: `\\(${answer}\\)`,
+      accepted: [answer, `(x${signed(s)})(x${signed(r)})`],
+      steps: ["Find two numbers that multiply to the constant term.", "Those same two numbers must add to the middle coefficient.", "Write the two binomial factors."]
+    };
+  },
   polynomialOperations() {
     const a = rand(2, 6), b = rand(-8, 8);
     return {
@@ -1003,6 +1219,15 @@ const practice = {
       steps: ["Vertex form is \\(y=(x-h)^2+k\\).", "The vertex is \\((h,k)\\)."]
     };
   },
+  quadraticMinimumAx2C() {
+    const a = rand(1, 5), c = rand(-8, 8);
+    return {
+      prompt: `Find the minimum point of \\(y=${a}x^2${signed(c)}\\).`,
+      answer: `(0, ${c})`,
+      accepted: [`(0,${c})`, `0,${c}`],
+      steps: ["There is no bx term, so the axis of symmetry is x = 0.", "Substitute x = 0 into the function.", "Because a is positive, the vertex is the minimum point."]
+    };
+  },
   quadraticSolving() {
     const r = rand(2, 8), s = rand(-8, -2);
     return {
@@ -1012,6 +1237,103 @@ const practice = {
       steps: ["Factor the quadratic.", "Set each factor equal to zero."]
     };
   },
+  solveAx2EqualsBx() {
+    const a = rand(2, 6), root = rand(2, 8);
+    const b = a * root;
+    return {
+      prompt: `Solve for x: \\(${a}x^2=${b}x\\).`,
+      answer: `x=0 or x=${root}`,
+      accepted: [`x=0orx=${root}`, `x=${root}orx=0`, `0,${root}`, `${root},0`],
+      steps: ["Move all terms to one side.", "Factor out the common x.", "Set each factor equal to zero."]
+    };
+  },
+  solveX2BxEqualsC() {
+    const r = rand(2, 8), s = -rand(2, 8);
+    const b = -(r + s);
+    const c = -r * s;
+    return {
+      prompt: `Solve for x by factoring: \\(x^2${signed(b)}x=${c}\\).`,
+      answer: `x=${r} or x=${s}`,
+      accepted: [`x=${r}orx=${s}`, `x=${s}orx=${r}`, `${r},${s}`, `${s},${r}`],
+      steps: ["Move the constant to the left side so the equation equals zero.", "Factor the trinomial.", "Set each factor equal to zero."]
+    };
+  },
+  solveX2MinusC() {
+    const root = rand(3, 12);
+    return {
+      prompt: `Solve for x by factoring: \\(x^2-${root * root}=0\\).`,
+      answer: `x=${root} or x=-${root}`,
+      accepted: [`x=${root}orx=-${root}`, `x=-${root}orx=${root}`, `${root},-${root}`, `-${root},${root}`],
+      steps: ["Recognize a difference of squares.", "Factor into conjugate binomials.", "Set each factor equal to zero."]
+    };
+  },
+  solveAx2EqualsC() {
+    const a = [2, 3, 5][rand(0, 2)];
+    const root = rand(2, 7);
+    const c = a * root * root;
+    return {
+      prompt: `Solve for x: \\(${a}x^2=${c}\\).`,
+      answer: `x=${root} or x=-${root}`,
+      accepted: [`x=${root}orx=-${root}`, `x=-${root}orx=${root}`, `${root},-${root}`, `-${root},${root}`],
+      steps: [`Divide both sides by ${a}.`, "Take both square roots.", "Remember to include the positive and negative solution."]
+    };
+  },
+  solveVertexRational() {
+    const a = [2, 3, 4][rand(0, 2)], h = rand(-4, 4), rootDistance = rand(1, 4);
+    const k = -a * rootDistance * rootDistance;
+    const left = h - rootDistance, right = h + rootDistance;
+    return {
+      prompt: `Solve for x: \\(${a}(x${signed(-h)})^2${signed(k)}=0\\).`,
+      answer: `x=${left} or x=${right}`,
+      accepted: [`x=${left}orx=${right}`, `x=${right}orx=${left}`, `${left},${right}`, `${right},${left}`],
+      steps: ["Move the constant term to the other side.", "Divide by the coefficient of the squared expression.", "Take both square roots and solve for x."]
+    };
+  },
+  solveVertexIrrational() {
+    const a = [2, 3, 5][rand(0, 2)], h = rand(-4, 4), radicand = [2, 3, 5, 6, 7][rand(0, 4)];
+    const k = -a * radicand;
+    const answer = `x=${h}+sqrt(${radicand}) or x=${h}-sqrt(${radicand})`;
+    return {
+      prompt: `Solve for x: \\(${a}(x${signed(-h)})^2${signed(k)}=0\\).`,
+      answer,
+      displayAnswer: `\\(x=${h}\\pm\\sqrt{${radicand}}\\)`,
+      accepted: [answer, `x=${h}±sqrt(${radicand})`, `${h}+sqrt(${radicand}),${h}-sqrt(${radicand})`],
+      steps: ["Move the constant term to the other side.", "Divide by the coefficient of the squared expression.", "Take both square roots; the result is irrational."]
+    };
+  },
+  minMaxStatement() {
+    const a = rand(1, 5) * (Math.random() < 0.5 ? 1 : -1);
+    const b = rand(-8, 8);
+    const c = rand(1, 9);
+    const answer = a > 0 ? "minimum" : "maximum";
+    return {
+      prompt: `Complete the statement: \\(y=${a}x^2${signed(b)}x-${c}\\) will have a ________.`,
+      answer,
+      accepted: [answer],
+      steps: ["Look at the sign of the leading coefficient a.", "If a is positive, the parabola opens upward and has a minimum.", "If a is negative, the parabola opens downward and has a maximum."]
+    };
+  },
+  axisSymmetry() {
+    const a = rand(1, 5), axis = rand(-4, 5), b = -2 * a * axis, c = rand(1, 9);
+    return {
+      prompt: `Find the equation of the axis of symmetry for \\(y=${a}x^2${signed(b)}x-${c}\\).`,
+      answer: `x=${axis}`,
+      accepted: [`x=${axis}`, `${axis}`],
+      steps: ["Use \\(x=-\\frac{b}{2a}\\).", "Substitute the a- and b-values from the quadratic.", "The axis of symmetry is a vertical line, so write x = number."]
+    };
+  },
+  vertexStandard() {
+    const a = rand(1, 4), h = rand(-4, 4);
+    const k = -rand(a * h * h + 1, a * h * h + 9);
+    const b = -2 * a * h;
+    const constant = a * h * h + k;
+    return {
+      prompt: `Find the vertex of \\(y=${polyText([a, b, constant])}\\).`,
+      answer: `(${h}, ${k})`,
+      accepted: [`(${h},${k})`, `${h},${k}`],
+      steps: ["Find the axis of symmetry with \\(x=-\\frac{b}{2a}\\).", "Substitute that x-value into the function.", "Write the vertex as an ordered pair."]
+    };
+  },
   exponentialModel() {
     const start = rand(2, 9), base = rand(2, 4), t = rand(2, 5);
     return {
@@ -1019,6 +1341,30 @@ const practice = {
       answer: `${start * base ** t}`,
       accepted: [`${start * base ** t}`],
       steps: ["Evaluate the exponent first.", "Multiply by the starting value."]
+    };
+  },
+  exponentialFromTable() {
+    const a = rand(2, 8), b = [2, 3, 4][rand(0, 2)];
+    const xs = [0, 1, 2, 3];
+    const ys = xs.map(x => a * b ** x);
+    return {
+      prompt: `Write an exponential equation of the form \\(y=a(b)^x\\) from the table. x: ${xs.join(", ")}; y: ${ys.join(", ")}.`,
+      answer: `y=${a}(${b})^x`,
+      displayAnswer: `\\(y=${a}(${b})^x\\)`,
+      accepted: [`y=${a}(${b})^x`, `y=${a}*${b}^x`, `${a}(${b})^x`],
+      steps: ["The value when x = 0 is a.", "The common multiplier from one y-value to the next is b.", "Write the equation in the form \\(y=a(b)^x\\)."]
+    };
+  },
+  depreciationValue() {
+    const start = [12000, 18000, 24000, 30000][rand(0, 3)];
+    const rate = [10, 15, 20, 25][rand(0, 3)];
+    const years = rand(3, 7);
+    const value = Math.round(start * (1 - rate / 100) ** years);
+    return {
+      prompt: `A car is worth $${start.toLocaleString()} and depreciates by ${rate}% each year. What is it worth after ${years} years? Round to the nearest dollar.`,
+      answer: `$${value.toLocaleString()}`,
+      accepted: [`$${value.toLocaleString()}`, `${value}`],
+      steps: [`Depreciating by ${rate}% means the car keeps ${100 - rate}% each year.`, `Use \\(${start}(1-${rate / 100})^${years}\\).`, "Round the result to the nearest dollar."]
     };
   },
   functionIdentification() {
@@ -1160,6 +1506,58 @@ function signedNumber(n) {
 function linearEquationText(m, b) {
   if (b === 0) return `y=${formatNumber(m)}x`;
   return `y=${formatNumber(m)}x${signedNumber(b)}`;
+}
+
+function termText(coefficient, variablePart, isFirst = false) {
+  if (coefficient === 0) return "";
+  const sign = coefficient < 0 ? "-" : (isFirst ? "" : "+");
+  const abs = Math.abs(coefficient);
+  const number = variablePart && abs === 1 ? "" : `${abs}`;
+  return `${sign}${number}${variablePart}`;
+}
+
+function polyText([a, b, c]) {
+  const terms = [
+    termText(a, "x^2", true),
+    termText(b, "x"),
+    termText(c, "")
+  ].filter(Boolean);
+  return terms.join("") || "0";
+}
+
+function linearFactorText(a, b) {
+  return `${a === 1 ? "" : a}x${signed(b)}`;
+}
+
+function cubicText([a, b, c, d]) {
+  const terms = [
+    termText(a, "x^3", true),
+    termText(b, "x^2"),
+    termText(c, "x"),
+    termText(d, "")
+  ].filter(Boolean);
+  return terms.join("") || "0";
+}
+
+function quarticText([a, b, c, d, e]) {
+  const terms = [
+    termText(a, "x^4", true),
+    termText(b, "x^3"),
+    termText(c, "x^2"),
+    termText(d, "x"),
+    termText(e, "")
+  ].filter(Boolean);
+  return terms.join("") || "0";
+}
+
+function multiplyPoly(first, second) {
+  const result = Array(first.length + second.length - 1).fill(0);
+  first.forEach((a, i) => {
+    second.forEach((b, j) => {
+      result[i + j] += a * b;
+    });
+  });
+  return result;
 }
 
 function signed(n) {
