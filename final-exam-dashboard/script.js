@@ -304,7 +304,7 @@ function renderDetail(n) {
 }
 
 function cleanAnswer(value) {
-  return value.toLowerCase().replace(/\s+/g, "").replace(/−/g, "-").replace(/√/g, "sqrt");
+  return value.toLowerCase().replace(/\s+/g, "").replace(/−/g, "-").replace(/√/g, "sqrt").replace(/≥/g, ">=").replace(/≤/g, "<=").replace(/≈/g, "=");
 }
 
 function practiceTypeFor(n) {
@@ -332,12 +332,30 @@ function practiceTypeFor(n) {
   if (n <= 57) return "slope";
   if (n === 60) return "perpendicularLineThroughPoint";
   if (n === 61) return "parallelLineThroughPoint";
+  if (n === 62) return "yInterceptFromEquation";
+  if (n === 63) return "xInterceptFromEquation";
+  if (n === 64 || n === 69) return "lineEquationFromGraph";
+  if (n === 65) return "lineEquationFromSlopePoint";
+  if (n >= 66 && n <= 68) return "lineEquationFromTwoPoints";
+  if (n === 70 || n === 78) return "linearRegressionTable";
+  if (n === 71) return "pointInLinearInequality";
+  if (n === 72) return "inequalityGraphBelowDashed";
+  if (n === 73) return "inequalityGraphAboveSolid";
+  if (n === 74) return "inequalityGraphBelowDashedHorizontal";
+  if (n === 75) return "inequalityGraphRightSolidVertical";
   if (n <= 70) return "linearEquationWriting";
   if (n <= 75) return "linearInequalityGraph";
   if (n === 76) return "exponentialPercent";
   if (n <= 78) return "linearModelTable";
+  if (n === 80) return "systemYValue";
   if (n <= 80) return "systems";
+  if (n === 85 || n === 88) return "radicalWholeNumber";
+  if (n === 86 || n === 87) return "exponentQuotient";
   if (n <= 87) return "exponentRules";
+  if (n === 89 || n === 90) return "radicalSumTwo";
+  if (n === 91) return "radicalSumThree";
+  if (n === 92 || n === 93) return "radicalProduct";
+  if (n === 94) return "radicalCoeffTwoTerm";
   if (n <= 95) return "radicalSimplify";
   if (n <= 105) return "polynomialOperations";
   if (n <= 113) return "factorQuadratic";
@@ -379,12 +397,30 @@ const PRACTICE_LABELS = {
   slope: "slope",
   perpendicularLineThroughPoint: "perpendicular lines through a point",
   parallelLineThroughPoint: "parallel lines through a point",
+  yInterceptFromEquation: "y-intercepts from equations",
+  xInterceptFromEquation: "x-intercepts from equations",
+  lineEquationFromGraph: "equation of a line from a graph",
+  lineEquationFromSlopePoint: "line equations from slope and point",
+  lineEquationFromTwoPoints: "line equations from two points",
+  linearRegressionTable: "linear regression from data tables",
+  pointInLinearInequality: "testing points in linear inequalities",
+  inequalityGraphBelowDashed: "inequalities from dashed-line graphs",
+  inequalityGraphAboveSolid: "inequalities from solid-line graphs",
+  inequalityGraphBelowDashedHorizontal: "horizontal inequality graphs",
+  inequalityGraphRightSolidVertical: "vertical inequality graphs",
   linearEquationWriting: "writing linear equations",
   linearInequalityGraph: "linear inequalities",
   exponentialPercent: "percent growth",
   linearModelTable: "linear models",
   systems: "systems",
+  systemYValue: "y-value of a system",
   exponentRules: "exponent rules",
+  exponentQuotient: "quotients with exponent rules",
+  radicalWholeNumber: "simplifying square roots",
+  radicalSumTwo: "sums of square roots",
+  radicalSumThree: "three-term radical sums",
+  radicalCoeffTwoTerm: "radical sums with coefficients",
+  radicalProduct: "products of square roots",
   polynomialOperations: "polynomial operations",
   quadraticFeatures: "quadratic features",
   quadraticSolving: "solving quadratics",
@@ -655,7 +691,7 @@ const practice = {
     return {
       prompt: `Write an equation of a line perpendicular to \\(y=${givenSlope}x+4\\) that passes through \\((${x},${y})\\).`,
       answer: equation,
-      displayAnswer: `\(${equation}\)`,
+      displayAnswer: `\\(${equation}\\)`,
       accepted: [equation, `y-${y}=${formatNumber(m)}(x${signed(-x)})`],
       steps: ["Perpendicular slopes are opposite reciprocals.", "Use the point and new slope in point-slope form.", "Rewrite in slope-intercept form if needed."]
     };
@@ -668,9 +704,140 @@ const practice = {
     return {
       prompt: `Write an equation of a line parallel to \\(y=${m}x-2\\) that passes through \\((${x},${y})\\).`,
       answer: equation,
-      displayAnswer: `\(${equation}\)`,
+      displayAnswer: `\\(${equation}\\)`,
       accepted: [equation, `y-${y}=${m}(x${signed(-x)})`],
       steps: ["Parallel lines have the same slope.", "Use the given point with that slope.", "Rewrite in slope-intercept form if needed."]
+    };
+  },
+  yInterceptFromEquation() {
+    const yIntercept = rand(-5, 6);
+    const a = rand(2, 5), c = rand(2, 6);
+    const constant = c * yIntercept;
+    return {
+      prompt: `Find the y-intercept of \\(${a}x+${c}y=${constant}\\). Write the answer as an ordered pair.`,
+      answer: `(0, ${yIntercept})`,
+      accepted: [`(0,${yIntercept})`, `0,${yIntercept}`, `y=${yIntercept}`],
+      steps: ["A y-intercept happens where x = 0.", "Substitute 0 for x and solve for y.", "Write the result as an ordered pair with x-coordinate 0."]
+    };
+  },
+  xInterceptFromEquation() {
+    const xIntercept = rand(-5, 6) || 4;
+    const a = rand(2, 6), c = rand(2, 5);
+    const constant = a * xIntercept;
+    return {
+      prompt: `Find the x-intercept of \\(${a}x+${c}y=${constant}\\). Write the answer as an ordered pair.`,
+      answer: `(${xIntercept}, 0)`,
+      accepted: [`(${xIntercept},0)`, `${xIntercept},0`, `x=${xIntercept}`],
+      steps: ["An x-intercept happens where y = 0.", "Substitute 0 for y and solve for x.", "Write the result as an ordered pair with y-coordinate 0."]
+    };
+  },
+  lineEquationFromGraph() {
+    const m = [-2, -1, 0.5, 1, 1.5, 2][rand(0, 5)];
+    const b = rand(-4, 4);
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: "Write the equation of the graphed line.",
+      visual: graphSvg({ m, b }),
+      answer: equation,
+      displayAnswer: `\\(${equation}\\)`,
+      accepted: [equation],
+      steps: ["Find the y-intercept where the line crosses the y-axis.", "Use two clear lattice points to find the slope.", "Write the equation in slope-intercept form \\(y=mx+b\\)."]
+    };
+  },
+  lineEquationFromSlopePoint() {
+    const m = [-3, -2, -1, 2, 3][rand(0, 4)];
+    const x = rand(-4, 5), y = rand(-5, 6);
+    const b = y - m * x;
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: `Write the equation of a line with slope \\(${m}\\) that passes through \\((${x},${y})\\).`,
+      answer: equation,
+      displayAnswer: `\\(${equation}\\)`,
+      accepted: [equation, `y-${y}=${m}(x${signed(-x)})`],
+      steps: ["Use point-slope form with the given slope and point.", "Substitute the slope and ordered pair.", "Rewrite in slope-intercept form if needed."]
+    };
+  },
+  lineEquationFromTwoPoints() {
+    const x1 = rand(-5, 1), y1 = rand(-4, 4);
+    const dx = [2, 3, 4, 6][rand(0, 3)];
+    const dy = [-6, -4, -3, 2, 3, 4, 6][rand(0, 6)];
+    const x2 = x1 + dx, y2 = y1 + dy;
+    const m = dy / dx;
+    const b = y1 - m * x1;
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: `Write the equation of the line through \\((${x1},${y1})\\) and \\((${x2},${y2})\\).`,
+      answer: equation,
+      displayAnswer: `\\(${equation}\\)`,
+      accepted: [equation],
+      steps: ["Find the slope using rise over run.", "Substitute one point into \\(y=mx+b\\) to find b.", "Write the final equation in slope-intercept form."]
+    };
+  },
+  linearRegressionTable() {
+    const m = rand(3, 12), b = rand(10, 45);
+    const xs = [1, 2, 3, 4, 5];
+    const ys = xs.map(x => m * x + b);
+    return {
+      prompt: `The table shows a real-world situation that can be modeled by a linear equation. x: ${xs.join(", ")}; y: ${ys.join(", ")}. Write a linear regression equation for the data.`,
+      answer: `y=${m}x+${b}`,
+      accepted: [`y=${m}x+${b}`, `${m}x+${b}`],
+      steps: ["The data have a constant rate of change, so a linear model fits exactly.", "Use the constant change as the slope.", "Use the starting value from the pattern to write the equation."]
+    };
+  },
+  pointInLinearInequality() {
+    const m = rand(-3, 3) || 2, b = rand(-4, 4), x = rand(-4, 5);
+    const y = m * x + b - rand(1, 4);
+    return {
+      prompt: `Is \\((${x},${y})\\) part of the solution set for \\(y<${m}x${signed(b)}\\)? Answer yes or no.`,
+      answer: "yes",
+      accepted: ["yes", "y"],
+      steps: ["Substitute the x- and y-values into the inequality.", "Compare the two sides.", "If the statement is true, the point is in the solution set."]
+    };
+  },
+  inequalityGraphBelowDashed() {
+    const m = [-2, -1, 1, 2][rand(0, 3)], b = rand(-3, 3);
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: "Write the linear inequality represented by the shaded region below the dashed line.",
+      visual: graphSvg({ m, b, dashed: true, shade: "below" }),
+      answer: equation.replace("y=", "y<"),
+      displayAnswer: `\\(${equation.replace("y=", "y<")}\\)`,
+      accepted: [equation.replace("y=", "y<")],
+      steps: ["A dashed boundary means the line is not included.", "Shading below uses less than.", "Write the boundary line, then replace the equals sign with <."]
+    };
+  },
+  inequalityGraphAboveSolid() {
+    const m = [-2, -1, 1, 2][rand(0, 3)], b = rand(-3, 3);
+    const equation = linearEquationText(m, b);
+    return {
+      prompt: "Write the linear inequality represented by the shaded region above the solid line.",
+      visual: graphSvg({ m, b, dashed: false, shade: "above" }),
+      answer: equation.replace("y=", "y>="),
+      displayAnswer: `\\(${equation.replace("y=", "y\\ge")}\\)`,
+      accepted: [equation.replace("y=", "y>="), equation.replace("y=", "y≥")],
+      steps: ["A solid boundary means the line is included.", "Shading above uses greater than.", "Use \\(\\ge\\) because the boundary line is solid."]
+    };
+  },
+  inequalityGraphBelowDashedHorizontal() {
+    const y = rand(-4, 4);
+    return {
+      prompt: "Write the linear inequality represented by the shaded region below the dashed horizontal line.",
+      visual: graphSvg({ horizontal: y, dashed: true, shade: "below" }),
+      answer: `y<${y}`,
+      displayAnswer: `\\(y<${y}\\)`,
+      accepted: [`y<${y}`],
+      steps: ["A horizontal boundary has equation \\(y=\\text{constant}\\).", "Dashed means the boundary is not included.", "Below the line means use <."]
+    };
+  },
+  inequalityGraphRightSolidVertical() {
+    const x = rand(-4, 4);
+    return {
+      prompt: "Write the linear inequality represented by the shaded region to the right of the solid vertical line.",
+      visual: graphSvg({ vertical: x, dashed: false, shade: "right" }),
+      answer: `x>=${x}`,
+      displayAnswer: `\\(x\\ge${x}\\)`,
+      accepted: [`x>=${x}`, `x≥${x}`],
+      steps: ["A vertical boundary has equation \\(x=\\text{constant}\\).", "Solid means the boundary is included.", "To the right means x-values greater than the boundary, so use \\(\\ge\\)."]
     };
   },
   linearInequalityGraph() {
@@ -711,6 +878,16 @@ const practice = {
       steps: ["Add the equations to eliminate y.", "Solve for x, then substitute back to find y."]
     };
   },
+  systemYValue() {
+    const x = rand(-4, 5), y = rand(-4, 6);
+    const a = rand(2, 5), b = rand(2, 5);
+    return {
+      prompt: `Find only the y-value of the system: \\(${a}x+${b}y=${a * x + b * y}\\) and \\(x-y=${x - y}\\).`,
+      answer: `${y}`,
+      accepted: [`${y}`, `y=${y}`],
+      steps: ["Use substitution or elimination to solve the system.", "The question asks only for the y-value.", "Report just the y-coordinate of the solution."]
+    };
+  },
   exponentRules() {
     const a = rand(2, 5), b = rand(2, 5), c = rand(2, 4);
     return {
@@ -718,6 +895,94 @@ const practice = {
       answer: `x^${a * c}y^${b * c}`,
       accepted: [`x^${a * c}y^${b * c}`, `x${a * c}y${b * c}`],
       steps: ["Power to a power means multiply exponents.", "Apply the outside exponent to every factor inside parentheses."]
+    };
+  },
+  exponentQuotient() {
+    const coefficient = -rand(2, 6);
+    const xNum = rand(5, 8), xDen = rand(1, 3);
+    const yNum = rand(2, 5), yDen = yNum + rand(1, 3);
+    const zNum = rand(1, 4), zDen = zNum + rand(1, 3);
+    const xPower = xNum - xDen;
+    const yPower = yDen - yNum;
+    const zPower = zDen - zNum;
+    const answer = `${coefficient}x^${xPower}/(y^${yPower}z^${zPower})`;
+    return {
+      prompt: `Simplify \\(\\frac{${coefficient * 4}x^${xNum}y^${yNum}z^${zNum}}{4x^${xDen}y^${yDen}z^${zDen}}\\). Write the answer with positive exponents.`,
+      answer,
+      displayAnswer: `\\(\\frac{${coefficient}x^${xPower}}{y^${yPower}z^${zPower}}\\)`,
+      accepted: [answer, `${coefficient}x^${xPower}y^-${yPower}z^-${zPower}`],
+      steps: ["Divide the coefficients.", "Subtract exponents for matching bases.", "Move factors with negative exponents to the denominator."]
+    };
+  },
+  radicalWholeNumber() {
+    const options = [[72, "6sqrt(2)", "6\\sqrt2"], [75, "5sqrt(3)", "5\\sqrt3"], [98, "7sqrt(2)", "7\\sqrt2"], [108, "6sqrt(3)", "6\\sqrt3"]];
+    const [radicand, answer, display] = options[rand(0, options.length - 1)];
+    return {
+      prompt: `Simplify \\(\\sqrt{${radicand}}\\).`,
+      answer,
+      displayAnswer: `\\(${display}\\)`,
+      accepted: [answer, answer.replace("sqrt", "√"), answer.replace(/[()]/g, "")],
+      steps: ["Find the largest perfect-square factor inside the radical.", "Take the square root of that factor out front.", "Leave the remaining whole-number factor inside the radical."]
+    };
+  },
+  radicalSumTwo() {
+    const options = [
+      ["\\sqrt{48}+\\sqrt{27}", "7sqrt(3)", "7\\sqrt3"],
+      ["\\sqrt{50}+\\sqrt{32}", "9sqrt(2)", "9\\sqrt2"],
+      ["\\sqrt{75}-\\sqrt{12}", "3sqrt(3)", "3\\sqrt3"]
+    ];
+    const [prompt, answer, display] = options[rand(0, options.length - 1)];
+    return {
+      prompt: `Simplify \\(${prompt}\\).`,
+      answer,
+      displayAnswer: `\\(${display}\\)`,
+      accepted: [answer, answer.replace("sqrt", "√"), answer.replace(/[()]/g, "")],
+      steps: ["Simplify each radical first.", "Identify like radicals with the same number under the radical.", "Add or subtract the coefficients of the like radicals."]
+    };
+  },
+  radicalSumThree() {
+    const options = [
+      ["\\sqrt{27}+\\sqrt{12}-\\sqrt{48}", "sqrt(3)", "\\sqrt3"],
+      ["\\sqrt{80}-\\sqrt{45}+\\sqrt{20}", "5sqrt(5)", "5\\sqrt5"],
+      ["\\sqrt{72}+\\sqrt{18}-\\sqrt{32}", "5sqrt(2)", "5\\sqrt2"]
+    ];
+    const [prompt, answer, display] = options[rand(0, options.length - 1)];
+    return {
+      prompt: `Simplify \\(${prompt}\\).`,
+      answer,
+      displayAnswer: `\\(${display}\\)`,
+      accepted: [answer, answer.replace("sqrt", "√"), answer.replace(/[()]/g, "")],
+      steps: ["Simplify all three radicals.", "Combine only radicals that have the same radicand.", "Keep the final coefficient and radical together."]
+    };
+  },
+  radicalCoeffTwoTerm() {
+    const options = [
+      ["7\\sqrt{2}-\\sqrt{18}", "4sqrt(2)", "4\\sqrt2"],
+      ["5\\sqrt{3}+2\\sqrt{27}", "11sqrt(3)", "11\\sqrt3"],
+      ["9\\sqrt{5}-\\sqrt{45}", "6sqrt(5)", "6\\sqrt5"]
+    ];
+    const [prompt, answer, display] = options[rand(0, options.length - 1)];
+    return {
+      prompt: `Simplify \\(${prompt}\\).`,
+      answer,
+      displayAnswer: `\\(${display}\\)`,
+      accepted: [answer, answer.replace("sqrt", "√"), answer.replace(/[()]/g, "")],
+      steps: ["Simplify any radical that is not already simplest form.", "Rewrite the expression with like radicals.", "Add or subtract the coefficients."]
+    };
+  },
+  radicalProduct() {
+    const options = [
+      ["\\sqrt6\\cdot\\sqrt3", "3sqrt(2)", "3\\sqrt2"],
+      ["\\sqrt{10}\\cdot\\sqrt{15}", "5sqrt(6)", "5\\sqrt6"],
+      ["\\sqrt4\\cdot\\sqrt9", "6", "6"]
+    ];
+    const [prompt, answer, display] = options[rand(0, options.length - 1)];
+    return {
+      prompt: `Simplify \\(${prompt}\\).`,
+      answer,
+      displayAnswer: `\\(${display}\\)`,
+      accepted: [answer, answer.replace("sqrt", "√"), answer.replace(/[()]/g, "")],
+      steps: ["Multiply the radicands together.", "Simplify the resulting square root.", "If both radicals are perfect squares, multiply their square roots."]
     };
   },
   polynomialOperations() {
@@ -789,6 +1054,50 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;");
 }
 
+function graphSvg({ m = null, b = 0, vertical = null, horizontal = null, dashed = false, shade = null }) {
+  const size = 240;
+  const pad = 22;
+  const scale = (size - pad * 2) / 12;
+  const xToPx = (x) => pad + (x + 6) * scale;
+  const yToPx = (y) => pad + (6 - y) * scale;
+  const lineStyle = dashed ? 'stroke-dasharray="7 5"' : "";
+  const grid = Array.from({ length: 13 }, (_, i) => i - 6).map(v => `
+    <line x1="${xToPx(v)}" y1="${pad}" x2="${xToPx(v)}" y2="${size - pad}" class="grid-line"></line>
+    <line x1="${pad}" y1="${yToPx(v)}" x2="${size - pad}" y2="${yToPx(v)}" class="grid-line"></line>
+  `).join("");
+  let boundary = "";
+  let shading = "";
+  if (vertical !== null) {
+    const x = xToPx(vertical);
+    boundary = `<line x1="${x}" y1="${pad}" x2="${x}" y2="${size - pad}" class="boundary-line" ${lineStyle}></line>`;
+    if (shade === "right") shading = `<rect x="${x}" y="${pad}" width="${size - pad - x}" height="${size - pad * 2}" class="shade-region"></rect>`;
+  } else if (horizontal !== null) {
+    const y = yToPx(horizontal);
+    boundary = `<line x1="${pad}" y1="${y}" x2="${size - pad}" y2="${y}" class="boundary-line" ${lineStyle}></line>`;
+    if (shade === "below") shading = `<rect x="${pad}" y="${y}" width="${size - pad * 2}" height="${size - pad - y}" class="shade-region"></rect>`;
+    if (shade === "above") shading = `<rect x="${pad}" y="${pad}" width="${size - pad * 2}" height="${y - pad}" class="shade-region"></rect>`;
+  } else {
+    const x1 = -6, x2 = 6, y1 = m * x1 + b, y2 = m * x2 + b;
+    const p1 = `${xToPx(x1)},${yToPx(y1)}`;
+    const p2 = `${xToPx(x2)},${yToPx(y2)}`;
+    boundary = `<line x1="${xToPx(x1)}" y1="${yToPx(y1)}" x2="${xToPx(x2)}" y2="${yToPx(y2)}" class="boundary-line" ${lineStyle}></line>`;
+    if (shade === "below") shading = `<polygon points="${p1} ${p2} ${xToPx(6)},${yToPx(-6)} ${xToPx(-6)},${yToPx(-6)}" class="shade-region"></polygon>`;
+    if (shade === "above") shading = `<polygon points="${p1} ${p2} ${xToPx(6)},${yToPx(6)} ${xToPx(-6)},${yToPx(6)}" class="shade-region"></polygon>`;
+  }
+  return `
+    <svg class="practice-graph" viewBox="0 0 ${size} ${size}" role="img" aria-label="Coordinate plane graph">
+      <defs><clipPath id="graph-clip"><rect x="${pad}" y="${pad}" width="${size - pad * 2}" height="${size - pad * 2}"></rect></clipPath></defs>
+      <rect x="${pad}" y="${pad}" width="${size - pad * 2}" height="${size - pad * 2}" class="graph-bg"></rect>
+      ${grid}
+      <line x1="${pad}" y1="${yToPx(0)}" x2="${size - pad}" y2="${yToPx(0)}" class="axis-line"></line>
+      <line x1="${xToPx(0)}" y1="${pad}" x2="${xToPx(0)}" y2="${size - pad}" class="axis-line"></line>
+      <g clip-path="url(#graph-clip)">${shading}${boundary}</g>
+      <text x="${size - 16}" y="${yToPx(0) - 5}" class="axis-label">x</text>
+      <text x="${xToPx(0) + 5}" y="${pad + 12}" class="axis-label">y</text>
+    </svg>
+  `;
+}
+
 function renderPractice(problem) {
   const generator = practice[problem.practiceType] || practice[problem.topic] || practice.functionEvaluation;
   const item = generator();
@@ -797,6 +1106,7 @@ function renderPractice(problem) {
   box.innerHTML = `
     <h3>Similar Practice: ${PRACTICE_LABELS[problem.practiceType] || TOPICS[problem.topic]}</h3>
     <p class="practice-prompt">${item.prompt}</p>
+    ${item.visual || ""}
     <div class="answer-line">
       <input id="practiceInput" placeholder="Type your answer">
       <button class="primary" id="checkPractice">Check</button>

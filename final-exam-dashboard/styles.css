@@ -346,6 +346,45 @@ h1 {
   font-weight: 800;
 }
 
+.practice-graph {
+  display: block;
+  width: min(100%, 300px);
+  margin: 10px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.graph-bg {
+  fill: #ffffff;
+}
+
+.grid-line {
+  stroke: #e3e8f0;
+  stroke-width: 1;
+}
+
+.axis-line {
+  stroke: #647184;
+  stroke-width: 1.4;
+}
+
+.boundary-line {
+  stroke: #18212f;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.shade-region {
+  fill: rgba(35, 87, 164, 0.18);
+}
+
+.axis-label {
+  fill: #647184;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .answer-line {
   display: flex;
   gap: 8px;
