@@ -116,7 +116,7 @@ const KEY = {
   83:["\\(256x^{12}y^8\\)",["Raise each factor to the fourth power.","\\((-4)^4=256\\), \\((x^3)^4=x^{12}\\), and \\((y^2)^4=y^8\\)."]],
   84:["\\(9x^6y^8\\)",["Square the coefficient and multiply exponents by 2."]],
   85:["\\(5\\sqrt2\\)",["\\(50=25\\cdot2\\).","Take \\(\\sqrt{25}=5\\) out of the radical."]],
-  86:["\\(9x^6y^8\\)",["Use the quotient rule for exponents.","Reduce coefficients and subtract exponents for matching bases."]],
+  86:["\\(-6x^3y^5z^{10}\\)",["Divide the coefficients: \\(-24\\div4=-6\\).","Subtract exponents for matching bases: \\(x^{6-3}=x^3\\) and \\(z^{15-5}=z^{10}\\).","The \\(y^5\\) stays in the numerator because there is no y-factor in the denominator."]],
   87:["\\(6x^4\\)",["Apply power rules carefully to every factor.","Simplify the coefficient and variable powers."]],
   88:["\\(5\\sqrt3\\)",["\\(75=25\\cdot3\\).","Take \\(\\sqrt{25}=5\\) out."]],
   89:["\\(7\\sqrt3\\)",["\\(\\sqrt{48}=4\\sqrt3\\) and \\(\\sqrt{27}=3\\sqrt3\\).","Add like radicals."]],
