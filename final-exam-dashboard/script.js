@@ -97,7 +97,7 @@ const KEY = {
   64:["\\(y=\\frac{2}{3}x-2\\)",["Read the slope and y-intercept from the graphed line.","Use slope-intercept form \\(y=mx+b\\)."]],
   65:["\\(y=-\\frac{2}{5}x+9\\)",["Use the given slope \\(-\\frac25\\) and point in point-slope form.","Rewrite the result in slope-intercept form: \\(y=-\\frac25x+9\\)."]],
   66:["\\(y=\\frac12x+\\frac12\\)",["Slope is \\(\\frac{4-(-2)}{7-(-5)}=\\frac12\\).","Substitute a point to find \\(b=\\frac12\\)."]],
-  67:["\\(y=-\\frac{5}{2}x+5\\)",["Use the x-intercept and y-intercept to find the slope.","Write the line in slope-intercept form."]],
+  67:["\\(y=\\frac{5}{2}x+5\\)",["Use the x-intercept and y-intercept to find the slope \\(\\frac52\\).","Write the line in slope-intercept form: \\(y=\\frac52x+5\\)."]],
   68:["\\(y=\\frac{5}{3}x+\\frac{4}{3}\\)",["Find the slope from the two points.","Substitute one point to solve for the y-intercept."]],
   69:["\\(y=\\frac{1}{2}x+3\\)",["Read two points on line \\(l\\).","Find the slope and y-intercept."]],
   70:["\\(y=61.93x-1.79\\)",["Use a line of best fit for the table.","The verified model is \\(y=61.93x-1.79\\)."]],
