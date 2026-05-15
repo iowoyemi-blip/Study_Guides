@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Algebra I Speed Drill — Teacher</title>
+<style>
+  :root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --ink: #1a2332;
+    --ink-soft: #4a5b73;
+    --accent: #2962ff;
+    --accent-dark: #0039cb;
+    --teach: #6a1b9a;
+    --teach-bg: #f3e5f5;
+    --good: #2e7d32;
+    --good-bg: #e8f5e9;
+    --bad: #c62828;
+    --bad-bg: #ffebee;
+    --warn: #ef6c00;
+    --border: #d6dde7;
+    --muted: #f0f3f8;
+    --shadow: 0 2px 12px rgba(20, 40, 80, 0.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 780px;
+  }
+
+  header.title {
+    text-align: center;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  header.title h1 {
+    margin: 0 0 4px 0;
+    font-size: 28px;
+    color: var(--ink);
+  }
+  header.title p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+  .mode-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: var(--teach-bg);
+    color: var(--teach);
+    margin-top: 8px;
+  }
+  .mode-badge.student { background: #e3edff; color: var(--accent-dark); }
+
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0 0 10px 0;
+  }
+
+  /* ================= TEACHER HOME ================= */
+  .home-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .home-card {
+    background: var(--muted);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 22px 18px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: var(--ink);
+    transition: all 0.15s ease;
+  }
+  .home-card:hover {
+    background: #e6ecf5;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .home-card .icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .home-card h3 {
+    margin: 0 0 6px 0;
+    font-size: 17px;
+  }
+  .home-card p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .home-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  /* ================= EDITOR ================= */
+  .editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+  .editor-toolbar .grow { flex: 1; }
+  .unit-select {
+    flex: 1;
+    min-width: 180px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: white;
+  }
+  .editor-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .edit-q-card {
+    background: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .edit-q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+  .edit-q-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .edit-q-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .icon-btn {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+  .icon-btn:hover { background: var(--muted); border-color: var(--ink-soft); }
+  .icon-btn.danger:hover { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+
+  .edit-field {
+    margin-bottom: 10px;
+  }
+  .edit-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .edit-input, .edit-textarea {
+    width: 100%;
+    padding: 9px 11px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: inherit;
+    background: white;
+    color: var(--ink);
+  }
+  .edit-textarea {
+    resize: vertical;
+    min-height: 56px;
+    line-height: 1.4;
+  }
+  .edit-input:focus, .edit-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .choices-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .choice-edit-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .choice-edit-row input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    accent-color: var(--good);
+  }
+  .choice-edit-row .edit-input { flex: 1; }
+  .choice-edit-row.correct .edit-input {
+    background: var(--good-bg);
+    border-color: var(--good);
+  }
+  .choice-edit-row .remove-choice {
+    color: var(--bad);
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .choice-edit-row .remove-choice:hover { background: var(--bad-bg); border-color: var(--bad); }
+
+  .add-choice-row {
+    margin-top: 8px;
+  }
+  .add-choice-btn {
+    background: white;
+    border: 1.5px dashed var(--border);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .add-choice-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .add-choice-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .editor-add-question {
+    background: white;
+    border: 2px dashed var(--accent);
+    color: var(--accent);
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    font-family: inherit;
+    width: 100%;
+  }
+  .editor-add-question:hover { background: #e3edff; }
+
+  .save-status {
+    font-size: 13px;
+    color: var(--good);
+    font-weight: 600;
+    min-height: 18px;
+    transition: opacity 0.4s ease;
+  }
+  .save-status.fade { opacity: 0; }
+
+  /* ================= SHARE MODAL ================= */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 40, 80, 0.45);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .modal {
+    background: white;
+    border-radius: 14px;
+    padding: 28px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+  }
+  .modal > p.intro {
+    margin: 0 0 18px 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .share-option {
+    background: var(--muted);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .share-option h3 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .share-option .pill {
+    display: inline-block;
+    font-size: 10px;
+    background: var(--accent);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-left: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    vertical-align: middle;
+  }
+  .share-option p {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .share-link-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .share-link-row input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 12px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    background: white;
+    color: var(--ink-soft);
+  }
+  .share-action-row {
+    margin-top: 8px;
+  }
+  .share-action-row .primary { margin-top: 0; }
+  .modal-close-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  /* ================= SHARED BUTTONS ================= */
+  .primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease;
+  }
+  .primary.full-width { width: 100%; margin-top: 4px; }
+  .primary:hover:not(:disabled) { background: var(--accent-dark); }
+  .primary:disabled {
+    background: #c9d2e0;
+    cursor: not-allowed;
+  }
+
+  .secondary {
+    background: white;
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .secondary:hover { background: var(--muted); }
+
+  .ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: none;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: underline;
+  }
+  .ghost:hover { color: var(--bad); }
+
+  /* ================= DRILL UI (same as original) ================= */
+  .unit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .unit-btn {
+    background: var(--muted);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    color: var(--ink);
+  }
+  .unit-btn:hover { background: #e6ecf5; }
+  .unit-btn.selected {
+    background: #e3edff;
+    border-color: var(--accent);
+  }
+  .unit-btn .u-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .unit-btn .u-name { font-size: 15px; font-weight: 600; margin-top: 2px; }
+  .unit-btn .u-count { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+
+  .timer-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .preset-btn {
+    background: var(--muted);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--ink);
+    transition: all 0.15s ease;
+  }
+  .preset-btn:hover { background: #e6ecf5; }
+  .preset-btn.selected {
+    background: #e3edff;
+    border-color: var(--accent);
+    color: var(--accent-dark);
+  }
+
+  .custom-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .custom-row label { font-size: 14px; color: var(--ink-soft); }
+  .custom-row input {
+    width: 90px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  .custom-row input:focus { outline: none; border-color: var(--accent); }
+
+  .drill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .timer-display {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-display.warning { color: var(--warn); }
+  .timer-display.danger { color: var(--bad); }
+  .count-display { font-size: 14px; color: var(--ink-soft); text-align: right; }
+  .count-display strong { display: block; font-size: 20px; color: var(--ink); }
+
+  .question {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .topic-tag {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--accent-dark);
+    background: #e3edff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+    margin-bottom: 18px;
+  }
+  .choice {
+    background: var(--muted);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--ink);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: all 0.12s ease;
+    line-height: 1.4;
+  }
+  .choice:hover:not(:disabled) { background: #e6ecf5; }
+  .choice .letter {
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    width: 22px;
+  }
+  .choice.selected {
+    background: #e3edff;
+    border-color: var(--accent);
+  }
+
+  .drill-footer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .drill-footer .primary { flex: 1; }
+
+  .results-summary {
+    text-align: center;
+    padding: 12px 0 8px;
+  }
+  .results-score {
+    font-size: 56px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .results-score .total { color: var(--ink-soft); font-weight: 600; }
+  .results-meta { color: var(--ink-soft); font-size: 15px; margin-top: 8px; }
+
+  .review {
+    max-height: 480px;
+    overflow-y: auto;
+    border-top: 1px solid var(--border);
+    margin-top: 16px;
+    padding-top: 12px;
+  }
+  .review-item {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--border);
+  }
+  .review-item.correct { background: var(--good-bg); border-left-color: var(--good); }
+  .review-item.wrong { background: var(--bad-bg); border-left-color: var(--bad); }
+  .review-q { font-weight: 600; margin-bottom: 4px; font-size: 15px; }
+  .review-line { font-size: 13px; color: var(--ink-soft); margin: 2px 0; }
+  .review-line .ok { color: var(--good); font-weight: 600; }
+  .review-line .no { color: var(--bad); font-weight: 600; }
+
+  .results-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .results-buttons button { flex: 1; }
+
+  .hidden { display: none !important; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .home-cards { grid-template-columns: 1fr; }
+    .unit-grid { grid-template-columns: 1fr; }
+    .question { font-size: 18px; }
+    .timer-display { font-size: 26px; }
+    .results-score { font-size: 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="title">
+    <h1>Algebra I Speed Drill</h1>
+    <p>Review the "how-tos" before your unit assessment</p>
+    <span class="mode-badge" id="mode-badge">Teacher</span>
+  </header>
+
+  <!-- ============ TEACHER HOME ============ -->
+  <section id="teacher-home" class="card hidden">
+    <p class="section-label">What would you like to do?</p>
+    <div class="home-cards">
+      <button class="home-card" id="home-edit">
+        <span class="icon">✎</span>
+        <h3>Edit Questions</h3>
+        <p>Add, change, or delete questions for any unit.</p>
+      </button>
+      <button class="home-card" id="home-try">
+        <span class="icon">▶</span>
+        <h3>Try the Drill</h3>
+        <p>Run the drill yourself to test how it feels.</p>
+      </button>
+      <button class="home-card" id="home-share">
+        <span class="icon">↗</span>
+        <h3>Share with Students</h3>
+        <p>Download a student file or copy a student link.</p>
+      </button>
+    </div>
+    <div class="home-footer">
+      <span id="home-status">Edits save automatically to this browser.</span>
+      <button class="ghost" id="reset-all-btn">Reset all to defaults</button>
+    </div>
+  </section>
+
+  <!-- ============ EDITOR ============ -->
+  <section id="editor-screen" class="card hidden">
+    <div class="editor-toolbar">
+      <button class="secondary" id="editor-back">← Back</button>
+      <select class="unit-select" id="editor-unit-select"></select>
+      <button class="secondary" id="editor-reset-unit">Reset Unit</button>
+    </div>
+    <div class="save-status" id="save-status"></div>
+    <div class="editor-questions" id="editor-questions"></div>
+    <button class="editor-add-question" id="editor-add-question">+ Add Question to this Unit</button>
+  </section>
+
+  <!-- ============ SETUP SCREEN ============ -->
+  <section id="setup-screen" class="card hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <p class="section-label" style="margin:0">Choose a unit</p>
+      <button class="ghost" id="setup-back" style="text-decoration:none">← Back to Home</button>
+    </div>
+    <div class="unit-grid" id="unit-grid"></div>
+
+    <p class="section-label">Choose drill length</p>
+    <div class="timer-row" id="timer-presets"></div>
+    <div class="custom-row">
+      <label for="custom-seconds">Or custom:</label>
+      <input type="number" id="custom-seconds" min="10" max="3600" placeholder="seconds" />
+      <span style="font-size: 14px; color: var(--ink-soft);">seconds</span>
+    </div>
+
+    <button class="primary full-width" id="start-btn" disabled style="margin-top: 24px;">Start Drill</button>
+  </section>
+
+  <!-- ============ DRILL ============ -->
+  <section id="drill-screen" class="card hidden">
+    <div class="drill-header">
+      <div class="timer-display" id="timer-display">0:00</div>
+      <div class="count-display">
+        Answered<strong id="count-display">0</strong>
+      </div>
+    </div>
+
+    <div class="topic-tag" id="topic-tag"></div>
+    <div class="question" id="question-text"></div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="drill-footer">
+      <button class="secondary" id="quit-btn">End Drill</button>
+      <button class="primary" id="next-btn" disabled>Next</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="results-screen" class="card hidden">
+    <div class="results-summary">
+      <div class="results-score">
+        <span id="r-correct">0</span><span class="total"> / <span id="r-attempted">0</span></span>
+      </div>
+      <div class="results-meta" id="results-meta"></div>
+    </div>
+
+    <p class="section-label" style="margin-top: 18px;">Review</p>
+    <div class="review" id="review-list"></div>
+
+    <div class="results-buttons">
+      <button class="secondary" id="again-btn">Try Same Unit Again</button>
+      <button class="primary" id="new-drill-btn">New Drill</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ SHARE MODAL ============ -->
+<div id="share-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Share with Students</h2>
+    <p class="intro">Pick whichever option works best for how you share materials with your class.</p>
+
+    <div class="share-option">
+      <h3>Download a student HTML file<span class="pill">Recommended</span></h3>
+      <p>Saves a clean copy with your current edits baked in and the teacher tools hidden. Upload to Google Classroom, email as an attachment, or post on your class page. Works completely offline.</p>
+      <div class="share-action-row">
+        <button class="primary" id="download-student-btn">Download Student File</button>
+      </div>
+    </div>
+
+    <div class="share-option">
+      <h3>Copy a student link</h3>
+      <p>Encodes your edited questions directly into a URL. Use this <strong>only if you've already uploaded this teacher file to a hosted location</strong> students can visit (school website, GitHub Pages, etc.). The link won't work over a local file path.</p>
+      <div class="share-link-row">
+        <input type="text" id="share-link-input" readonly placeholder="Click 'Generate' to create the link" />
+      </div>
+      <div class="share-action-row" style="display:flex;gap:8px;">
+        <button class="secondary" id="generate-link-btn">Generate</button>
+        <button class="primary" id="copy-link-btn" disabled>Copy</button>
+      </div>
+    </div>
+
+    <div class="modal-close-row">
+      <button class="secondary" id="modal-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ======================================================================
+   MODE FLAG (replaced when generating student file)
+   ====================================================================== */
+/* === BEGIN STUDENT_MODE_MARKER === */
+const STUDENT_MODE_FORCED = false;
+/* === END STUDENT_MODE_MARKER === */
+
+/* ======================================================================
+   DEFAULT QUESTION BANK (replaced when generating student file)
+   ====================================================================== */
+/* === BEGIN DEFAULT_QUESTIONS_MARKER === */
+const DEFAULT_QUESTIONS = {
+  "Unit 1": {
+    name: "Exponents & Radicals",
+    questions: [
+      { topic: "Product Rule of Exponents", q: "How do you multiply expressions with the same base?", choices: ["Add the exponents", "Multiply the exponents", "Subtract the exponents"], answer: 0 },
+      { topic: "Quotient Rule of Exponents", q: "How do you divide expressions with the same base?", choices: ["Subtract the exponents (top minus bottom)", "Add the exponents", "Divide the exponents"], answer: 0 },
+      { topic: "Power Rule of Exponents", q: "When you have an exponent raised to another exponent, like (x³)⁴, what do you do?", choices: ["Multiply the exponents", "Add the exponents", "Raise the base to one of the exponents"], answer: 0 },
+      { topic: "Power of a Power", q: "How do you simplify (xᵃ)ᵇ?", choices: ["x^(a·b) — multiply the exponents", "x^(a+b) — add the exponents", "x^(a−b) — subtract the exponents"], answer: 0 },
+      { topic: "All Rules of Exponents", q: "When simplifying a complex exponent expression, what is the best first step?", choices: ["Identify each operation (multiply, divide, power) and apply the matching rule one step at a time", "Add all the exponents together at once", "Convert every exponent into a decimal"], answer: 0 },
+      { topic: "Simplify Square Root Expressions", q: "How do you simplify a square root like √48?", choices: ["Find the largest perfect-square factor and take its square root out", "Take the square root of each digit", "Divide the number by 2"], answer: 0 },
+      { topic: "Square Roots with Variables", q: "How do you simplify √(x⁶)?", choices: ["Divide the exponent by 2 → x³", "Multiply the exponent by 2 → x¹²", "Subtract 2 from the exponent → x⁴"], answer: 0 },
+      { topic: "Add/Subtract Square Roots", q: "How do you add or subtract square root expressions?", choices: ["Only combine terms with the same radicand — add or subtract the coefficients", "Add the radicands together under one root", "Multiply the coefficients and the radicands"], answer: 0 },
+      { topic: "Divide Square Roots", q: "How do you divide √a by √b?", choices: ["Combine under one radical and divide the radicands: √(a/b)", "Subtract the radicands: √(a − b)", "Divide the index of each radical"], answer: 0 },
+      { topic: "Rationalizing the Denominator", q: "How do you rationalize a denominator like 1/√3?", choices: ["Multiply the top AND bottom by √3", "Square the denominator only", "Move the radical to the numerator and drop it"], answer: 0 }
+    ]
+  },
+  "Unit 2": {
+    name: "Equations & Inequalities",
+    questions: [
+      { topic: "Order of Operations", q: "What order do you follow when simplifying an expression?", choices: ["PEMDAS — parentheses, exponents, multiply/divide left-to-right, add/subtract left-to-right", "Left to right, no exceptions", "Add first, then multiply, then handle parentheses last"], answer: 0 },
+      { topic: "Evaluating Algebraic Expressions", q: "How do you evaluate an expression like 3x + 2 when x = 4?", choices: ["Substitute 4 in for x, then follow the order of operations", "Add the coefficients and the value together", "Multiply x by every number in the expression first"], answer: 0 },
+      { topic: "Writing Expressions from Verbal Phrases", q: "How do you write an algebraic expression from a verbal phrase?", choices: ["Identify the operation words (sum, difference, of, less than) and translate them carefully", "Just write the numbers in the order they appear", "Use addition for every operation word"], answer: 0 },
+      { topic: "Multi-step Equations with Distribution", q: "When solving 2(x + 3) = 4x − 1, what's a good first step?", choices: ["Distribute, then combine like terms before isolating the variable", "Subtract the constants on both sides first", "Divide both sides by x"], answer: 0 },
+      { topic: "Word Problems → Equations", q: "What's the first step when solving a word problem with algebra?", choices: ["Define a variable for the unknown, then translate the words into an equation", "Guess and check until something works", "Add all the numbers in the problem together"], answer: 0 },
+      { topic: "Identities and Contradictions", q: "How do you know an equation is an identity (infinitely many solutions)?", choices: ["The variables cancel and you get a TRUE statement (like 5 = 5)", "The variables cancel and you get a FALSE statement (like 5 = 7)", "You can isolate x and get a single number"], answer: 0 },
+      { topic: "Literal Equations", q: "How do you solve a literal equation for a specific variable?", choices: ["Treat the other letters like numbers — use inverse operations to isolate the variable", "Set the equation equal to zero first", "Replace every letter with the number 1"], answer: 0 },
+      { topic: "One-Variable Inequalities", q: "When solving an inequality, what MUST you do if you multiply or divide both sides by a negative number?", choices: ["Flip the inequality sign", "Keep the sign the same", "Change the sign to equals"], answer: 0 },
+      { topic: "Compound Inequalities", q: "To solve an \"and\" compound inequality like 2 < x + 1 < 5, what do you do?", choices: ["Perform the same operation on all three parts at the same time", "Solve only the left side and ignore the right", "Split it into two pieces and add the answers"], answer: 0 }
+    ]
+  },
+  "Unit 3": {
+    name: "Functions & Slope",
+    questions: [
+      { topic: "Independent vs Dependent Variables", q: "In a dependency relationship, which is the dependent variable?", choices: ["The one whose value depends on the other variable", "The one you can choose freely", "Always the variable x"], answer: 0 },
+      { topic: "Continuous vs Discrete", q: "How can you tell if a relationship is discrete?", choices: ["The values are countable / whole units only (e.g., number of students)", "The values can be any real number, including decimals", "The graph is a smooth unbroken line"], answer: 0 },
+      { topic: "Writing a Linear Rule from Data", q: "To write the rule for a set of data that is linear, what do you need to find?", choices: ["The slope and the y-intercept", "The largest x-value in the data", "Only the first y-value"], answer: 0 },
+      { topic: "Find Output Given Input", q: "Given f(x) = 2x + 1, how do you find f(3)?", choices: ["Substitute 3 for x and simplify", "Set 2x + 1 equal to 3 and solve", "Multiply 3 by f"], answer: 0 },
+      { topic: "Find Input Given Output", q: "Given f(x) = 2x + 1 and f(x) = 7, how do you find x?", choices: ["Set 2x + 1 = 7 and solve for x", "Plug 7 in for x", "Divide 7 by 2"], answer: 0 },
+      { topic: "Is the Relation a Function?", q: "How do you tell if a relation is a function?", choices: ["Each input (x) is paired with exactly ONE output (y) — vertical line test on a graph", "Each output is paired with exactly one input", "The graph is a straight line"], answer: 0 },
+      { topic: "Definition of Slope", q: "What does slope describe?", choices: ["The constant rate of change — rise over run", "Where the line crosses the y-axis", "The y-value when x = 0"], answer: 0 },
+      { topic: "Slope from Two Points", q: "How do you find the slope between two points (x₁, y₁) and (x₂, y₂)?", choices: ["(y₂ − y₁) / (x₂ − x₁)", "(x₂ − x₁) / (y₂ − y₁)", "(x₂ + y₂) − (x₁ + y₁)"], answer: 0 }
+    ]
+  },
+  "Unit 4": {
+    name: "Linear Functions",
+    questions: [
+      { topic: "Slope-Intercept Form", q: "How do you graph a line using y = mx + b?", choices: ["Plot the y-intercept (b), then use the slope (m = rise/run) to find another point", "Plot the x-intercept first, then guess the slope", "Pick any two random points and connect them"], answer: 0 },
+      { topic: "Point-Slope Form", q: "What does point-slope form y − y₁ = m(x − x₁) require you to know?", choices: ["A point on the line AND the slope", "Two points and the y-intercept", "Only the slope"], answer: 0 },
+      { topic: "Standard Form", q: "What does standard form Ax + By = C make easiest to find?", choices: ["The x- and y-intercepts (set the other variable to 0)", "The slope directly", "The vertex of the line"], answer: 0 },
+      { topic: "Standard → Slope-Intercept", q: "How do you rewrite Ax + By = C in slope-intercept form?", choices: ["Solve the equation for y", "Solve the equation for x", "Set A = m and B = b"], answer: 0 },
+      { topic: "Horizontal and Vertical Lines", q: "What does the equation of a horizontal line look like?", choices: ["y = a constant (and a vertical line is x = a constant)", "x = a constant (and a vertical line is y = a constant)", "y = mx with m ≠ 0"], answer: 0 },
+      { topic: "Parallel Lines", q: "What is true about the slopes of parallel lines?", choices: ["They are EQUAL (same slope, different y-intercepts)", "They are negative reciprocals of each other", "Their product is 1"], answer: 0 },
+      { topic: "Perpendicular Lines", q: "What is true about the slopes of perpendicular lines?", choices: ["They are NEGATIVE RECIPROCALS (their product is −1)", "They are equal", "One is always zero"], answer: 0 },
+      { topic: "Interpret Linear Functions in Context", q: "In a real-world equation y = mx + b, what does b usually represent?", choices: ["The starting / initial value (the amount when x = 0)", "The rate of change", "The maximum value"], answer: 0 },
+      { topic: "Graph Linear Inequalities", q: "After graphing the boundary line of a linear inequality, how do you decide which side to shade?", choices: ["Test a point NOT on the line — if it makes the inequality true, shade that side", "Always shade above the line", "Shade both sides"], answer: 0 },
+      { topic: "Linear Inequality Word Problems", q: "What's the first step in setting up a linear inequality word problem?", choices: ["Define a variable, then translate the constraint into an inequality", "Solve as an equation first, then add an inequality at the end", "Graph the situation before writing anything"], answer: 0 },
+      { topic: "Scatterplots and Trend Lines", q: "What does a trend line on a scatterplot show?", choices: ["The overall direction and relationship of the data", "The exact value of every data point", "A perfect fit through every data point"], answer: 0 },
+      { topic: "Linear Regression", q: "What does linear regression on a calculator find?", choices: ["The equation of the line of best fit through the data", "The mean of all the y-values", "The slope only, not the y-intercept"], answer: 0 }
+    ]
+  },
+  "Unit 5": {
+    name: "Systems of Equations & Inequalities",
+    questions: [
+      { topic: "Solve System by Graphing", q: "How do you find the solution to a system of equations by graphing?", choices: ["Find the POINT where the two lines intersect", "Add the two equations together graphically", "Find where each line crosses the x-axis"], answer: 0 },
+      { topic: "Number of Solutions", q: "A system whose lines have the SAME slope but DIFFERENT y-intercepts has how many solutions?", choices: ["No solution (the lines are parallel)", "One solution", "Infinitely many solutions"], answer: 0 },
+      { topic: "Substitution Method", q: "What is the first step of the substitution method?", choices: ["Solve one equation for one variable, then substitute that expression into the other equation", "Add the two equations to eliminate a variable", "Graph both lines first"], answer: 0 },
+      { topic: "Elimination Method", q: "What's the goal of the elimination method?", choices: ["Add or subtract the equations (after lining up like terms) to ELIMINATE one variable", "Eliminate the constants from both equations", "Multiply the two equations together"], answer: 0 },
+      { topic: "System Word Problems", q: "What's the first step when setting up a system of equations word problem?", choices: ["Define TWO variables for the two unknowns, then write TWO equations from the problem", "Write a single equation in one variable", "Guess values and check them"], answer: 0 },
+      { topic: "Graph System of Inequalities", q: "How do you find the solution region for a system of linear inequalities?", choices: ["Graph each inequality and shade — the solution is where the shaded regions OVERLAP", "Find the intersection point of the boundary lines only", "Shade inside only one of the inequalities"], answer: 0 },
+      { topic: "System of Inequalities Applications", q: "How do you check whether a point is a solution to a system of inequalities?", choices: ["Substitute the point into BOTH inequalities — it must make BOTH true", "Test only the first inequality", "Plot the point and see if it's on a boundary line"], answer: 0 }
+    ]
+  },
+  "Unit 6": {
+    name: "Polynomials",
+    questions: [
+      { topic: "Polynomial in Standard Form", q: "How do you write a polynomial in standard form?", choices: ["Arrange the terms in DESCENDING order of exponent (highest power first)", "Arrange the terms in ascending order of exponent", "Alphabetize the variables"], answer: 0 },
+      { topic: "Add and Subtract Polynomials", q: "When SUBTRACTING one polynomial from another, what's the critical step?", choices: ["Distribute the negative sign to every term of the second polynomial first", "Subtract only the leading terms", "Change all signs in BOTH polynomials"], answer: 0 },
+      { topic: "Multiply Two Binomials", q: "What's the method for multiplying two binomials like (x + 2)(x + 3)?", choices: ["FOIL — First, Outer, Inner, Last", "Add the binomials, then square the result", "Multiply only the first terms and only the last terms"], answer: 0 },
+      { topic: "Multiply a Binomial by a Trinomial", q: "How do you multiply a binomial by a trinomial?", choices: ["Distribute each term of the binomial across every term of the trinomial, then combine like terms", "Use FOIL on them", "Only multiply the first terms of each"], answer: 0 },
+      { topic: "Factor Using GCF", q: "What is the FIRST step in factoring any polynomial?", choices: ["Look for and factor out the Greatest Common Factor (GCF)", "Try to factor as a difference of squares", "Always split the middle term"], answer: 0 },
+      { topic: "Factor by Grouping", q: "After grouping the terms in a four-term polynomial, what's the next step?", choices: ["Factor out the GCF from EACH group — the remaining binomial should match", "Add the two groups together", "Multiply the groups"], answer: 0 },
+      { topic: "Factor Trinomials (Splitting the Middle)", q: "To factor a trinomial x² + bx + c, what two numbers are you looking for?", choices: ["Two numbers that MULTIPLY to c AND ADD to b", "Two numbers that add to c and multiply to b", "Any two factors of b"], answer: 0 },
+      { topic: "Factor Difference of Squares", q: "How do you factor a² − b²?", choices: ["(a + b)(a − b)", "(a − b)(a − b)", "(a + b)²"], answer: 0 }
+    ]
+  },
+  "Unit 7": {
+    name: "Quadratic Functions",
+    questions: [
+      { topic: "Linear vs Quadratic from a Table", q: "How do you tell from a table of values that a function is quadratic?", choices: ["The SECOND differences are constant (first differences change at a steady rate)", "The first differences are constant", "The y-values are all positive"], answer: 0 },
+      { topic: "Real-World Quadratic Graphs", q: "On a real-world quadratic graph (like a projectile), what does the vertex represent?", choices: ["The MAXIMUM or MINIMUM value of the situation", "The starting position only", "An x-intercept"], answer: 0 },
+      { topic: "Graph from Factored Form", q: "What does the factored form y = a(x − p)(x − q) tell you directly?", choices: ["The x-intercepts (the zeros) are x = p and x = q", "The y-intercept is p + q", "The vertex is at (p, q)"], answer: 0 },
+      { topic: "Graph from Standard Form", q: "How do you find the axis of symmetry of y = ax² + bx + c?", choices: ["x = −b / (2a)", "x = b / (2a)", "x = c / a"], answer: 0 },
+      { topic: "Graph from Vertex Form", q: "What does vertex form y = a(x − h)² + k tell you directly?", choices: ["The vertex is at (h, k)", "The x-intercepts are h and k", "The y-intercept is h"], answer: 0 },
+      { topic: "Solve by Factoring (Zero Product Property)", q: "Once a quadratic is factored, how do you find the solutions?", choices: ["Set EACH factor equal to zero and solve (Zero Product Property)", "Add the factors together and set equal to zero", "Multiply the factors and divide by zero"], answer: 0 },
+      { topic: "Square Root Property", q: "How do you solve a quadratic like x² = 25 using the square root property?", choices: ["Take the square root of both sides — and don't forget ±", "Divide both sides by 2", "Subtract 25 from both sides only"], answer: 0 },
+      { topic: "Quadratic Formula", q: "What is the quadratic formula for ax² + bx + c = 0?", choices: ["x = ( −b ± √(b² − 4ac) ) / (2a)", "x = ( b ± √(b² − 4ac) ) / (2a)", "x = ( −b ± √(b² + 4ac) ) / a"], answer: 0 }
+    ]
+  },
+  "Unit 8": {
+    name: "Exponential Functions",
+    questions: [
+      { topic: "Identify Linear / Quadratic / Exponential from a Table", q: "How do you tell from a table of values that a function is EXPONENTIAL?", choices: ["The y-values have a constant RATIO (each one is multiplied by the same number)", "The y-values have constant first differences", "The y-values have constant second differences"], answer: 0 },
+      { topic: "Write Exponential Function from a Table", q: "What is the general form of an exponential function?", choices: ["y = a · bˣ  (where a is the initial value and b is the common ratio)", "y = ax + b", "y = ax² + bx + c"], answer: 0 },
+      { topic: "Exponential Growth vs Decay", q: "How do you tell if y = a · bˣ is exponential GROWTH or DECAY?", choices: ["If b > 1 it's growth; if 0 < b < 1 it's decay", "If a > 1 it's growth; if a < 1 it's decay", "If x > 0 it's growth; if x < 0 it's decay"], answer: 0 },
+      { topic: "Exponential Functions in Context", q: "In y = a · bˣ, what does \"a\" represent in a real-world problem?", choices: ["The initial value (the starting amount when x = 0)", "The growth rate", "The final value at the end of the problem"], answer: 0 },
+      { topic: "Exponential Regression", q: "What does exponential regression on a calculator find?", choices: ["The best-fit exponential function for the data", "The linear line through the data", "Only the y-intercept"], answer: 0 }
+    ]
+  }
+};
+/* === END DEFAULT_QUESTIONS_MARKER === */
+
+/* ======================================================================
+   STATE & STORAGE
+   ====================================================================== */
+const STORAGE_KEY = "algebra1_speed_drill_teacher_v1";
+const TIMER_PRESETS = [
+  { label: "30 sec", seconds: 30 },
+  { label: "1 min", seconds: 60 },
+  { label: "2 min", seconds: 120 },
+  { label: "3 min", seconds: 180 },
+  { label: "5 min", seconds: 300 }
+];
+
+// Working copy of questions — student or teacher. Begins as DEFAULT, then may be overridden.
+let QUESTIONS = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+
+// Detect the mode this page should run in.
+let isStudent = STUDENT_MODE_FORCED;
+
+// Drill state
+let drillState = {
+  selectedUnit: null,
+  selectedSeconds: null,
+  pool: [],
+  poolIndex: 0,
+  currentQuestion: null,
+  currentChoiceOrder: [],
+  currentSelection: null,
+  timerSeconds: 0,
+  timerInterval: null,
+  history: []
+};
+
+// Editor state
+let editorState = {
+  currentUnit: null
+};
+
+/* ======================================================================
+   HASH-LINK ENCODING (student link via URL)
+   ====================================================================== */
+function encodeQuestionsToUrlHash(questionsObj) {
+  // Compact JSON; base64-encode UTF-8 safely
+  const json = JSON.stringify(questionsObj);
+  const utf8 = unescape(encodeURIComponent(json));
+  const b64 = btoa(utf8).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return "data=" + b64;
+}
+function decodeQuestionsFromHash(hash) {
+  if (!hash || !hash.startsWith("#data=")) return null;
+  try {
+    let b64 = hash.slice("#data=".length).replace(/-/g, "+").replace(/_/g, "/");
+    // Re-pad
+    while (b64.length % 4) b64 += "=";
+    const utf8 = atob(b64);
+    const json = decodeURIComponent(escape(utf8));
+    return JSON.parse(json);
+  } catch (e) {
+    console.warn("Failed to decode hash data:", e);
+    return null;
+  }
+}
+
+/* ======================================================================
+   LOCAL STORAGE
+   ====================================================================== */
+function saveToLocal() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(QUESTIONS));
+  } catch (e) {
+    console.warn("Could not save to localStorage:", e);
+  }
+}
+function loadFromLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {
+    console.warn("Could not load from localStorage:", e);
+  }
+  return null;
+}
+function clearLocal() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+}
+
+/* ======================================================================
+   HELPERS
+   ====================================================================== */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+}
+function showScreen(id) {
+  ["teacher-home", "editor-screen", "setup-screen", "drill-screen", "results-screen"].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.classList.toggle("hidden", s !== id);
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function toast(msg, ms = 2200) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), ms);
+}
+
+/* ======================================================================
+   TEACHER HOME
+   ====================================================================== */
+function initTeacherHome() {
+  document.getElementById("home-edit").addEventListener("click", () => {
+    openEditor();
+  });
+  document.getElementById("home-try").addEventListener("click", () => {
+    renderSetup();
+    showScreen("setup-screen");
+  });
+  document.getElementById("home-share").addEventListener("click", openShareModal);
+
+  document.getElementById("reset-all-btn").addEventListener("click", () => {
+    if (confirm("Reset ALL units back to the original default questions? This cannot be undone.")) {
+      QUESTIONS = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS));
+      clearLocal();
+      toast("All questions reset to defaults");
+    }
+  });
+}
+
+/* ======================================================================
+   EDITOR
+   ====================================================================== */
+function openEditor() {
+  if (!editorState.currentUnit) editorState.currentUnit = Object.keys(QUESTIONS)[0];
+  renderEditor();
+  showScreen("editor-screen");
+}
+
+function renderEditor() {
+  // Populate unit dropdown
+  const sel = document.getElementById("editor-unit-select");
+  sel.innerHTML = "";
+  Object.entries(QUESTIONS).forEach(([key, data]) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = `${key} — ${data.name} (${data.questions.length} questions)`;
+    if (key === editorState.currentUnit) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.onchange = (e) => {
+    editorState.currentUnit = e.target.value;
+    renderEditor();
+  };
+
+  renderEditorQuestions();
+}
+
+function renderEditorQuestions() {
+  const wrap = document.getElementById("editor-questions");
+  wrap.innerHTML = "";
+  const unitKey = editorState.currentUnit;
+  const unit = QUESTIONS[unitKey];
+
+  unit.questions.forEach((q, qi) => {
+    const card = document.createElement("div");
+    card.className = "edit-q-card";
+
+    const choicesHtml = q.choices.map((c, ci) => `
+      <div class="choice-edit-row ${ci === q.answer ? "correct" : ""}">
+        <input type="radio" name="answer-${qi}" value="${ci}" ${ci === q.answer ? "checked" : ""} data-q="${qi}" data-action="set-answer" />
+        <input type="text" class="edit-input" value="${escapeAttr(c)}" data-q="${qi}" data-c="${ci}" data-action="edit-choice" />
+        <button class="remove-choice" data-q="${qi}" data-c="${ci}" data-action="remove-choice" title="Remove this choice" ${q.choices.length <= 2 ? "disabled" : ""}>×</button>
+      </div>
+    `).join("");
+
+    card.innerHTML = `
+      <div class="edit-q-header">
+        <span class="edit-q-num">Question ${qi + 1}</span>
+        <div class="edit-q-actions">
+          <button class="icon-btn" data-q="${qi}" data-action="move-up" ${qi === 0 ? "disabled" : ""}>↑</button>
+          <button class="icon-btn" data-q="${qi}" data-action="move-down" ${qi === unit.questions.length - 1 ? "disabled" : ""}>↓</button>
+          <button class="icon-btn danger" data-q="${qi}" data-action="delete-question">Delete</button>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label>Topic</label>
+        <input type="text" class="edit-input" value="${escapeAttr(q.topic)}" data-q="${qi}" data-action="edit-topic" />
+      </div>
+      <div class="edit-field">
+        <label>Question</label>
+        <textarea class="edit-textarea" data-q="${qi}" data-action="edit-question">${escapeText(q.q)}</textarea>
+      </div>
+      <div class="edit-field">
+        <label>Answer Choices <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--good);">(select the correct one)</span></label>
+        <div class="choices-edit">${choicesHtml}</div>
+        <div class="add-choice-row">
+          <button class="add-choice-btn" data-q="${qi}" data-action="add-choice" ${q.choices.length >= 4 ? "disabled" : ""}>+ Add Choice (max 4)</button>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+
+  // Bind events via delegation
+  wrap.onclick = handleEditorClick;
+  wrap.oninput = handleEditorInput;
+  wrap.onchange = handleEditorChange;
+}
+
+function handleEditorClick(e) {
+  const t = e.target;
+  const action = t.dataset.action;
+  if (!action) return;
+  const qi = parseInt(t.dataset.q, 10);
+  const unit = QUESTIONS[editorState.currentUnit];
+
+  if (action === "delete-question") {
+    if (confirm("Delete this question?")) {
+      unit.questions.splice(qi, 1);
+      persistAndRerender();
+    }
+  } else if (action === "move-up" && qi > 0) {
+    [unit.questions[qi - 1], unit.questions[qi]] = [unit.questions[qi], unit.questions[qi - 1]];
+    persistAndRerender();
+  } else if (action === "move-down" && qi < unit.questions.length - 1) {
+    [unit.questions[qi + 1], unit.questions[qi]] = [unit.questions[qi], unit.questions[qi + 1]];
+    persistAndRerender();
+  } else if (action === "remove-choice") {
+    const ci = parseInt(t.dataset.c, 10);
+    const q = unit.questions[qi];
+    if (q.choices.length > 2) {
+      q.choices.splice(ci, 1);
+      if (q.answer === ci) q.answer = 0;
+      else if (q.answer > ci) q.answer -= 1;
+      persistAndRerender();
+    }
+  } else if (action === "add-choice") {
+    const q = unit.questions[qi];
+    if (q.choices.length < 4) {
+      q.choices.push("New choice");
+      persistAndRerender();
+    }
+  }
+}
+
+function handleEditorInput(e) {
+  const t = e.target;
+  const action = t.dataset.action;
+  if (!action) return;
+  const qi = parseInt(t.dataset.q, 10);
+  const unit = QUESTIONS[editorState.currentUnit];
+  const q = unit.questions[qi];
+
+  if (action === "edit-topic") {
+    q.topic = t.value;
+    persistOnly();
+  } else if (action === "edit-question") {
+    q.q = t.value;
+    persistOnly();
+  } else if (action === "edit-choice") {
+    const ci = parseInt(t.dataset.c, 10);
+    q.choices[ci] = t.value;
+    persistOnly();
+  }
+}
+
+function handleEditorChange(e) {
+  const t = e.target;
+  if (t.dataset.action !== "set-answer") return;
+  const qi = parseInt(t.dataset.q, 10);
+  const q = QUESTIONS[editorState.currentUnit].questions[qi];
+  q.answer = parseInt(t.value, 10);
+  persistAndRerender();
+}
+
+function persistOnly() {
+  saveToLocal();
+  flashSaved();
+}
+function persistAndRerender() {
+  saveToLocal();
+  renderEditor();
+  flashSaved();
+}
+function flashSaved() {
+  const el = document.getElementById("save-status");
+  el.textContent = "✓ Saved";
+  el.classList.remove("fade");
+  clearTimeout(flashSaved._t);
+  flashSaved._t = setTimeout(() => { el.classList.add("fade"); }, 800);
+}
+
+function escapeAttr(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function escapeText(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+function initEditor() {
+  document.getElementById("editor-back").addEventListener("click", () => {
+    showScreen("teacher-home");
+  });
+  document.getElementById("editor-add-question").addEventListener("click", () => {
+    const unit = QUESTIONS[editorState.currentUnit];
+    unit.questions.push({
+      topic: "New Topic",
+      q: "New question text",
+      choices: ["Correct answer", "Distractor 1", "Distractor 2"],
+      answer: 0
+    });
+    saveToLocal();
+    renderEditor();
+    // Scroll to bottom
+    setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 50);
+  });
+  document.getElementById("editor-reset-unit").addEventListener("click", () => {
+    const key = editorState.currentUnit;
+    if (confirm(`Reset ${key} (${QUESTIONS[key].name}) to default questions?`)) {
+      QUESTIONS[key] = JSON.parse(JSON.stringify(DEFAULT_QUESTIONS[key]));
+      saveToLocal();
+      renderEditor();
+      toast(`${key} reset to defaults`);
+    }
+  });
+}
+
+/* ======================================================================
+   SETUP SCREEN
+   ====================================================================== */
+function renderSetup() {
+  const grid = document.getElementById("unit-grid");
+  grid.innerHTML = "";
+  Object.entries(QUESTIONS).forEach(([key, data]) => {
+    const btn = document.createElement("button");
+    btn.className = "unit-btn";
+    btn.innerHTML = `
+      <div class="u-num">${key.toUpperCase()}</div>
+      <div class="u-name">${data.name}</div>
+      <div class="u-count">${data.questions.length} topics</div>
+    `;
+    btn.addEventListener("click", () => {
+      drillState.selectedUnit = key;
+      document.querySelectorAll(".unit-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      updateStartButton();
+    });
+    grid.appendChild(btn);
+  });
+
+  const presetsRow = document.getElementById("timer-presets");
+  presetsRow.innerHTML = "";
+  TIMER_PRESETS.forEach(p => {
+    const btn = document.createElement("button");
+    btn.className = "preset-btn";
+    btn.textContent = p.label;
+    btn.addEventListener("click", () => {
+      drillState.selectedSeconds = p.seconds;
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      document.getElementById("custom-seconds").value = "";
+      updateStartButton();
+    });
+    presetsRow.appendChild(btn);
+  });
+
+  // Reset prior selections
+  drillState.selectedUnit = null;
+  drillState.selectedSeconds = null;
+  document.getElementById("custom-seconds").value = "";
+  updateStartButton();
+}
+
+function updateStartButton() {
+  const btn = document.getElementById("start-btn");
+  btn.disabled = !(drillState.selectedUnit && drillState.selectedSeconds);
+}
+
+/* ======================================================================
+   DRILL FLOW
+   ====================================================================== */
+function startDrill() {
+  drillState.history = [];
+  buildPool();
+  drillState.timerSeconds = drillState.selectedSeconds;
+  showScreen("drill-screen");
+  loadQuestion();
+  startTimer();
+}
+
+function buildPool() {
+  drillState.pool = shuffle(QUESTIONS[drillState.selectedUnit].questions);
+  drillState.poolIndex = 0;
+}
+function nextFromPool() {
+  if (drillState.poolIndex >= drillState.pool.length) {
+    drillState.pool = shuffle(QUESTIONS[drillState.selectedUnit].questions);
+    drillState.poolIndex = 0;
+  }
+  return drillState.pool[drillState.poolIndex++];
+}
+
+function startTimer() {
+  updateTimerDisplay();
+  drillState.timerInterval = setInterval(() => {
+    drillState.timerSeconds--;
+    updateTimerDisplay();
+    if (drillState.timerSeconds <= 0) {
+      endDrill();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById("timer-display");
+  el.textContent = formatTime(Math.max(0, drillState.timerSeconds));
+  el.classList.remove("warning", "danger");
+  if (drillState.timerSeconds <= 10) el.classList.add("danger");
+  else if (drillState.timerSeconds <= 30) el.classList.add("warning");
+}
+
+function loadQuestion() {
+  drillState.currentQuestion = nextFromPool();
+  const choiceCount = drillState.currentQuestion.choices.length;
+  drillState.currentChoiceOrder = shuffle([...Array(choiceCount).keys()]);
+  drillState.currentSelection = null;
+
+  document.getElementById("topic-tag").textContent = drillState.currentQuestion.topic;
+  document.getElementById("question-text").textContent = drillState.currentQuestion.q;
+
+  const choicesEl = document.getElementById("choices");
+  choicesEl.innerHTML = "";
+  const letters = ["a)", "b)", "c)", "d)"];
+  drillState.currentChoiceOrder.forEach((origIdx, displayIdx) => {
+    const btn = document.createElement("button");
+    btn.className = "choice";
+    btn.innerHTML = `<span class="letter">${letters[displayIdx]}</span><span>${escapeText(drillState.currentQuestion.choices[origIdx])}</span>`;
+    btn.addEventListener("click", () => {
+      drillState.currentSelection = displayIdx;
+      document.querySelectorAll(".choice").forEach(c => c.classList.remove("selected"));
+      btn.classList.add("selected");
+      document.getElementById("next-btn").disabled = false;
+    });
+    choicesEl.appendChild(btn);
+  });
+  document.getElementById("next-btn").disabled = true;
+}
+
+function recordAndAdvance() {
+  if (drillState.currentSelection === null) return;
+  const origPickedIdx = drillState.currentChoiceOrder[drillState.currentSelection];
+  drillState.history.push({
+    topic: drillState.currentQuestion.topic,
+    q: drillState.currentQuestion.q,
+    choices: drillState.currentQuestion.choices.slice(),
+    correctIdx: drillState.currentQuestion.answer,
+    pickedIdx: origPickedIdx
+  });
+  document.getElementById("count-display").textContent = drillState.history.length;
+  loadQuestion();
+}
+
+function endDrill() {
+  if (drillState.timerInterval) {
+    clearInterval(drillState.timerInterval);
+    drillState.timerInterval = null;
+  }
+  showResults();
+}
+
+function showResults() {
+  const correct = drillState.history.filter(h => h.pickedIdx === h.correctIdx).length;
+  const attempted = drillState.history.length;
+  document.getElementById("r-correct").textContent = correct;
+  document.getElementById("r-attempted").textContent = attempted;
+  const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
+  const unitName = QUESTIONS[drillState.selectedUnit].name;
+  const minLabel = formatTime(drillState.selectedSeconds);
+  document.getElementById("results-meta").textContent =
+    `${drillState.selectedUnit} — ${unitName} • ${minLabel} drill • ${accuracy}% accuracy`;
+
+  const list = document.getElementById("review-list");
+  list.innerHTML = "";
+  if (drillState.history.length === 0) {
+    list.innerHTML = `<p style="color: var(--ink-soft); text-align: center; padding: 16px;">No questions attempted.</p>`;
+  } else {
+    drillState.history.forEach((h, i) => {
+      const isRight = h.pickedIdx === h.correctIdx;
+      const item = document.createElement("div");
+      item.className = "review-item " + (isRight ? "correct" : "wrong");
+      item.innerHTML = `
+        <div class="review-q">${i + 1}. ${escapeText(h.q)}</div>
+        <div class="review-line"><strong>Topic:</strong> ${escapeText(h.topic)}</div>
+        <div class="review-line">Your answer: <span class="${isRight ? "ok" : "no"}">${escapeText(h.choices[h.pickedIdx])}</span></div>
+        ${isRight ? "" : `<div class="review-line">Correct: <span class="ok">${escapeText(h.choices[h.correctIdx])}</span></div>`}
+      `;
+      list.appendChild(item);
+    });
+  }
+  showScreen("results-screen");
+}
+
+/* ======================================================================
+   SHARE MODAL
+   ====================================================================== */
+function openShareModal() {
+  document.getElementById("share-modal").classList.remove("hidden");
+  document.getElementById("share-link-input").value = "";
+  document.getElementById("copy-link-btn").disabled = true;
+}
+function closeShareModal() {
+  document.getElementById("share-modal").classList.add("hidden");
+}
+
+function initShareModal() {
+  document.getElementById("modal-close").addEventListener("click", closeShareModal);
+  document.getElementById("share-modal").addEventListener("click", (e) => {
+    if (e.target.id === "share-modal") closeShareModal();
+  });
+  document.getElementById("download-student-btn").addEventListener("click", downloadStudentFile);
+  document.getElementById("generate-link-btn").addEventListener("click", generateShareLink);
+  document.getElementById("copy-link-btn").addEventListener("click", copyShareLink);
+}
+
+function generateShareLink() {
+  const hash = encodeQuestionsToUrlHash(QUESTIONS);
+  // Use the current URL as the base. If file:// flag for teacher.
+  let base = window.location.href.split("#")[0];
+  const link = base + "#" + hash;
+  document.getElementById("share-link-input").value = link;
+  document.getElementById("copy-link-btn").disabled = false;
+  if (base.startsWith("file:")) {
+    toast("Note: this link uses a local file path — host the HTML to make it shareable", 4000);
+  }
+}
+
+async function copyShareLink() {
+  const link = document.getElementById("share-link-input").value;
+  if (!link) return;
+  try {
+    await navigator.clipboard.writeText(link);
+    toast("Link copied to clipboard");
+  } catch (e) {
+    // Fallback
+    const input = document.getElementById("share-link-input");
+    input.select();
+    document.execCommand("copy");
+    toast("Link copied (fallback method)");
+  }
+}
+
+/* ----- DOWNLOAD STUDENT FILE: rewrite source with edits baked in ----- */
+let ORIGINAL_SOURCE = null;
+function captureOriginalSource() {
+  // Captured at DOMContentLoaded so it reflects clean original.
+  ORIGINAL_SOURCE = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+}
+
+function buildStudentFile() {
+  if (!ORIGINAL_SOURCE) return null;
+  let src = ORIGINAL_SOURCE;
+
+  // 1. Flip the STUDENT_MODE_FORCED flag to true
+  src = src.replace(
+    /\/\* === BEGIN STUDENT_MODE_MARKER === \*\/[\s\S]*?\/\* === END STUDENT_MODE_MARKER === \*\//,
+    "/* === BEGIN STUDENT_MODE_MARKER === */\nconst STUDENT_MODE_FORCED = true;\n/* === END STUDENT_MODE_MARKER === */"
+  );
+
+  // 2. Replace DEFAULT_QUESTIONS with current edited copy
+  const newQuestionsBlock =
+    "/* === BEGIN DEFAULT_QUESTIONS_MARKER === */\nconst DEFAULT_QUESTIONS = " +
+    JSON.stringify(QUESTIONS, null, 2) +
+    ";\n/* === END DEFAULT_QUESTIONS_MARKER === */";
+  src = src.replace(
+    /\/\* === BEGIN DEFAULT_QUESTIONS_MARKER === \*\/[\s\S]*?\/\* === END DEFAULT_QUESTIONS_MARKER === \*\//,
+    () => newQuestionsBlock   // function form prevents $& interpretation in replacement string
+  );
+
+  // 3. Update title element
+  src = src.replace(/<title>[^<]*<\/title>/, "<title>Algebra I Speed Drill</title>");
+
+  return src;
+}
+
+function downloadStudentFile() {
+  const src = buildStudentFile();
+  if (!src) {
+    toast("Could not build student file");
+    return;
+  }
+  const blob = new Blob([src], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Algebra1_Speed_Drill_Students.html";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  toast("Student file downloaded");
+}
+
+/* ======================================================================
+   STUDENT MODE BEHAVIOR
+   ====================================================================== */
+function applyStudentMode() {
+  document.getElementById("mode-badge").textContent = "Student";
+  document.getElementById("mode-badge").classList.add("student");
+  // Hide teacher-only UI in case the screens get reached somehow
+  document.getElementById("setup-back").style.display = "none";
+  // Go straight to drill setup
+  renderSetup();
+  showScreen("setup-screen");
+
+  // After drill ends, "New Drill" should still send the student back to setup, not teacher home.
+  document.getElementById("new-drill-btn").onclick = () => {
+    renderSetup();
+    showScreen("setup-screen");
+  };
+}
+
+/* ======================================================================
+   INIT
+   ====================================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  captureOriginalSource();
+
+  // 1) Check URL hash for encoded questions (always takes precedence — overrides defaults AND localStorage)
+  const fromHash = decodeQuestionsFromHash(window.location.hash);
+  if (fromHash) {
+    QUESTIONS = fromHash;
+    isStudent = true; // any link with #data= forces student view
+  } else if (!STUDENT_MODE_FORCED) {
+    // 2) Teacher mode: try loading saved edits from localStorage
+    const saved = loadFromLocal();
+    if (saved) {
+      QUESTIONS = saved;
+    }
+  }
+  // 3) STUDENT_MODE_FORCED (from a downloaded student file) — uses DEFAULT_QUESTIONS as-is
+
+  // Wire up navigation common to both modes
+  document.getElementById("next-btn").addEventListener("click", recordAndAdvance);
+  document.getElementById("quit-btn").addEventListener("click", () => {
+    if (confirm("End the drill now and see your results?")) {
+      endDrill();
+    }
+  });
+  document.getElementById("again-btn").addEventListener("click", startDrill);
+  document.getElementById("new-drill-btn").addEventListener("click", () => {
+    if (isStudent) {
+      renderSetup();
+      showScreen("setup-screen");
+    } else {
+      showScreen("teacher-home");
+    }
+  });
+  document.getElementById("setup-back").addEventListener("click", () => {
+    showScreen("teacher-home");
+  });
+  document.getElementById("start-btn").addEventListener("click", startDrill);
+
+  if (isStudent) {
+    applyStudentMode();
+  } else {
+    initTeacherHome();
+    initEditor();
+    initShareModal();
+    showScreen("teacher-home");
+  }
+});
+</script>
+</body>
+</html>
