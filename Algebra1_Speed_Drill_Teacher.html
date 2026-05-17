@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Algebra I Speed Drill — Teacher</title>
+<!-- KaTeX for math notation rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
 <style>
   :root {
     --bg: #f7f9fc;
@@ -299,6 +303,95 @@
     width: 100%;
   }
   .editor-add-question:hover { background: #e3edff; }
+
+  /* Live LaTeX preview inside each edit card */
+  .edit-preview {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+  .edit-preview .preview-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .edit-preview .preview-q {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.5;
+  }
+  .edit-preview .preview-choice {
+    font-size: 14px;
+    color: var(--ink-soft);
+    padding: 3px 0;
+    line-height: 1.5;
+  }
+  .edit-preview .preview-choice.correct {
+    color: var(--good);
+    font-weight: 600;
+  }
+  .edit-preview .preview-choice .ltr {
+    display: inline-block;
+    width: 22px;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Math notation help panel */
+  .math-help {
+    background: #fffbe6;
+    border: 1px solid #f0d97a;
+    border-radius: 8px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .math-help summary {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b5500;
+    list-style: none;
+    user-select: none;
+  }
+  .math-help summary::before {
+    content: "▸ ";
+    display: inline-block;
+    transition: transform 0.15s ease;
+  }
+  .math-help[open] summary::before {
+    transform: rotate(90deg);
+  }
+  .math-help summary::-webkit-details-marker { display: none; }
+  .math-help .help-body {
+    padding: 0 14px 12px;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .math-help code {
+    background: rgba(255,255,255,0.7);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    color: #6b5500;
+  }
+  .math-help .help-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 14px;
+    align-items: baseline;
+    margin: 4px 0;
+  }
 
   .save-status {
     font-size: 13px;
@@ -703,6 +796,25 @@
       <select class="unit-select" id="editor-unit-select"></select>
       <button class="secondary" id="editor-reset-unit">Reset Unit</button>
     </div>
+
+    <details class="math-help">
+      <summary>How to write math notation (LaTeX)</summary>
+      <div class="help-body">
+        Wrap math expressions in dollar signs: <code>$ ... $</code>. The preview below each question shows what students will see.
+        <div class="help-row" style="margin-top:10px;">
+          <div><code>$x^2$</code></div><div>renders as $x^2$</div>
+          <div><code>$\sqrt{48}$</code></div><div>renders as $\sqrt{48}$</div>
+          <div><code>$\frac{1}{2}$</code></div><div>renders as $\frac{1}{2}$</div>
+          <div><code>$\frac{-b \pm \sqrt{b^2-4ac}}{2a}$</code></div><div>renders as $\frac{-b \pm \sqrt{b^2-4ac}}{2a}$</div>
+          <div><code>$y = ax^2 + bx + c$</code></div><div>renders as $y = ax^2 + bx + c$</div>
+          <div><code>$x_1, y_2$</code></div><div>renders as $x_1, y_2$ (subscripts)</div>
+          <div><code>$a \cdot b$</code></div><div>renders as $a \cdot b$ (dot product)</div>
+          <div><code>$\geq, \leq, \neq, \pm$</code></div><div>renders as $\geq, \leq, \neq, \pm$</div>
+        </div>
+        Plain text without dollar signs is left alone, so existing questions don't need to change.
+      </div>
+    </details>
+
     <div class="save-status" id="save-status"></div>
     <div class="editor-questions" id="editor-questions"></div>
     <button class="editor-add-question" id="editor-add-question">+ Add Question to this Unit</button>
@@ -819,14 +931,14 @@ const DEFAULT_QUESTIONS = {
     questions: [
       { topic: "Product Rule of Exponents", q: "How do you multiply expressions with the same base?", choices: ["Add the exponents", "Multiply the exponents", "Subtract the exponents"], answer: 0 },
       { topic: "Quotient Rule of Exponents", q: "How do you divide expressions with the same base?", choices: ["Subtract the exponents (top minus bottom)", "Add the exponents", "Divide the exponents"], answer: 0 },
-      { topic: "Power Rule of Exponents", q: "When you have an exponent raised to another exponent, like (x³)⁴, what do you do?", choices: ["Multiply the exponents", "Add the exponents", "Raise the base to one of the exponents"], answer: 0 },
-      { topic: "Power of a Power", q: "How do you simplify (xᵃ)ᵇ?", choices: ["x^(a·b) — multiply the exponents", "x^(a+b) — add the exponents", "x^(a−b) — subtract the exponents"], answer: 0 },
+      { topic: "Power Rule of Exponents", q: "When you have an exponent raised to another exponent, like $(x^3)^4$, what do you do?", choices: ["Multiply the exponents", "Add the exponents", "Raise the base to one of the exponents"], answer: 0 },
+      { topic: "Power of a Power", q: "How do you simplify $(x^a)^b$?", choices: ["$x^{a \\cdot b}$ — multiply the exponents", "$x^{a+b}$ — add the exponents", "$x^{a-b}$ — subtract the exponents"], answer: 0 },
       { topic: "All Rules of Exponents", q: "When simplifying a complex exponent expression, what is the best first step?", choices: ["Identify each operation (multiply, divide, power) and apply the matching rule one step at a time", "Add all the exponents together at once", "Convert every exponent into a decimal"], answer: 0 },
-      { topic: "Simplify Square Root Expressions", q: "How do you simplify a square root like √48?", choices: ["Find the largest perfect-square factor and take its square root out", "Take the square root of each digit", "Divide the number by 2"], answer: 0 },
-      { topic: "Square Roots with Variables", q: "How do you simplify √(x⁶)?", choices: ["Divide the exponent by 2 → x³", "Multiply the exponent by 2 → x¹²", "Subtract 2 from the exponent → x⁴"], answer: 0 },
+      { topic: "Simplify Square Root Expressions", q: "How do you simplify a square root like $\\sqrt{48}$?", choices: ["Find the largest perfect-square factor and take its square root out", "Take the square root of each digit", "Divide the number by 2"], answer: 0 },
+      { topic: "Square Roots with Variables", q: "How do you simplify $\\sqrt{x^6}$?", choices: ["Divide the exponent by 2 → $x^3$", "Multiply the exponent by 2 → $x^{12}$", "Subtract 2 from the exponent → $x^4$"], answer: 0 },
       { topic: "Add/Subtract Square Roots", q: "How do you add or subtract square root expressions?", choices: ["Only combine terms with the same radicand — add or subtract the coefficients", "Add the radicands together under one root", "Multiply the coefficients and the radicands"], answer: 0 },
-      { topic: "Divide Square Roots", q: "How do you divide √a by √b?", choices: ["Combine under one radical and divide the radicands: √(a/b)", "Subtract the radicands: √(a − b)", "Divide the index of each radical"], answer: 0 },
-      { topic: "Rationalizing the Denominator", q: "How do you rationalize a denominator like 1/√3?", choices: ["Multiply the top AND bottom by √3", "Square the denominator only", "Move the radical to the numerator and drop it"], answer: 0 }
+      { topic: "Divide Square Roots", q: "How do you divide $\\sqrt{a}$ by $\\sqrt{b}$?", choices: ["Combine under one radical and divide the radicands: $\\sqrt{\\frac{a}{b}}$", "Subtract the radicands: $\\sqrt{a - b}$", "Divide the index of each radical"], answer: 0 },
+      { topic: "Rationalizing the Denominator", q: "How do you rationalize a denominator like $\\frac{1}{\\sqrt{3}}$?", choices: ["Multiply the top AND bottom by $\\sqrt{3}$", "Square the denominator only", "Move the radical to the numerator and drop it"], answer: 0 }
     ]
   },
   "Unit 2": {
@@ -853,14 +965,14 @@ const DEFAULT_QUESTIONS = {
       { topic: "Find Input Given Output", q: "Given f(x) = 2x + 1 and f(x) = 7, how do you find x?", choices: ["Set 2x + 1 = 7 and solve for x", "Plug 7 in for x", "Divide 7 by 2"], answer: 0 },
       { topic: "Is the Relation a Function?", q: "How do you tell if a relation is a function?", choices: ["Each input (x) is paired with exactly ONE output (y) — vertical line test on a graph", "Each output is paired with exactly one input", "The graph is a straight line"], answer: 0 },
       { topic: "Definition of Slope", q: "What does slope describe?", choices: ["The constant rate of change — rise over run", "Where the line crosses the y-axis", "The y-value when x = 0"], answer: 0 },
-      { topic: "Slope from Two Points", q: "How do you find the slope between two points (x₁, y₁) and (x₂, y₂)?", choices: ["(y₂ − y₁) / (x₂ − x₁)", "(x₂ − x₁) / (y₂ − y₁)", "(x₂ + y₂) − (x₁ + y₁)"], answer: 0 }
+      { topic: "Slope from Two Points", q: "How do you find the slope between two points $(x_1, y_1)$ and $(x_2, y_2)$?", choices: ["$\\frac{y_2 - y_1}{x_2 - x_1}$", "$\\frac{x_2 - x_1}{y_2 - y_1}$", "$(x_2 + y_2) - (x_1 + y_1)$"], answer: 0 }
     ]
   },
   "Unit 4": {
     name: "Linear Functions",
     questions: [
       { topic: "Slope-Intercept Form", q: "How do you graph a line using y = mx + b?", choices: ["Plot the y-intercept (b), then use the slope (m = rise/run) to find another point", "Plot the x-intercept first, then guess the slope", "Pick any two random points and connect them"], answer: 0 },
-      { topic: "Point-Slope Form", q: "What does point-slope form y − y₁ = m(x − x₁) require you to know?", choices: ["A point on the line AND the slope", "Two points and the y-intercept", "Only the slope"], answer: 0 },
+      { topic: "Point-Slope Form", q: "What does point-slope form $y - y_1 = m(x - x_1)$ require you to know?", choices: ["A point on the line AND the slope", "Two points and the y-intercept", "Only the slope"], answer: 0 },
       { topic: "Standard Form", q: "What does standard form Ax + By = C make easiest to find?", choices: ["The x- and y-intercepts (set the other variable to 0)", "The slope directly", "The vertex of the line"], answer: 0 },
       { topic: "Standard → Slope-Intercept", q: "How do you rewrite Ax + By = C in slope-intercept form?", choices: ["Solve the equation for y", "Solve the equation for x", "Set A = m and B = b"], answer: 0 },
       { topic: "Horizontal and Vertical Lines", q: "What does the equation of a horizontal line look like?", choices: ["y = a constant (and a vertical line is x = a constant)", "x = a constant (and a vertical line is y = a constant)", "y = mx with m ≠ 0"], answer: 0 },
@@ -903,21 +1015,21 @@ const DEFAULT_QUESTIONS = {
     questions: [
       { topic: "Linear vs Quadratic from a Table", q: "How do you tell from a table of values that a function is quadratic?", choices: ["The SECOND differences are constant (first differences change at a steady rate)", "The first differences are constant", "The y-values are all positive"], answer: 0 },
       { topic: "Real-World Quadratic Graphs", q: "On a real-world quadratic graph (like a projectile), what does the vertex represent?", choices: ["The MAXIMUM or MINIMUM value of the situation", "The starting position only", "An x-intercept"], answer: 0 },
-      { topic: "Graph from Factored Form", q: "What does the factored form y = a(x − p)(x − q) tell you directly?", choices: ["The x-intercepts (the zeros) are x = p and x = q", "The y-intercept is p + q", "The vertex is at (p, q)"], answer: 0 },
-      { topic: "Graph from Standard Form", q: "How do you find the axis of symmetry of y = ax² + bx + c?", choices: ["x = −b / (2a)", "x = b / (2a)", "x = c / a"], answer: 0 },
-      { topic: "Graph from Vertex Form", q: "What does vertex form y = a(x − h)² + k tell you directly?", choices: ["The vertex is at (h, k)", "The x-intercepts are h and k", "The y-intercept is h"], answer: 0 },
+      { topic: "Graph from Factored Form", q: "What does the factored form $y = a(x - p)(x - q)$ tell you directly?", choices: ["The x-intercepts (the zeros) are $x = p$ and $x = q$", "The y-intercept is $p + q$", "The vertex is at $(p, q)$"], answer: 0 },
+      { topic: "Graph from Standard Form", q: "How do you find the axis of symmetry of $y = ax^2 + bx + c$?", choices: ["$x = \\frac{-b}{2a}$", "$x = \\frac{b}{2a}$", "$x = \\frac{c}{a}$"], answer: 0 },
+      { topic: "Graph from Vertex Form", q: "What does vertex form $y = a(x - h)^2 + k$ tell you directly?", choices: ["The vertex is at $(h, k)$", "The x-intercepts are $h$ and $k$", "The y-intercept is $h$"], answer: 0 },
       { topic: "Solve by Factoring (Zero Product Property)", q: "Once a quadratic is factored, how do you find the solutions?", choices: ["Set EACH factor equal to zero and solve (Zero Product Property)", "Add the factors together and set equal to zero", "Multiply the factors and divide by zero"], answer: 0 },
-      { topic: "Square Root Property", q: "How do you solve a quadratic like x² = 25 using the square root property?", choices: ["Take the square root of both sides — and don't forget ±", "Divide both sides by 2", "Subtract 25 from both sides only"], answer: 0 },
-      { topic: "Quadratic Formula", q: "What is the quadratic formula for ax² + bx + c = 0?", choices: ["x = ( −b ± √(b² − 4ac) ) / (2a)", "x = ( b ± √(b² − 4ac) ) / (2a)", "x = ( −b ± √(b² + 4ac) ) / a"], answer: 0 }
+      { topic: "Square Root Property", q: "How do you solve a quadratic like $x^2 = 25$ using the square root property?", choices: ["Take the square root of both sides — and don't forget $\\pm$", "Divide both sides by 2", "Subtract 25 from both sides only"], answer: 0 },
+      { topic: "Quadratic Formula", q: "What is the quadratic formula for $ax^2 + bx + c = 0$?", choices: ["$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$", "$x = \\frac{b \\pm \\sqrt{b^2 - 4ac}}{2a}$", "$x = \\frac{-b \\pm \\sqrt{b^2 + 4ac}}{a}$"], answer: 0 }
     ]
   },
   "Unit 8": {
     name: "Exponential Functions",
     questions: [
       { topic: "Identify Linear / Quadratic / Exponential from a Table", q: "How do you tell from a table of values that a function is EXPONENTIAL?", choices: ["The y-values have a constant RATIO (each one is multiplied by the same number)", "The y-values have constant first differences", "The y-values have constant second differences"], answer: 0 },
-      { topic: "Write Exponential Function from a Table", q: "What is the general form of an exponential function?", choices: ["y = a · bˣ  (where a is the initial value and b is the common ratio)", "y = ax + b", "y = ax² + bx + c"], answer: 0 },
-      { topic: "Exponential Growth vs Decay", q: "How do you tell if y = a · bˣ is exponential GROWTH or DECAY?", choices: ["If b > 1 it's growth; if 0 < b < 1 it's decay", "If a > 1 it's growth; if a < 1 it's decay", "If x > 0 it's growth; if x < 0 it's decay"], answer: 0 },
-      { topic: "Exponential Functions in Context", q: "In y = a · bˣ, what does \"a\" represent in a real-world problem?", choices: ["The initial value (the starting amount when x = 0)", "The growth rate", "The final value at the end of the problem"], answer: 0 },
+      { topic: "Write Exponential Function from a Table", q: "What is the general form of an exponential function?", choices: ["$y = a \\cdot b^x$  (where $a$ is the initial value and $b$ is the common ratio)", "$y = ax + b$", "$y = ax^2 + bx + c$"], answer: 0 },
+      { topic: "Exponential Growth vs Decay", q: "How do you tell if $y = a \\cdot b^x$ is exponential GROWTH or DECAY?", choices: ["If $b > 1$ it's growth; if $0 < b < 1$ it's decay", "If $a > 1$ it's growth; if $a < 1$ it's decay", "If $x > 0$ it's growth; if $x < 0$ it's decay"], answer: 0 },
+      { topic: "Exponential Functions in Context", q: "In $y = a \\cdot b^x$, what does \"$a$\" represent in a real-world problem?", choices: ["The initial value (the starting amount when $x = 0$)", "The growth rate", "The final value at the end of the problem"], answer: 0 },
       { topic: "Exponential Regression", q: "What does exponential regression on a calculator find?", choices: ["The best-fit exponential function for the data", "The linear line through the data", "Only the y-intercept"], answer: 0 }
     ]
   }
@@ -1019,6 +1131,25 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+// Render LaTeX math inside the given element. Safe to call even if KaTeX isn't loaded yet.
+function renderMath(element) {
+  if (!element) return;
+  if (typeof renderMathInElement === "function") {
+    try {
+      renderMathInElement(element, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false,
+        errorColor: "#c62828"
+      });
+    } catch (e) {
+      console.warn("renderMath failed:", e);
+    }
+  }
 }
 function formatTime(s) {
   const m = Math.floor(s / 60);
@@ -1131,14 +1262,37 @@ function renderEditorQuestions() {
           <button class="add-choice-btn" data-q="${qi}" data-action="add-choice" ${q.choices.length >= 4 ? "disabled" : ""}>+ Add Choice (max 4)</button>
         </div>
       </div>
+      <div class="edit-preview" data-preview-for="${qi}"></div>
     `;
     wrap.appendChild(card);
+    renderEditorPreview(qi);
   });
 
   // Bind events via delegation
   wrap.onclick = handleEditorClick;
   wrap.oninput = handleEditorInput;
   wrap.onchange = handleEditorChange;
+}
+
+// Build the live preview block for a single question
+function renderEditorPreview(qi) {
+  const unit = QUESTIONS[editorState.currentUnit];
+  const q = unit.questions[qi];
+  if (!q) return;
+  const previewEl = document.querySelector(`[data-preview-for="${qi}"]`);
+  if (!previewEl) return;
+  const letters = ["a)", "b)", "c)", "d)"];
+  const choicesHtml = q.choices.map((c, ci) => `
+    <div class="preview-choice ${ci === q.answer ? "correct" : ""}">
+      <span class="ltr">${letters[ci]}</span>${escapeText(c)}${ci === q.answer ? "  ✓" : ""}
+    </div>
+  `).join("");
+  previewEl.innerHTML = `
+    <div class="preview-label">Student preview</div>
+    <div class="preview-q">${escapeText(q.q || "(no question text)")}</div>
+    ${choicesHtml}
+  `;
+  renderMath(previewEl);
 }
 
 function handleEditorClick(e) {
@@ -1188,13 +1342,16 @@ function handleEditorInput(e) {
   if (action === "edit-topic") {
     q.topic = t.value;
     persistOnly();
+    // Topic doesn't show in preview, no re-render needed
   } else if (action === "edit-question") {
     q.q = t.value;
     persistOnly();
+    renderEditorPreview(qi);
   } else if (action === "edit-choice") {
     const ci = parseInt(t.dataset.c, 10);
     q.choices[ci] = t.value;
     persistOnly();
+    renderEditorPreview(qi);
   }
 }
 
@@ -1374,6 +1531,11 @@ function loadQuestion() {
     choicesEl.appendChild(btn);
   });
   document.getElementById("next-btn").disabled = true;
+
+  // Render math notation in the topic, question, and choices
+  renderMath(document.getElementById("topic-tag"));
+  renderMath(document.getElementById("question-text"));
+  renderMath(choicesEl);
 }
 
 function recordAndAdvance() {
@@ -1426,6 +1588,7 @@ function showResults() {
       `;
       list.appendChild(item);
     });
+    renderMath(list);
   }
   showScreen("results-screen");
 }
