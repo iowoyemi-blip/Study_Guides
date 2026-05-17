@@ -96,7 +96,7 @@
   /* ================= TEACHER HOME ================= */
   .home-cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
   }
   .home-card {
@@ -115,6 +115,14 @@
     border-color: var(--accent);
     transform: translateY(-2px);
   }
+  .home-card.info {
+    background: #fff4dc;
+  }
+  .home-card.info:hover {
+    background: #ffe9b3;
+    border-color: var(--warn);
+  }
+  .home-card.info .icon { color: var(--warn); }
   .home-card .icon {
     font-size: 28px;
     margin-bottom: 8px;
@@ -140,6 +148,60 @@
     font-size: 13px;
     color: var(--ink-soft);
   }
+
+  /* ================= INSTRUCTIONS SCREEN ================= */
+  .instructions-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .instructions-content {
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .instructions-content h2 {
+    font-size: 20px;
+    margin: 22px 0 6px 0;
+    color: var(--ink);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .instructions-content h2:first-child { margin-top: 0; }
+  .instructions-content h3 {
+    font-size: 16px;
+    margin: 16px 0 6px 0;
+    color: var(--accent-dark);
+  }
+  .instructions-content p {
+    margin: 6px 0 10px 0;
+  }
+  .instructions-content ul {
+    margin: 4px 0 10px 0;
+    padding-left: 22px;
+  }
+  .instructions-content li {
+    margin: 4px 0;
+  }
+  .instructions-content code {
+    background: var(--muted);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .instructions-content strong { color: var(--ink); }
+  .instructions-content .callout {
+    background: #fff4dc;
+    border-left: 4px solid var(--warn);
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 14px;
+  }
+  .instructions-content .callout strong { color: #7a4500; }
 
   /* ================= EDITOR ================= */
   .editor-toolbar {
@@ -589,6 +651,16 @@
     border-color: var(--accent);
     color: var(--accent-dark);
   }
+  .preset-btn.untimed {
+    background: #f3e5f5;
+    color: #4a148c;
+  }
+  .preset-btn.untimed:hover { background: #ead0ee; }
+  .preset-btn.untimed.selected {
+    background: #d8b6dd;
+    border-color: #6a1b9a;
+    color: #4a148c;
+  }
 
   .custom-row {
     display: flex;
@@ -676,6 +748,32 @@
     background: #e3edff;
     border-color: var(--accent);
   }
+  /* Immediate feedback on click */
+  .choice.correct {
+    background: var(--good-bg);
+    border-color: var(--good);
+    color: var(--good);
+  }
+  .choice.correct .letter { color: var(--good); }
+  .choice.incorrect {
+    background: var(--bad-bg);
+    border-color: var(--bad);
+    color: var(--bad);
+  }
+  .choice.incorrect .letter { color: var(--bad); }
+  .choice:disabled { cursor: default; opacity: 1; }
+  .choice.correct::after {
+    content: " ✓";
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--good);
+  }
+  .choice.incorrect::after {
+    content: " ✗";
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--bad);
+  }
 
   .drill-footer {
     display: flex;
@@ -696,6 +794,58 @@
   }
   .results-score .total { color: var(--ink-soft); font-weight: 600; }
   .results-meta { color: var(--ink-soft); font-size: 15px; margin-top: 8px; }
+
+  /* Topic-level breakdown on results screen */
+  .topic-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 6px 0 4px;
+  }
+  .topic-stat {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-left-width: 4px;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+  .topic-stat .name { font-weight: 600; color: var(--ink); }
+  .topic-stat .score {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+  .topic-stat.full {
+    border-left-color: var(--good);
+    background: var(--good-bg);
+  }
+  .topic-stat.full .name { color: #1a5e1f; }
+  .topic-stat.full .score { color: var(--good); }
+  .topic-stat.partial {
+    border-left-color: var(--warn);
+    background: #fff4dc;
+  }
+  .topic-stat.partial .name { color: #7a4500; }
+  .topic-stat.partial .score { color: var(--warn); }
+  .topic-stat.none {
+    border-left-color: var(--bad);
+    background: var(--bad-bg);
+  }
+  .topic-stat.none .name { color: #8a1f1f; }
+  .topic-stat.none .score { color: var(--bad); }
+
+  .breakdown-hint {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0 0 8px 0;
+  }
 
   .review {
     max-height: 480px;
@@ -782,10 +932,164 @@
         <h3>Share with Students</h3>
         <p>Download a student file or copy a student link.</p>
       </button>
+      <button class="home-card info" id="home-instructions">
+        <span class="icon">?</span>
+        <h3>Instructions</h3>
+        <p>New here? Read a quick walkthrough.</p>
+      </button>
     </div>
     <div class="home-footer">
       <span id="home-status">Edits save automatically to this browser.</span>
       <button class="ghost" id="reset-all-btn">Reset all to defaults</button>
+    </div>
+  </section>
+
+  <!-- ============ INSTRUCTIONS ============ -->
+  <section id="instructions-screen" class="card hidden">
+    <div class="instructions-toolbar">
+      <button class="secondary" id="instructions-back">← Back</button>
+      <h2 style="margin: 0; font-size: 22px;">Instructions</h2>
+    </div>
+
+    <div class="instructions-content">
+      <h2>What this app is</h2>
+      <p>
+        A speed-drill tool for Algebra I students to practice the conceptual "how-tos" (like
+        <em>"How do you multiply expressions with the same base?"</em>) before a unit assessment.
+        Students pick a unit and a drill length, then race through multiple-choice questions while
+        the timer counts down. At the end they see their score, a topic-by-topic breakdown, and a
+        full review of every question.
+      </p>
+      <p>
+        Everything is one HTML file — no install, no login, no student data is sent anywhere.
+        Works in any modern browser, offline or online.
+      </p>
+
+      <h2>Editing questions</h2>
+      <p>
+        Click <strong>Edit Questions</strong> on the home page. Use the dropdown at the top of the
+        editor to switch between Unit 1 through Unit 8. Each question is a card with four editable areas:
+      </p>
+      <ul>
+        <li><strong>Topic</strong> — a short label (e.g., "Quadratic Formula"). This appears in the topic breakdown students see on the results screen.</li>
+        <li><strong>Question</strong> — what students will read.</li>
+        <li><strong>Answer Choices</strong> — between 2 and 4 choices. Click the green radio button next to the choice that is correct.</li>
+        <li><strong>Student preview</strong> — a live preview below the inputs showing what students will see, including rendered math.</li>
+      </ul>
+
+      <h3>Actions on each question card</h3>
+      <ul>
+        <li><code>↑</code> <code>↓</code> — reorder the question within the unit.</li>
+        <li><code>Duplicate</code> — make an exact copy of this question right below it. Handy when you want a similar question but with different answer choices.</li>
+        <li><code>Delete</code> — remove the question (asks for confirmation first).</li>
+      </ul>
+
+      <h3>Adding new questions</h3>
+      <p>
+        Scroll to the bottom of the editor and click <strong>+ Add Question to this Unit</strong>.
+        A new card appears with placeholder text — just edit it like any other card.
+      </p>
+
+      <h3>Adding or removing answer choices</h3>
+      <p>
+        Each question allows 2 to 4 choices. Use <strong>+ Add Choice</strong> below the choices,
+        or the <code>×</code> button next to any choice to remove it. The choice marked with the
+        green radio button is the correct one.
+      </p>
+
+      <h3>Resetting</h3>
+      <ul>
+        <li><strong>Reset Unit</strong> (in the editor toolbar) — restore the current unit to the original default questions.</li>
+        <li><strong>Reset all to defaults</strong> (at the bottom of the home page) — wipe every edit across every unit. This cannot be undone.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>Auto-save:</strong> all edits save automatically to your browser as you type. Closing the tab is fine — your edits are still there next time you open the file in the same browser.
+      </div>
+
+      <h2>Writing math notation (LaTeX)</h2>
+      <p>
+        For real math symbols (fractions, radicals, the quadratic formula, etc.), wrap your math in
+        dollar signs: <code>$ ... $</code>. The student preview shows what the result looks like.
+        Plain text without dollar signs is left alone, so existing questions don't need to change.
+      </p>
+      <p>Common patterns:</p>
+      <ul>
+        <li><code>$x^2$</code> — exponent</li>
+        <li><code>$\sqrt{48}$</code> — square root</li>
+        <li><code>$\frac{1}{2}$</code> — fraction</li>
+        <li><code>$x_1, y_2$</code> — subscripts</li>
+        <li><code>$\pm, \cdot, \geq, \leq, \neq$</code> — common symbols</li>
+        <li><code>$\frac{-b \pm \sqrt{b^2-4ac}}{2a}$</code> — the quadratic formula</li>
+      </ul>
+      <p>
+        The full cheat sheet (with each example rendered live) is in the yellow panel at the
+        top of the editor — click <strong>How to write math notation</strong> to expand it.
+      </p>
+
+      <h2>Trying the drill yourself</h2>
+      <p>
+        Click <strong>Try the Drill</strong> to run a drill from a student's perspective. Use this
+        before sharing to test your edits.
+      </p>
+      <ul>
+        <li><strong>Pick a unit</strong> — all 8 units are available.</li>
+        <li><strong>Pick a duration</strong> — five timed presets (30 sec, 1, 2, 3, 5 min), a custom seconds field, or the purple <strong>Untimed</strong> button for practice mode.</li>
+        <li>Click <strong>Start Drill</strong>.</li>
+      </ul>
+
+      <h3>During the drill</h3>
+      <p>
+        Pick an answer. The correct choice turns green with a ✓; if you picked wrong, your choice
+        turns red with a ✗. Click <strong>Next</strong> to advance — the drill doesn't auto-advance,
+        so students set their own pace within the timer. The timer turns yellow at 30 seconds left,
+        red at 10 seconds.
+      </p>
+      <p>
+        In <strong>Untimed / Practice Mode</strong>, the timer counts UP from zero and the drill
+        only ends when you click <strong>End Drill</strong>. Good for students who freeze under
+        time pressure or who want low-stress practice the night before a test.
+      </p>
+
+      <h3>After the drill</h3>
+      <p>Students see:</p>
+      <ul>
+        <li>Their score (correct out of attempted) and accuracy percentage.</li>
+        <li>A <strong>Topic breakdown</strong> — every topic they saw, with a color-coded score (green if 100%, yellow if 50%+, red below 50%), sorted weakest first so the topics to review jump to the top.</li>
+        <li>A scrollable review of every question with their answer and the correct answer marked.</li>
+      </ul>
+
+      <h2>Sharing with students</h2>
+      <p>
+        Click <strong>Share with Students</strong> on the home page. There are two options.
+      </p>
+
+      <h3>Option 1: Download a student file (recommended)</h3>
+      <p>
+        Click <strong>Download Student File</strong>. The browser saves
+        <code>Algebra1_Speed_Drill_Students.html</code> with your edits baked in and the teacher
+        controls hidden. Upload it to Google Classroom, email it as an attachment, or post it on
+        your class page. Once a student has the file, it works offline.
+      </p>
+
+      <h3>Option 2: Copy a student link</h3>
+      <p>
+        Use this only if you've already uploaded the teacher HTML to a hosted location students
+        can reach (school website, GitHub Pages, etc.). Click <strong>Generate</strong>, then
+        <strong>Copy</strong>. The link encodes your edited questions inside the URL itself —
+        students open the link and see your version with no teacher tools visible.
+      </p>
+      <div class="callout">
+        <strong>Note:</strong> the link approach won't work over a local <code>file://</code> path. The HTML needs to be hosted somewhere students can actually visit in a browser.
+      </div>
+
+      <h2>Tips</h2>
+      <ul>
+        <li>Use <strong>Duplicate</strong> to build variations of the same topic — duplicate, then change only the wording or the distractors.</li>
+        <li>Each topic has one default question. You can add as many additional questions per topic as you want; the drill will randomly cycle through all of them.</li>
+        <li>If a 5-minute drill on a small unit ends up repeating questions, that's intentional — the drill reshuffles and reuses the pool when it runs out.</li>
+        <li>The <strong>Topic</strong> field is what shows up in the breakdown on results. Keep it short and consistent (e.g., "Slope from Two Points", not "Slope from any pair of points (x1,y1) and (x2,y2)").</li>
+      </ul>
     </div>
   </section>
 
@@ -866,6 +1170,12 @@
         <span id="r-correct">0</span><span class="total"> / <span id="r-attempted">0</span></span>
       </div>
       <div class="results-meta" id="results-meta"></div>
+    </div>
+
+    <div id="topic-breakdown-section" class="hidden">
+      <p class="section-label" style="margin-top: 18px;">Topic breakdown</p>
+      <p class="breakdown-hint" id="breakdown-hint">Sorted weakest first — focus your review on the ones in red and yellow.</p>
+      <div id="topic-breakdown" class="topic-breakdown"></div>
     </div>
 
     <p class="section-label" style="margin-top: 18px;">Review</p>
@@ -1045,7 +1355,8 @@ const TIMER_PRESETS = [
   { label: "1 min", seconds: 60 },
   { label: "2 min", seconds: 120 },
   { label: "3 min", seconds: 180 },
-  { label: "5 min", seconds: 300 }
+  { label: "5 min", seconds: 300 },
+  { label: "Untimed", untimed: true }
 ];
 
 // Working copy of questions — student or teacher. Begins as DEFAULT, then may be overridden.
@@ -1058,6 +1369,7 @@ let isStudent = STUDENT_MODE_FORCED;
 let drillState = {
   selectedUnit: null,
   selectedSeconds: null,
+  untimed: false,
   pool: [],
   poolIndex: 0,
   currentQuestion: null,
@@ -1157,7 +1469,7 @@ function formatTime(s) {
   return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 function showScreen(id) {
-  ["teacher-home", "editor-screen", "setup-screen", "drill-screen", "results-screen"].forEach(s => {
+  ["teacher-home", "instructions-screen", "editor-screen", "setup-screen", "drill-screen", "results-screen"].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.toggle("hidden", s !== id);
   });
@@ -1182,6 +1494,14 @@ function initTeacherHome() {
     showScreen("setup-screen");
   });
   document.getElementById("home-share").addEventListener("click", openShareModal);
+  document.getElementById("home-instructions").addEventListener("click", () => {
+    showScreen("instructions-screen");
+    // Render any LaTeX in the math examples on first view
+    renderMath(document.getElementById("instructions-screen"));
+  });
+  document.getElementById("instructions-back").addEventListener("click", () => {
+    showScreen("teacher-home");
+  });
 
   document.getElementById("reset-all-btn").addEventListener("click", () => {
     if (confirm("Reset ALL units back to the original default questions? This cannot be undone.")) {
@@ -1244,6 +1564,7 @@ function renderEditorQuestions() {
         <div class="edit-q-actions">
           <button class="icon-btn" data-q="${qi}" data-action="move-up" ${qi === 0 ? "disabled" : ""}>↑</button>
           <button class="icon-btn" data-q="${qi}" data-action="move-down" ${qi === unit.questions.length - 1 ? "disabled" : ""}>↓</button>
+          <button class="icon-btn" data-q="${qi}" data-action="duplicate-question" title="Make a copy of this question">Duplicate</button>
           <button class="icon-btn danger" data-q="${qi}" data-action="delete-question">Delete</button>
         </div>
       </div>
@@ -1307,6 +1628,24 @@ function handleEditorClick(e) {
       unit.questions.splice(qi, 1);
       persistAndRerender();
     }
+  } else if (action === "duplicate-question") {
+    const copy = JSON.parse(JSON.stringify(unit.questions[qi]));
+    unit.questions.splice(qi + 1, 0, copy);
+    persistAndRerender();
+    // Scroll the new (duplicated) card into view so the teacher can immediately edit it
+    setTimeout(() => {
+      const cards = document.querySelectorAll(".edit-q-card");
+      const newCard = cards[qi + 1];
+      if (newCard) {
+        newCard.scrollIntoView({ behavior: "smooth", block: "center" });
+        // Brief highlight to draw the eye
+        newCard.style.transition = "background-color 0.6s ease";
+        const original = newCard.style.backgroundColor;
+        newCard.style.backgroundColor = "#fff4dc";
+        setTimeout(() => { newCard.style.backgroundColor = original; }, 700);
+      }
+    }, 60);
+    toast("Question duplicated — edit the copy below");
   } else if (action === "move-up" && qi > 0) {
     [unit.questions[qi - 1], unit.questions[qi]] = [unit.questions[qi], unit.questions[qi - 1]];
     persistAndRerender();
@@ -1439,10 +1778,16 @@ function renderSetup() {
   presetsRow.innerHTML = "";
   TIMER_PRESETS.forEach(p => {
     const btn = document.createElement("button");
-    btn.className = "preset-btn";
+    btn.className = "preset-btn" + (p.untimed ? " untimed" : "");
     btn.textContent = p.label;
     btn.addEventListener("click", () => {
-      drillState.selectedSeconds = p.seconds;
+      if (p.untimed) {
+        drillState.untimed = true;
+        drillState.selectedSeconds = null;
+      } else {
+        drillState.untimed = false;
+        drillState.selectedSeconds = p.seconds;
+      }
       document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("selected"));
       btn.classList.add("selected");
       document.getElementById("custom-seconds").value = "";
@@ -1454,13 +1799,15 @@ function renderSetup() {
   // Reset prior selections
   drillState.selectedUnit = null;
   drillState.selectedSeconds = null;
+  drillState.untimed = false;
   document.getElementById("custom-seconds").value = "";
   updateStartButton();
 }
 
 function updateStartButton() {
   const btn = document.getElementById("start-btn");
-  btn.disabled = !(drillState.selectedUnit && drillState.selectedSeconds);
+  const hasDuration = drillState.untimed || drillState.selectedSeconds;
+  btn.disabled = !(drillState.selectedUnit && hasDuration);
 }
 
 /* ======================================================================
@@ -1469,7 +1816,7 @@ function updateStartButton() {
 function startDrill() {
   drillState.history = [];
   buildPool();
-  drillState.timerSeconds = drillState.selectedSeconds;
+  drillState.timerSeconds = drillState.untimed ? 0 : drillState.selectedSeconds;
   showScreen("drill-screen");
   loadQuestion();
   startTimer();
@@ -1490,10 +1837,15 @@ function nextFromPool() {
 function startTimer() {
   updateTimerDisplay();
   drillState.timerInterval = setInterval(() => {
-    drillState.timerSeconds--;
-    updateTimerDisplay();
-    if (drillState.timerSeconds <= 0) {
-      endDrill();
+    if (drillState.untimed) {
+      drillState.timerSeconds++;
+      updateTimerDisplay();
+    } else {
+      drillState.timerSeconds--;
+      updateTimerDisplay();
+      if (drillState.timerSeconds <= 0) {
+        endDrill();
+      }
     }
   }, 1000);
 }
@@ -1502,6 +1854,7 @@ function updateTimerDisplay() {
   const el = document.getElementById("timer-display");
   el.textContent = formatTime(Math.max(0, drillState.timerSeconds));
   el.classList.remove("warning", "danger");
+  if (drillState.untimed) return; // No warning colors in practice mode
   if (drillState.timerSeconds <= 10) el.classList.add("danger");
   else if (drillState.timerSeconds <= 30) el.classList.add("warning");
 }
@@ -1518,16 +1871,34 @@ function loadQuestion() {
   const choicesEl = document.getElementById("choices");
   choicesEl.innerHTML = "";
   const letters = ["a)", "b)", "c)", "d)"];
+  const correctOrigIdx = drillState.currentQuestion.answer;
+  const choiceButtons = [];
   drillState.currentChoiceOrder.forEach((origIdx, displayIdx) => {
     const btn = document.createElement("button");
     btn.className = "choice";
+    btn.dataset.origIdx = origIdx;
     btn.innerHTML = `<span class="letter">${letters[displayIdx]}</span><span>${escapeText(drillState.currentQuestion.choices[origIdx])}</span>`;
     btn.addEventListener("click", () => {
+      // Ignore clicks after the answer is locked in
+      if (drillState.currentSelection !== null) return;
       drillState.currentSelection = displayIdx;
-      document.querySelectorAll(".choice").forEach(c => c.classList.remove("selected"));
-      btn.classList.add("selected");
+
+      const pickedCorrectly = (origIdx === correctOrigIdx);
+
+      // Lock all choices and apply immediate feedback styling
+      choiceButtons.forEach(b => {
+        b.disabled = true;
+        const bOrig = parseInt(b.dataset.origIdx, 10);
+        if (bOrig === correctOrigIdx) {
+          b.classList.add("correct");
+        } else if (b === btn && !pickedCorrectly) {
+          b.classList.add("incorrect");
+        }
+      });
+
       document.getElementById("next-btn").disabled = false;
     });
+    choiceButtons.push(btn);
     choicesEl.appendChild(btn);
   });
   document.getElementById("next-btn").disabled = true;
@@ -1560,6 +1931,62 @@ function endDrill() {
   showResults();
 }
 
+function renderTopicBreakdown() {
+  const section = document.getElementById("topic-breakdown-section");
+  const container = document.getElementById("topic-breakdown");
+  const hint = document.getElementById("breakdown-hint");
+  container.innerHTML = "";
+
+  if (drillState.history.length === 0) {
+    section.classList.add("hidden");
+    return;
+  }
+  section.classList.remove("hidden");
+
+  // Aggregate by topic
+  const byTopic = new Map();
+  drillState.history.forEach(h => {
+    if (!byTopic.has(h.topic)) byTopic.set(h.topic, { correct: 0, total: 0 });
+    const s = byTopic.get(h.topic);
+    s.total++;
+    if (h.pickedIdx === h.correctIdx) s.correct++;
+  });
+
+  // Sort by accuracy ascending (weakest first), then alphabetical as a tiebreaker
+  const sorted = [...byTopic.entries()].sort((a, b) => {
+    const accA = a[1].correct / a[1].total;
+    const accB = b[1].correct / b[1].total;
+    if (accA !== accB) return accA - accB;
+    return a[0].localeCompare(b[0]);
+  });
+
+  let needsReviewCount = 0;
+  sorted.forEach(([topic, stat]) => {
+    const acc = stat.correct / stat.total;
+    let cls = "none";
+    if (acc === 1) cls = "full";
+    else if (acc >= 0.5) cls = "partial";
+    if (acc < 1) needsReviewCount++;
+
+    const el = document.createElement("div");
+    el.className = `topic-stat ${cls}`;
+    el.innerHTML = `<span class="name">${escapeText(topic)}</span><span class="score">${stat.correct}/${stat.total}</span>`;
+    container.appendChild(el);
+  });
+
+  // Tweak the hint based on how the student did
+  if (needsReviewCount === 0) {
+    hint.textContent = "All topics solid — nice work.";
+  } else if (needsReviewCount === sorted.length) {
+    hint.textContent = "Sorted weakest first — every topic could use another pass.";
+  } else {
+    hint.textContent = `Sorted weakest first — ${needsReviewCount} topic${needsReviewCount === 1 ? "" : "s"} to review (red/yellow).`;
+  }
+
+  // Render any LaTeX inside topic names (in case teachers use math in their topic strings)
+  renderMath(container);
+}
+
 function showResults() {
   const correct = drillState.history.filter(h => h.pickedIdx === h.correctIdx).length;
   const attempted = drillState.history.length;
@@ -1567,9 +1994,13 @@ function showResults() {
   document.getElementById("r-attempted").textContent = attempted;
   const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
   const unitName = QUESTIONS[drillState.selectedUnit].name;
-  const minLabel = formatTime(drillState.selectedSeconds);
+  const durationLabel = drillState.untimed
+    ? `Practice mode (${formatTime(drillState.timerSeconds)} elapsed)`
+    : `${formatTime(drillState.selectedSeconds)} drill`;
   document.getElementById("results-meta").textContent =
-    `${drillState.selectedUnit} — ${unitName} • ${minLabel} drill • ${accuracy}% accuracy`;
+    `${drillState.selectedUnit} — ${unitName} • ${durationLabel} • ${accuracy}% accuracy`;
+
+  renderTopicBreakdown();
 
   const list = document.getElementById("review-list");
   list.innerHTML = "";
@@ -1752,6 +2183,19 @@ document.addEventListener("DOMContentLoaded", () => {
     showScreen("teacher-home");
   });
   document.getElementById("start-btn").addEventListener("click", startDrill);
+
+  // Custom-seconds input wiring (once, persistent across renderSetup() calls)
+  document.getElementById("custom-seconds").addEventListener("input", (e) => {
+    const v = parseInt(e.target.value, 10);
+    if (!isNaN(v) && v >= 10 && v <= 3600) {
+      drillState.selectedSeconds = v;
+      drillState.untimed = false;
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("selected"));
+    } else {
+      drillState.selectedSeconds = null;
+    }
+    updateStartButton();
+  });
 
   if (isStudent) {
     applyStudentMode();
