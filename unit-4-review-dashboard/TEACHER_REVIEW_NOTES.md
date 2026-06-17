@@ -17,7 +17,19 @@ The packet page preview uses rendered images from the 24-page student study guid
 
 ## Similar Practice
 
-The similar-practice section uses the matching Version A / Version B companion problem whenever one exists. This keeps the extra practice aligned with the packet structure students already see.
+The similar-practice section now generates outside-the-packet practice instead of routing students to the matching Version A / Version B companion problem.
+
+Each major Unit 4 skill has at least four similar prompts available through the `New Similar Problem` button:
+
+- slope through two points
+- slope and slope-intercept form from standard form
+- equivalent forms and point-slope form
+- equations through two points
+- vertical and horizontal lines
+- intersections, intercepts, and graph-to-standard-form writing
+- parallel and perpendicular lines
+- graph features and function notation
+- testing, graphing, and writing linear inequalities
 
 ## Answer-Key Notes
 

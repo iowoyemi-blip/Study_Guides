@@ -657,21 +657,7 @@ const PROBLEMS = [
     "answer": "y >= -1/2x + 3/2",
     "steps": [
       "The boundary is solid, so use <= or >=.",
-      "The graph is shaded above the line, so y >= -1/2x + 3/2.",
-      "Embedded media:",
-      "- word/media/image1.png",
-      "- word/media/image2.png",
-      "- word/media/image3.png",
-      "- word/media/image4.png",
-      "- word/media/image5.png",
-      "- word/media/image6.png",
-      "- word/media/image7.png",
-      "- word/media/image8.png",
-      "- word/media/image9.png",
-      "- word/media/image10.png",
-      "- word/media/image11.png",
-      "- word/media/image12.png",
-      "- word/media/image13.png"
+      "The graph is shaded above the line, so y >= -1/2x + 3/2."
     ],
     "page": 23,
     "practiceId": "23-A"
@@ -796,21 +782,134 @@ function acceptedAnswers(answer) {
   return items.map(normalize);
 }
 
-function practiceCandidate(selected) {
-  if (selected.practiceId) return PROBLEMS.find(p => p.id === selected.practiceId);
-  const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id);
-  return sameTopic[0] || selected;
+function practiceResult(prompt, answer, accepted, steps) {
+  return { prompt, answer, accepted: accepted || [], steps };
 }
 
-function renderPractice(type, overrideId) {
-  const selected = PROBLEMS.find(p => p.id === state.selected);
-  const item = overrideId ? PROBLEMS.find(p => p.id === overrideId) : practiceCandidate(selected);
+const practiceBanks = {
+  slopePoints: [
+    () => practiceResult("Find the slope through (-4, 7) and (2, -5).", "m = -2", ["-2"], ["m = (-5 - 7) / (2 - (-4)).", "m = -12 / 6 = -2."]),
+    () => practiceResult("Find the slope through (3, -1) and (9, 5).", "m = 1", ["1"], ["m = (5 - (-1)) / (9 - 3).", "m = 6 / 6 = 1."]),
+    () => practiceResult("Find the slope through (-6, 1) and (2, 5).", "m = 1/2", ["1/2", "0.5"], ["m = (5 - 1) / (2 - (-6)).", "m = 4 / 8 = 1/2."]),
+    () => practiceResult("Find the slope through (1, 8) and (5, -4).", "m = -3", ["-3"], ["m = (-4 - 8) / (5 - 1).", "m = -12 / 4 = -3."])
+  ],
+  standardSlope: [
+    () => practiceResult("What is the slope of 2x - 5y = 15?", "m = 2/5", ["2/5"], ["Solve for y: -5y = -2x + 15.", "Divide by -5: y = 2/5x - 3, so the slope is 2/5."]),
+    () => practiceResult("What is the slope of 4x + y = 9?", "m = -4", ["-4"], ["Solve for y: y = -4x + 9.", "The coefficient of x is the slope."]),
+    () => practiceResult("What is the slope of 6x + 3y = 12?", "m = -2", ["-2"], ["3y = -6x + 12.", "y = -2x + 4, so the slope is -2."]),
+    () => practiceResult("What is the slope of -3x + 4y = 20?", "m = 3/4", ["3/4"], ["4y = 3x + 20.", "y = 3/4x + 5, so the slope is 3/4."])
+  ],
+  slopeInterceptForm: [
+    () => practiceResult("Convert 5x + y = 11 to slope-intercept form.", "y = -5x + 11", ["-5x+11"], ["Subtract 5x from both sides.", "y = -5x + 11."]),
+    () => practiceResult("Convert 3x - 2y = 10 to slope-intercept form.", "y = 3/2x - 5", ["3/2x-5"], ["-2y = -3x + 10.", "Divide by -2: y = 3/2x - 5."]),
+    () => practiceResult("Convert 8x + 4y = -12 to slope-intercept form.", "y = -2x - 3", ["-2x-3"], ["4y = -8x - 12.", "Divide by 4: y = -2x - 3."]),
+    () => practiceResult("Convert -6x + 3y = 15 to slope-intercept form.", "y = 2x + 5", ["2x+5"], ["3y = 6x + 15.", "Divide by 3: y = 2x + 5."])
+  ],
+  equivalentForms: [
+    () => practiceResult("Rewrite y - 2 = 3(x + 4) in slope-intercept form.", "y = 3x + 14", ["3x+14"], ["Distribute: y - 2 = 3x + 12.", "Add 2: y = 3x + 14."]),
+    () => practiceResult("Rewrite y + 5 = -2(x - 1) in slope-intercept form.", "y = -2x - 3", ["-2x-3"], ["Distribute: y + 5 = -2x + 2.", "Subtract 5: y = -2x - 3."]),
+    () => practiceResult("Rewrite y - 6 = 1/2(x - 8) in slope-intercept form.", "y = 1/2x + 2", ["1/2x+2"], ["Distribute: y - 6 = 1/2x - 4.", "Add 6: y = 1/2x + 2."]),
+    () => practiceResult("Rewrite y + 1 = -3/4(x + 4) in slope-intercept form.", "y = -3/4x - 4", ["-3/4x-4"], ["Distribute: y + 1 = -3/4x - 3.", "Subtract 1: y = -3/4x - 4."])
+  ],
+  pointSlope: [
+    () => practiceResult("Write a point-slope equation for a line with slope -4 through (2, 7).", "y - 7 = -4(x - 2)", ["y-7=-4(x-2)"], ["Use y - y1 = m(x - x1).", "Substitute m = -4, x1 = 2, and y1 = 7."]),
+    () => practiceResult("Write a point-slope equation for a line with slope 3/5 through (-1, 6).", "y - 6 = 3/5(x + 1)", ["y-6=3/5(x+1)"], ["Use y - y1 = m(x - x1).", "x - (-1) becomes x + 1."]),
+    () => practiceResult("Write a point-slope equation for a line with slope 2 through (5, -3).", "y + 3 = 2(x - 5)", ["y+3=2(x-5)"], ["Use y - y1 = m(x - x1).", "y - (-3) becomes y + 3."]),
+    () => practiceResult("Write a point-slope equation for a line with slope -1/2 through (-4, -8).", "y + 8 = -1/2(x + 4)", ["y+8=-1/2(x+4)"], ["Use y - y1 = m(x - x1).", "Both coordinates are negative, so both grouped terms become plus."])
+  ],
+  equationTwoPoints: [
+    () => practiceResult("Write the slope-intercept equation through (0, -6) and (4, 2).", "y = 2x - 6", ["2x-6"], ["m = (2 - (-6)) / (4 - 0) = 8 / 4 = 2.", "The y-intercept is -6, so y = 2x - 6."]),
+    () => practiceResult("Write the slope-intercept equation through (0, 5) and (6, -1).", "y = -x + 5", ["-x+5", "y=-1x+5"], ["m = (-1 - 5) / (6 - 0) = -6 / 6 = -1.", "The y-intercept is 5, so y = -x + 5."]),
+    () => practiceResult("Write the slope-intercept equation through (2, 1) and (6, 9).", "y = 2x - 3", ["2x-3"], ["m = (9 - 1) / (6 - 2) = 8 / 4 = 2.", "Use (2, 1): 1 = 2(2) + b, so b = -3."]),
+    () => practiceResult("Write the slope-intercept equation through (-2, 8) and (4, -4).", "y = -2x + 4", ["-2x+4"], ["m = (-4 - 8) / (4 - (-2)) = -12 / 6 = -2.", "Use (-2, 8): 8 = -2(-2) + b, so b = 4."])
+  ],
+  specialLines: [
+    () => practiceResult("State the slope and equation of the vertical line through x = -5.", "undefined slope; x = -5", ["x=-5", "undefined;x=-5"], ["Vertical lines have equation x = constant.", "Their slope is undefined."]),
+    () => practiceResult("State the slope and equation of the horizontal line through y = 3.", "slope 0; y = 3", ["0;y=3", "y=3"], ["Horizontal lines have equation y = constant.", "Their slope is 0."]),
+    () => practiceResult("Which line has undefined slope: x = 7 or y = 7?", "x = 7", ["x=7"], ["An x = constant equation is vertical.", "Vertical lines have undefined slope."]),
+    () => practiceResult("Which line has slope 0: x = -2 or y = -2?", "y = -2", ["y=-2"], ["A y = constant equation is horizontal.", "Horizontal lines have slope 0."])
+  ],
+  intersection: [
+    () => practiceResult("Find the intersection of x = 4 and y = 2x - 7.", "(4, 1)", ["4,1"], ["x must be 4.", "Substitute: y = 2(4) - 7 = 1."]),
+    () => practiceResult("Find the intersection of x = -3 and y = -x + 5.", "(-3, 8)", ["-3,8"], ["x must be -3.", "Substitute: y = -(-3) + 5 = 8."]),
+    () => practiceResult("Find the intersection of x = 1 and y = -4x + 6.", "(1, 2)", ["1,2"], ["x must be 1.", "Substitute: y = -4(1) + 6 = 2."]),
+    () => practiceResult("Find the intersection of x = -2 and y = 3x - 1.", "(-2, -7)", ["-2,-7"], ["x must be -2.", "Substitute: y = 3(-2) - 1 = -7."])
+  ],
+  interceptsStandard: [
+    () => practiceResult("Find the x-intercept and y-intercept of 2x + y = 8.", "x-intercept (4, 0); y-intercept (0, 8)", ["4,0;0,8"], ["Set y = 0 to get 2x = 8, so x = 4.", "Set x = 0 to get y = 8."]),
+    () => practiceResult("Find the y-intercept of 3x - 2y = 12.", "(0, -6)", ["0,-6", "-6"], ["Set x = 0.", "-2y = 12, so y = -6."]),
+    () => practiceResult("Find the x-intercept and y-intercept of 4x - y = 12.", "x-intercept (3, 0); y-intercept (0, -12)", ["3,0;0,-12"], ["Set y = 0 to get 4x = 12, so x = 3.", "Set x = 0 to get -y = 12, so y = -12."]),
+    () => practiceResult("Find the y-intercept of 5x + 10y = -20.", "(0, -2)", ["0,-2", "-2"], ["Set x = 0.", "10y = -20, so y = -2."])
+  ],
+  graphToStandard: [
+    () => practiceResult("A graphed line has slope -2/3 and y-intercept 4. Write its equation in standard form.", "2x + 3y = 12", ["2x+3y=12"], ["Start with y = -2/3x + 4.", "Multiply by 3: 3y = -2x + 12.", "Move the x-term left: 2x + 3y = 12."]),
+    () => practiceResult("A graphed line has slope 3/5 and y-intercept -2. Write its equation in standard form.", "3x - 5y = 10", ["3x-5y=10"], ["Start with y = 3/5x - 2.", "Multiply by 5: 5y = 3x - 10.", "Move terms to get 3x - 5y = 10."]),
+    () => practiceResult("A graphed line crosses the y-axis at 1 and has slope -4. Write its equation in standard form.", "4x + y = 1", ["4x+y=1"], ["Start with y = -4x + 1.", "Move the x-term left: 4x + y = 1."]),
+    () => practiceResult("A graphed line crosses the y-axis at -3 and has slope 1/2. Write its equation in standard form.", "x - 2y = 6", ["x-2y=6"], ["Start with y = 1/2x - 3.", "Multiply by 2: 2y = x - 6.", "Move terms to get x - 2y = 6."])
+  ],
+  parallelPerpendicular: [
+    () => practiceResult("Write the line through (2, -1) parallel to y = 4x + 3.", "y = 4x - 9", ["4x-9"], ["Parallel lines use the same slope, so m = 4.", "Use (2, -1): -1 = 4(2) + b, so b = -9."]),
+    () => practiceResult("Write the line through (-4, 6) parallel to y = -1/2x + 8.", "y = -1/2x + 4", ["-1/2x+4"], ["Parallel lines use the same slope, so m = -1/2.", "Use (-4, 6): 6 = 2 + b, so b = 4."]),
+    () => practiceResult("Write the line through (3, 5) perpendicular to y = -3x + 1.", "y = 1/3x + 4", ["1/3x+4"], ["The perpendicular slope to -3 is 1/3.", "Use (3, 5): 5 = 1 + b, so b = 4."]),
+    () => practiceResult("Write the line through (-6, -2) perpendicular to y = 2/5x - 7.", "y = -5/2x - 17", ["-5/2x-17"], ["The perpendicular slope to 2/5 is -5/2.", "Use (-6, -2): -2 = 15 + b, so b = -17."])
+  ],
+  graphFeatures: [
+    () => practiceResult("For f(x) = -2x + 9, state the slope, y-intercept, and f(3).", "slope -2; y-intercept (0, 9); f(3) = 3", ["-2;0,9;3"], ["The slope is the coefficient of x: -2.", "The y-intercept is (0, 9).", "f(3) = -2(3) + 9 = 3."]),
+    () => practiceResult("For g(x) = 5x - 4, find x when g(x) = 16.", "x = 4", ["4"], ["Set 5x - 4 = 16.", "5x = 20, so x = 4."]),
+    () => practiceResult("A line has slope -1/2 and y-intercept 3. Which features should its graph show?", "decreases left to right; crosses y-axis at 3", ["decreases;3"], ["A negative slope means the line decreases from left to right.", "The y-intercept tells where the line crosses the y-axis."]),
+    () => practiceResult("Which equation has the steeper positive slope: y = 2x - 1 or y = 5x + 4?", "y = 5x + 4", ["5x+4"], ["Compare the slopes 2 and 5.", "The larger absolute value gives the steeper line."])
+  ],
+  inequalitiesTest: [
+    () => practiceResult("Does (2, 7) satisfy y > 3x - 1?", "yes", ["yes"], ["Substitute x = 2 and y = 7.", "7 > 3(2) - 1 gives 7 > 5, which is true."]),
+    () => practiceResult("Does (-1, 4) satisfy y <= -2x + 1?", "no", ["no"], ["Substitute x = -1 and y = 4.", "4 <= -2(-1) + 1 gives 4 <= 3, which is false."]),
+    () => practiceResult("Which points satisfy y >= x + 2: (0, 3), (2, 3), (-1, 1)?", "(0, 3) and (-1, 1)", ["0,3;-1,1", "(0,3),(-1,1)"], ["Test each point in the inequality.", "(0, 3) gives 3 >= 2, true.", "(2, 3) gives 3 >= 4, false; (-1, 1) gives 1 >= 1, true."]),
+    () => practiceResult("Which points satisfy y < -x + 4: (1, 2), (3, 0), (5, 0)?", "(1, 2) and (3, 0)", ["1,2;3,0", "(1,2),(3,0)"], ["Test each point in the inequality.", "(1, 2) gives 2 < 3, true.", "(3, 0) gives 0 < 1, true.", "(5, 0) gives 0 < -1, false."])
+  ],
+  inequalitiesGraph: [
+    () => practiceResult("Describe the graph of y > 2x - 3.", "dashed boundary; shade above", ["dashed;above"], ["The symbol > does not include equality, so the boundary is dashed.", "Because y is greater than the line, shade above."]),
+    () => practiceResult("Describe the graph of y <= -1/2x + 4.", "solid boundary; shade below", ["solid;below"], ["The symbol <= includes equality, so the boundary is solid.", "Because y is less than or equal to the line, shade below."]),
+    () => practiceResult("A graph has a dashed boundary line y = 3x + 1 and is shaded below. Write the inequality.", "y < 3x + 1", ["y<3x+1"], ["Dashed means use < or >.", "Shaded below means y is less than the line."]),
+    () => practiceResult("A graph has a solid boundary line y = -2x - 5 and is shaded above. Write the inequality.", "y >= -2x - 5", ["y>=-2x-5"], ["Solid means equality is included.", "Shaded above means y is greater than or equal to the line."])
+  ]
+};
+
+let practiceCounters = {};
+
+function practiceTypeForProblem(problem) {
+  const title = (problem?.title || "").toLowerCase();
+  if (title.includes("slope through two points")) return "slopePoints";
+  if (title.includes("slope from standard")) return "standardSlope";
+  if (title.includes("slope-intercept form") || title.includes("standard to slope-intercept")) return "slopeInterceptForm";
+  if (title.includes("equivalent forms")) return "equivalentForms";
+  if (title.includes("point-slope")) return "pointSlope";
+  if (title.includes("equation through two points")) return "equationTwoPoints";
+  if (title.includes("zero slope") || title.includes("undefined slope") || title.includes("vertical and horizontal")) return "specialLines";
+  if (title.includes("intersection")) return "intersection";
+  if (title.includes("equation from a graph in standard form")) return "graphToStandard";
+  if (title.includes("y-intercept") || title.includes("graphing from standard") || title.includes("standard form")) return "interceptsStandard";
+  if (title.includes("parallel") || title.includes("perpendicular")) return "parallelPerpendicular";
+  if (title.includes("testing linear inequalities")) return "inequalitiesTest";
+  if (title.includes("inequality") || title.includes("inequalities")) return "inequalitiesGraph";
+  if (title.includes("graphing and reading") || title.includes("matching equations")) return "graphFeatures";
+  return "slopeInterceptForm";
+}
+
+function nextPractice(type, reset = false) {
+  const bank = practiceBanks[type] || practiceBanks.slopeInterceptForm;
+  const key = `${state.selected || "none"}:${type}`;
+  if (reset) practiceCounters[key] = 0;
+  const index = practiceCounters[key] || 0;
+  practiceCounters[key] = index + 1;
+  return bank[index % bank.length]();
+}
+
+function renderPractice(type, reset = false) {
+  const item = nextPractice(type, reset);
   if (!item) return;
   $("practiceBox").classList.remove("hidden");
   $("practiceBox").innerHTML = `
     <h3>Similar Practice</h3>
-    <p class="practice-prompt"><strong>Try companion problem ${escapeHTML(item.id)}.</strong> ${escapeHTML(item.prompt || item.title)}</p>
-    <p class="practice-prompt">This problem appears on packet page ${item.page}.</p>
+    <p class="practice-prompt"><strong>New practice for this same skill.</strong> ${escapeHTML(item.prompt)}</p>
     <div class="answer-line"><input id="practiceInput" placeholder="Type your answer"><button class="primary" id="checkPractice">Check</button></div>
     <p class="practice-feedback" id="practiceFeedback"></p>
     <div class="action-row"><button class="soft" id="showPracticeAnswer">Show Answer</button><button class="ghost" id="newPractice">New Similar Problem</button></div>
@@ -818,15 +917,14 @@ function renderPractice(type, overrideId) {
   `;
   $("checkPractice").addEventListener("click", () => {
     const response = normalize($("practiceInput").value);
-    const ok = acceptedAnswers(item.answer).includes(response);
+    const accepted = [...acceptedAnswers(item.answer), ...item.accepted.map(normalize)];
+    const ok = accepted.includes(response);
     $("practiceFeedback").textContent = ok ? "Correct. Your answer matches this practice problem." : "Not yet. Compare notation, signs, coordinates, and units, then try again.";
     $("practiceFeedback").className = `practice-feedback ${ok ? "ok" : "no"}`;
   });
   $("showPracticeAnswer").addEventListener("click", () => $("practiceSteps").classList.remove("hidden"));
   $("newPractice").addEventListener("click", () => {
-    const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id && p.id !== item.id);
-    const next = sameTopic[0] || practiceCandidate(selected);
-    renderPractice(type, next.id);
+    renderPractice(type);
   });
 }
 
@@ -840,7 +938,7 @@ document.addEventListener("click", (event) => {
   if (event.target.id === "showAnswer") { $("answerText").classList.remove("hidden"); $("showAnswer").classList.add("hidden"); $("showSteps").classList.remove("hidden"); }
   if (event.target.id === "showSteps") { $("stepsBox").classList.remove("hidden"); $("showSteps").classList.add("hidden"); }
   if (event.target.id === "markChecked" && state.selected) { if (!state.checked.includes(state.selected)) state.checked.push(state.selected); saveProgress(); renderDashboard(); }
-  if (event.target.id === "startPractice" && state.selected) { renderPractice(PROBLEMS.find(p => p.id === state.selected).practiceType); }
+  if (event.target.id === "startPractice" && state.selected) { renderPractice(practiceTypeForProblem(PROBLEMS.find(p => p.id === state.selected)), true); }
   if (event.target.id === "showPacket") $("packetBox").classList.toggle("hidden");
   if (event.target.id === "resetProgress") { state.checked = []; saveProgress(); renderDashboard(); }
 });
