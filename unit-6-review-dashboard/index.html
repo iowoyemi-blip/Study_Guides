@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unit 6 Review Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    window.MathJax = { tex: { inlineMath: [['\\(', '\\)'], ['$', '$']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow" id="courseName">Algebra I - Polynomials</p>
+      <h1 id="appTitle">Unit 6 Review Dashboard</h1>
+    </div>
+    <div class="top-actions" aria-label="Dashboard view controls">
+      <button class="seg active" data-view="packet">Packet Order</button>
+      <button class="seg" data-view="topic">Topic View</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <aside class="sidebar" aria-label="Study tools">
+      <label class="search-label" for="searchBox">Find a problem or topic</label>
+      <input id="searchBox" type="search" placeholder="Example: graph, slope, factoring">
+      <div class="stat-grid">
+        <div><strong id="checkedCount">0</strong><span>checked</span></div>
+        <div><strong id="reviewCount">0</strong><span>review</span></div>
+      </div>
+      <div class="filter-stack" id="topicFilters"></div>
+    </aside>
+
+    <section class="dashboard-panel" aria-live="polite">
+      <div class="panel-header">
+        <div>
+          <h2 id="panelTitle">Packet Order</h2>
+          <p id="panelSubtitle">Click a problem number to check the final answer first.</p>
+        </div>
+        <button id="resetProgress" class="ghost">Reset Progress</button>
+      </div>
+      <div id="problemGrid" class="problem-grid"></div>
+    </section>
+
+    <section class="detail-panel" id="detailPanel" aria-label="Problem details">
+      <div class="empty-state">
+        <h2>Choose a problem number.</h2>
+        <p>Use this space after you have already tried the problem on paper.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
