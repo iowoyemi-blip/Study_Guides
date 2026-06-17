@@ -521,21 +521,120 @@ function acceptedAnswers(answer) {
   return items.map(normalize);
 }
 
-function practiceCandidate(selected) {
-  if (selected.practiceId) return PROBLEMS.find(p => p.id === selected.practiceId);
-  const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id);
-  return sameTopic[0] || selected;
+function practiceResult(prompt, answer, accepted, steps) {
+  return { prompt, answer, accepted: accepted || [], steps };
 }
 
-function renderPractice(type, overrideId) {
-  const selected = PROBLEMS.find(p => p.id === state.selected);
-  const item = overrideId ? PROBLEMS.find(p => p.id === overrideId) : practiceCandidate(selected);
+const practiceBanks = {
+  polynomialVocabulary: [
+    () => practiceResult("Which expression is NOT a polynomial: 3x^2 - 4x + 1, 7x^3, 2/x + 5, or -8?", "2/x + 5", ["2/x+5"], ["A polynomial cannot have a variable in the denominator.", "2/x has x in the denominator, so it is not a polynomial."]),
+    () => practiceResult("Which expression is NOT a polynomial: x^4 - 2, 5x + 9, sqrt(x) + 1, or 6?", "sqrt(x) + 1", ["sqrt(x)+1"], ["A square root of x means the variable has exponent 1/2.", "Polynomial variable exponents must be whole numbers."]),
+    () => practiceResult("Which expression is a polynomial: 4/x, x^-2 + 3, 6x^2 - x + 8, or 5/(x + 1)?", "6x^2 - x + 8", ["6x^2-x+8"], ["Variables in denominators and negative exponents are not allowed.", "6x^2 - x + 8 has whole-number exponents only."]),
+    () => practiceResult("Is 9x^3 - 2x + 4 a polynomial? Explain briefly.", "yes, it is a polynomial", ["yes"], ["Each variable exponent is a whole number.", "There are no variables in denominators or radicals."])
+  ],
+  classifyPolynomial: [
+    () => practiceResult("Classify 8x^3 - 5x + 2 by degree and number of terms.", "cubic trinomial", ["cubictrinomial"], ["The highest exponent is 3, so the degree is cubic.", "There are three terms, so it is a trinomial."]),
+    () => practiceResult("Classify -4x^2 + 11 by degree and number of terms.", "quadratic binomial", ["quadraticbinomial"], ["The highest exponent is 2, so it is quadratic.", "There are two terms, so it is a binomial."]),
+    () => practiceResult("Classify 7x^4 by degree and number of terms.", "quartic monomial", ["quarticmonomial"], ["The highest exponent is 4, so it is quartic.", "There is one term, so it is a monomial."]),
+    () => practiceResult("Classify -2x^5 + 3x^2 - 9 by degree and number of terms.", "quintic trinomial", ["quintictrinomial"], ["The highest exponent is 5, so it is quintic.", "There are three terms, so it is a trinomial."])
+  ],
+  standardForm: [
+    () => practiceResult("Write 5 - 3x^3 + 2x in standard form.", "-3x^3 + 2x + 5", ["-3x^3+2x+5"], ["Standard form orders terms from highest degree to lowest degree.", "The cubic term comes first, then the linear term, then the constant."]),
+    () => practiceResult("Write 7x - 4 + 6x^2 in standard form.", "6x^2 + 7x - 4", ["6x^2+7x-4"], ["Put the x^2 term first.", "Then write the x term and the constant."]),
+    () => practiceResult("Write -9 + x^4 - 2x^2 in standard form.", "x^4 - 2x^2 - 9", ["x^4-2x^2-9"], ["Order by degree: fourth degree, second degree, constant."]),
+    () => practiceResult("Write 3x + 8x^3 - x^2 + 1 in standard form.", "8x^3 - x^2 + 3x + 1", ["8x^3-x^2+3x+1"], ["Order terms by descending exponent.", "Keep each term's sign with the term."])
+  ],
+  gcfOnly: [
+    () => practiceResult("Find the GCF of 14x^4 + 21x^2.", "7x^2", ["7x^2"], ["The GCF of 14 and 21 is 7.", "The lowest shared power of x is x^2."]),
+    () => practiceResult("Find the GCF of 18a^5 - 12a^3.", "6a^3", ["6a^3"], ["The GCF of 18 and 12 is 6.", "The common variable factor is a^3."]),
+    () => practiceResult("Find the GCF of 16m^3 + 24m^2.", "8m^2", ["8m^2"], ["The GCF of 16 and 24 is 8.", "The common variable factor is m^2."]),
+    () => practiceResult("Find the GCF of 30p^6 - 45p^4.", "15p^4", ["15p^4"], ["The GCF of 30 and 45 is 15.", "The lowest shared power is p^4."])
+  ],
+  multiplyBinomials: [
+    () => practiceResult("Expand (x + 6)(x - 2).", "x^2 + 4x - 12", ["x^2+4x-12"], ["Multiply: x^2 - 2x + 6x - 12.", "Combine like terms to get x^2 + 4x - 12."]),
+    () => practiceResult("Expand (x - 7)(x + 3).", "x^2 - 4x - 21", ["x^2-4x-21"], ["Multiply: x^2 + 3x - 7x - 21.", "Combine like terms."]),
+    () => practiceResult("Expand (2x + 1)(x + 5).", "2x^2 + 11x + 5", ["2x^2+11x+5"], ["Multiply each term in the first binomial by each term in the second.", "2x^2 + 10x + x + 5 = 2x^2 + 11x + 5."]),
+    () => practiceResult("Expand (3x - 4)(x - 2).", "3x^2 - 10x + 8", ["3x^2-10x+8"], ["Multiply: 3x^2 - 6x - 4x + 8.", "Combine like terms."])
+  ],
+  factorTrinomials: [
+    () => practiceResult("Factor x^2 + 9x + 20.", "(x + 4)(x + 5)", ["(x+4)(x+5)", "(x+5)(x+4)"], ["Find factors of 20 that add to 9.", "4 and 5 work."]),
+    () => practiceResult("Factor x^2 - 8x + 15.", "(x - 3)(x - 5)", ["(x-3)(x-5)", "(x-5)(x-3)"], ["Find factors of 15 that add to -8.", "-3 and -5 work."]),
+    () => practiceResult("Factor x^2 + x - 30.", "(x + 6)(x - 5)", ["(x+6)(x-5)", "(x-5)(x+6)"], ["Find factors of -30 that add to 1.", "6 and -5 work."]),
+    () => practiceResult("Factor x^2 - 4x - 21.", "(x - 7)(x + 3)", ["(x-7)(x+3)", "(x+3)(x-7)"], ["Find factors of -21 that add to -4.", "-7 and 3 work."])
+  ],
+  addSubtractPolynomials: [
+    () => practiceResult("Simplify (3x^2 + 5x - 8) + (4x^2 - 2x + 1).", "7x^2 + 3x - 7", ["7x^2+3x-7"], ["Combine like terms.", "3x^2 + 4x^2 = 7x^2, 5x - 2x = 3x, and -8 + 1 = -7."]),
+    () => practiceResult("Simplify (9x^2 - x + 6) - (2x^2 + 4x - 3).", "7x^2 - 5x + 9", ["7x^2-5x+9"], ["Distribute the subtraction to the second polynomial.", "9x^2 - 2x^2 = 7x^2, -x - 4x = -5x, and 6 - (-3) = 9."]),
+    () => practiceResult("Simplify (5x^3 - 2x + 4) + (x^3 + 7x - 10).", "6x^3 + 5x - 6", ["6x^3+5x-6"], ["Combine cubic terms, linear terms, and constants.", "5x^3 + x^3 = 6x^3, -2x + 7x = 5x, and 4 - 10 = -6."]),
+    () => practiceResult("Simplify (6x^2 + 3x - 1) - (x^2 - 8x + 5).", "5x^2 + 11x - 6", ["5x^2+11x-6"], ["Subtract each term in the second polynomial.", "6x^2 - x^2 = 5x^2, 3x - (-8x) = 11x, and -1 - 5 = -6."])
+  ],
+  multiplyPolynomials: [
+    () => practiceResult("Multiply (x + 4)(2x^2 - x + 3).", "2x^3 + 7x^2 - x + 12", ["2x^3+7x^2-x+12"], ["Distribute x and 4.", "2x^3 - x^2 + 3x + 8x^2 - 4x + 12.", "Combine like terms."]),
+    () => practiceResult("Multiply (2x - 1)(x^2 + 3x - 5).", "2x^3 + 5x^2 - 13x + 5", ["2x^3+5x^2-13x+5"], ["Distribute 2x and -1.", "2x^3 + 6x^2 - 10x - x^2 - 3x + 5.", "Combine like terms."]),
+    () => practiceResult("Multiply (x - 3)(3x^2 + 2x + 1).", "3x^3 - 7x^2 - 5x - 3", ["3x^3-7x^2-5x-3"], ["Distribute x and -3.", "3x^3 + 2x^2 + x - 9x^2 - 6x - 3.", "Combine like terms."]),
+    () => practiceResult("Multiply (3x + 2)(x^2 - 4x + 6).", "3x^3 - 10x^2 + 10x + 12", ["3x^3-10x^2+10x+12"], ["Distribute 3x and 2.", "3x^3 - 12x^2 + 18x + 2x^2 - 8x + 12.", "Combine like terms."])
+  ],
+  factorGcf: [
+    () => practiceResult("Factor 12x^3 + 18x^2 completely.", "6x^2(2x + 3)", ["6x^2(2x+3)"], ["The GCF is 6x^2.", "Divide each term by 6x^2."]),
+    () => practiceResult("Factor 15a^4 - 10a^2 completely.", "5a^2(3a^2 - 2)", ["5a^2(3a^2-2)"], ["The GCF is 5a^2.", "Factor it out of each term."]),
+    () => practiceResult("Factor 21m^5 + 14m^3 completely.", "7m^3(3m^2 + 2)", ["7m^3(3m^2+2)"], ["The GCF is 7m^3.", "Divide both terms by the GCF."]),
+    () => practiceResult("Factor 24p^4 - 36p^2 completely.", "12p^2(2p^2 - 3)", ["12p^2(2p^2-3)"], ["The GCF is 12p^2.", "Factor it out."])
+  ],
+  differenceSquares: [
+    () => practiceResult("Factor 16x^2 - 81.", "(4x - 9)(4x + 9)", ["(4x-9)(4x+9)", "(4x+9)(4x-9)"], ["This is a difference of squares.", "16x^2 = (4x)^2 and 81 = 9^2."]),
+    () => practiceResult("Factor 49x^2 - 25.", "(7x - 5)(7x + 5)", ["(7x-5)(7x+5)", "(7x+5)(7x-5)"], ["Use a^2 - b^2 = (a - b)(a + b).", "49x^2 = (7x)^2 and 25 = 5^2."]),
+    () => practiceResult("Factor x^2 - 64.", "(x - 8)(x + 8)", ["(x-8)(x+8)", "(x+8)(x-8)"], ["x^2 and 64 are both squares.", "Use the difference-of-squares pattern."]),
+    () => practiceResult("Factor 36a^2 - 121.", "(6a - 11)(6a + 11)", ["(6a-11)(6a+11)", "(6a+11)(6a-11)"], ["36a^2 = (6a)^2 and 121 = 11^2.", "Write conjugate factors."])
+  ],
+  perfectSquare: [
+    () => practiceResult("Factor x^2 + 12x + 36.", "(x + 6)^2", ["(x+6)^2", "(x+6)(x+6)"], ["36 = 6^2 and 12x = 2(x)(6).", "The trinomial is a perfect square."]),
+    () => practiceResult("Factor x^2 - 18x + 81.", "(x - 9)^2", ["(x-9)^2", "(x-9)(x-9)"], ["81 = 9^2 and -18x = 2(x)(-9).", "The factor is squared."]),
+    () => practiceResult("Factor x^2 + 16x + 64.", "(x + 8)^2", ["(x+8)^2", "(x+8)(x+8)"], ["64 = 8^2 and 16x = 2(x)(8).", "So the factors are identical."]),
+    () => practiceResult("Factor x^2 - 6x + 9.", "(x - 3)^2", ["(x-3)^2", "(x-3)(x-3)"], ["9 = 3^2 and -6x = 2(x)(-3).", "This is a perfect-square trinomial."])
+  ],
+  solveFactoring: [
+    () => practiceResult("Solve x^2 + 8x + 15 = 0.", "x = -3 or x = -5", ["-3,-5", "-5,-3"], ["Factor: (x + 3)(x + 5) = 0.", "Set each factor equal to zero."]),
+    () => practiceResult("Solve x^2 - x - 12 = 0.", "x = -3 or x = 4", ["-3,4", "4,-3"], ["Factor: (x - 4)(x + 3) = 0.", "Set each factor equal to zero."]),
+    () => practiceResult("Solve x^2 - 10x + 21 = 0.", "x = 3 or x = 7", ["3,7", "7,3"], ["Factor: (x - 3)(x - 7) = 0.", "Set each factor equal to zero."]),
+    () => practiceResult("Solve x^2 + 3x - 28 = 0.", "x = -7 or x = 4", ["-7,4", "4,-7"], ["Factor: (x + 7)(x - 4) = 0.", "Set each factor equal to zero."])
+  ]
+};
+
+let practiceCounters = {};
+
+function practiceTypeForProblem(problem) {
+  const title = (problem?.title || "").toLowerCase();
+  if (title === "polynomial vocabulary") return "polynomialVocabulary";
+  if (title.includes("classifying")) return "classifyPolynomial";
+  if (title.includes("standard form")) return "standardForm";
+  if (title === "greatest common factor") return "gcfOnly";
+  if (title.includes("multiplying binomials")) return "multiplyBinomials";
+  if (title.includes("adding") || title.includes("subtracting")) return "addSubtractPolynomials";
+  if (title.includes("multiplying polynomials")) return "multiplyPolynomials";
+  if (title.includes("factoring gcf")) return "factorGcf";
+  if (title.includes("difference of squares")) return "differenceSquares";
+  if (title.includes("perfect-square")) return "perfectSquare";
+  if (title.includes("solving by factoring")) return "solveFactoring";
+  if (title.includes("factoring trinomials")) return "factorTrinomials";
+  return "classifyPolynomial";
+}
+
+function nextPractice(type, reset = false) {
+  const bank = practiceBanks[type] || practiceBanks.classifyPolynomial;
+  const key = `${state.selected || "none"}:${type}`;
+  if (reset) practiceCounters[key] = 0;
+  const index = practiceCounters[key] || 0;
+  practiceCounters[key] = index + 1;
+  return bank[index % bank.length]();
+}
+
+function renderPractice(type, reset = false) {
+  const item = nextPractice(type, reset);
   if (!item) return;
   $("practiceBox").classList.remove("hidden");
   $("practiceBox").innerHTML = `
     <h3>Similar Practice</h3>
-    <p class="practice-prompt"><strong>Try companion problem ${escapeHTML(item.id)}.</strong> ${escapeHTML(item.prompt || item.title)}</p>
-    <p class="practice-prompt">This problem appears on packet page ${item.page}.</p>
+    <p class="practice-prompt"><strong>New practice for this same skill.</strong> ${escapeHTML(item.prompt)}</p>
     <div class="answer-line"><input id="practiceInput" placeholder="Type your answer"><button class="primary" id="checkPractice">Check</button></div>
     <p class="practice-feedback" id="practiceFeedback"></p>
     <div class="action-row"><button class="soft" id="showPracticeAnswer">Show Answer</button><button class="ghost" id="newPractice">New Similar Problem</button></div>
@@ -543,15 +642,14 @@ function renderPractice(type, overrideId) {
   `;
   $("checkPractice").addEventListener("click", () => {
     const response = normalize($("practiceInput").value);
-    const ok = acceptedAnswers(item.answer).includes(response);
+    const accepted = [...acceptedAnswers(item.answer), ...item.accepted.map(normalize)];
+    const ok = accepted.includes(response);
     $("practiceFeedback").textContent = ok ? "Correct. Your answer matches this practice problem." : "Not yet. Compare notation, signs, coordinates, and units, then try again.";
     $("practiceFeedback").className = `practice-feedback ${ok ? "ok" : "no"}`;
   });
   $("showPracticeAnswer").addEventListener("click", () => $("practiceSteps").classList.remove("hidden"));
   $("newPractice").addEventListener("click", () => {
-    const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id && p.id !== item.id);
-    const next = sameTopic[0] || practiceCandidate(selected);
-    renderPractice(type, next.id);
+    renderPractice(type);
   });
 }
 
@@ -565,7 +663,7 @@ document.addEventListener("click", (event) => {
   if (event.target.id === "showAnswer") { $("answerText").classList.remove("hidden"); $("showAnswer").classList.add("hidden"); $("showSteps").classList.remove("hidden"); }
   if (event.target.id === "showSteps") { $("stepsBox").classList.remove("hidden"); $("showSteps").classList.add("hidden"); }
   if (event.target.id === "markChecked" && state.selected) { if (!state.checked.includes(state.selected)) state.checked.push(state.selected); saveProgress(); renderDashboard(); }
-  if (event.target.id === "startPractice" && state.selected) { renderPractice(PROBLEMS.find(p => p.id === state.selected).practiceType); }
+  if (event.target.id === "startPractice" && state.selected) { renderPractice(practiceTypeForProblem(PROBLEMS.find(p => p.id === state.selected)), true); }
   if (event.target.id === "showPacket") $("packetBox").classList.toggle("hidden");
   if (event.target.id === "resetProgress") { state.checked = []; saveProgress(); renderDashboard(); }
 });

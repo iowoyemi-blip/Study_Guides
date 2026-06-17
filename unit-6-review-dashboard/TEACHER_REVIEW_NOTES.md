@@ -17,7 +17,17 @@ The packet page preview uses rendered images from the 8-page student study guide
 
 ## Similar Practice
 
-The similar-practice section uses the matching Version A / Version B companion problem whenever one exists. This keeps the extra practice aligned with the packet structure students already see.
+The similar-practice section now generates outside-the-packet practice instead of routing students to the matching Version A / Version B companion problem.
+
+Each major Unit 6 skill has at least four similar prompts available through the `New Similar Problem` button:
+
+- identifying polynomial and non-polynomial expressions
+- classifying polynomials and writing standard form
+- finding and factoring out greatest common factors
+- multiplying binomials and larger polynomial expressions
+- adding and subtracting polynomials
+- factoring trinomials, differences of squares, and perfect-square trinomials
+- solving quadratic equations by factoring
 
 ## Answer-Key Notes
 
