@@ -17,7 +17,16 @@ The packet page preview uses rendered images from the 12-page student study guid
 
 ## Similar Practice
 
-The similar-practice section uses the matching Version A / Version B companion problem whenever one exists. This keeps the extra practice aligned with the packet structure students already see.
+The similar-practice section now generates outside-the-packet practice instead of routing students to the matching Version A / Version B companion problem.
+
+Each major Unit 3 skill has at least four similar prompts available through the `New Similar Problem` button:
+
+- domain and range from graph descriptions
+- function values and inputs
+- slope from two points
+- linear rules from graphs, tables, and descriptions
+- function/not-a-function decisions across representations
+- linear context graph situations
 
 ## Answer-Key Notes
 

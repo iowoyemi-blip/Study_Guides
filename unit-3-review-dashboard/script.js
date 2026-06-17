@@ -349,24 +349,7 @@ const PROBLEMS = [
     "answer": "a. yes, constant difference -2; b. 8; c. x = 3; d. g(x) = -2x + 12",
     "steps": [
       "The y-values decrease by 2 each step.",
-      "The starting value is 12, so the rule is g(x) = -2x + 12.",
-      "Embedded media:",
-      "- word/media/image1.png",
-      "- word/media/image2.png",
-      "- word/media/image3.png",
-      "- word/media/image4.png",
-      "- word/media/image5.png",
-      "- word/media/image6.png",
-      "- word/media/image7.png",
-      "- word/media/image8.png",
-      "- word/media/image9.png",
-      "- word/media/image10.png",
-      "- word/media/image11.png",
-      "- word/media/image12.png",
-      "- word/media/image13.png",
-      "- word/media/image14.png",
-      "- word/media/image15.png",
-      "- word/media/image16.png"
+      "The starting value is 12, so the rule is g(x) = -2x + 12."
     ],
     "page": 11,
     "practiceId": "12-A"
@@ -491,21 +474,288 @@ function acceptedAnswers(answer) {
   return items.map(normalize);
 }
 
-function practiceCandidate(selected) {
-  if (selected.practiceId) return PROBLEMS.find(p => p.id === selected.practiceId);
-  const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id);
-  return sameTopic[0] || selected;
+function practiceResult(prompt, answer, accepted, steps) {
+  return { prompt, answer, accepted: accepted || [], steps };
 }
 
-function renderPractice(type, overrideId) {
-  const selected = PROBLEMS.find(p => p.id === state.selected);
-  const item = overrideId ? PROBLEMS.find(p => p.id === overrideId) : practiceCandidate(selected);
+const practiceBanks = {
+  domainRange: [
+    () => practiceResult(
+      "A continuous graph begins with an open circle at x = -6 and ends with a closed circle at x = 2. Write the domain.",
+      "(-6, 2]",
+      ["(-6,2]"],
+      [
+        "Domain means the x-values covered by the graph.",
+        "The open circle at -6 means -6 is not included.",
+        "The closed circle at 2 means 2 is included, so the domain is (-6, 2]."
+      ]
+    ),
+    () => practiceResult(
+      "A continuous graph has lowest y-value -3 included and highest y-value 5 not included. Write the range.",
+      "[-3, 5)",
+      ["[-3,5)"],
+      [
+        "Range means the y-values covered by the graph.",
+        "The lowest value -3 is included, so use a bracket.",
+        "The highest value 5 is not included, so use a parenthesis."
+      ]
+    ),
+    () => practiceResult(
+      "A graph covers x-values from -4 to 7. The point at x = -4 is closed and the point at x = 7 is open. Write the domain.",
+      "[-4, 7)",
+      ["[-4,7)"],
+      [
+        "Use the left and right x-values.",
+        "Closed at -4 gives a bracket.",
+        "Open at 7 gives a parenthesis, so the domain is [-4, 7)."
+      ]
+    ),
+    () => practiceResult(
+      "A graph covers y-values greater than -2 and less than or equal to 6. Write the range in interval notation.",
+      "(-2, 6]",
+      ["(-2,6]"],
+      [
+        "Greater than -2 means -2 is not included.",
+        "Less than or equal to 6 means 6 is included.",
+        "The range is (-2, 6]."
+      ]
+    )
+  ],
+  functionValues: [
+    () => practiceResult(
+      "Use the table: x: -1, 0, 1, 2 and f(x): 6, 3, 0, -3. What is f(2)?",
+      "-3",
+      ["f(2) = -3"],
+      [
+        "Find x = 2 in the table.",
+        "The matching output is -3, so f(2) = -3."
+      ]
+    ),
+    () => practiceResult(
+      "Use the table: x: 0, 1, 2, 3 and g(x): -4, -1, 2, 5. For what value of x is g(x) = 2?",
+      "x = 2",
+      ["2"],
+      [
+        "Find the output 2 in the g(x) row.",
+        "The input above it is x = 2."
+      ]
+    ),
+    () => practiceResult(
+      "Given h(x) = -2x + 7, what is h(4)?",
+      "-1",
+      ["h(4) = -1"],
+      [
+        "Substitute 4 for x.",
+        "h(4) = -2(4) + 7 = -8 + 7 = -1."
+      ]
+    ),
+    () => practiceResult(
+      "Given p(x) = 3x - 5, find x when p(x) = 10.",
+      "x = 5",
+      ["5"],
+      [
+        "Set the rule equal to 10: 3x - 5 = 10.",
+        "Add 5 to both sides: 3x = 15.",
+        "Divide by 3, so x = 5."
+      ]
+    )
+  ],
+  slope: [
+    () => practiceResult(
+      "Find the slope through (-2, 5) and (4, -1).",
+      "m = -1",
+      ["-1"],
+      [
+        "Use m = (y2 - y1) / (x2 - x1).",
+        "m = (-1 - 5) / (4 - (-2)) = -6 / 6.",
+        "m = -1."
+      ]
+    ),
+    () => practiceResult(
+      "Find the slope through (1, -3) and (5, 5).",
+      "m = 2",
+      ["2"],
+      [
+        "Use m = (y2 - y1) / (x2 - x1).",
+        "m = (5 - (-3)) / (5 - 1) = 8 / 4.",
+        "m = 2."
+      ]
+    ),
+    () => practiceResult(
+      "Find the slope through (-3, 2) and (3, 5).",
+      "m = 1/2",
+      ["1/2", "0.5"],
+      [
+        "Use m = (y2 - y1) / (x2 - x1).",
+        "m = (5 - 2) / (3 - (-3)) = 3 / 6.",
+        "m = 1/2."
+      ]
+    ),
+    () => practiceResult(
+      "Find the slope through (2, 7) and (6, -1).",
+      "m = -2",
+      ["-2"],
+      [
+        "Use m = (y2 - y1) / (x2 - x1).",
+        "m = (-1 - 7) / (6 - 2) = -8 / 4.",
+        "m = -2."
+      ]
+    )
+  ],
+  linearRule: [
+    () => practiceResult(
+      "A line has slope 3 and y-intercept -4. Write the equation.",
+      "y = 3x - 4",
+      ["3x-4", "f(x)=3x-4"],
+      [
+        "Slope-intercept form is y = mx + b.",
+        "Use m = 3 and b = -4.",
+        "The equation is y = 3x - 4."
+      ]
+    ),
+    () => practiceResult(
+      "For the table x: 0, 1, 2, 3 and y: 8, 6, 4, 2, write the linear rule.",
+      "y = -2x + 8",
+      ["-2x+8", "f(x)=-2x+8"],
+      [
+        "The outputs decrease by 2 each time x increases by 1, so m = -2.",
+        "When x = 0, y = 8, so b = 8.",
+        "The rule is y = -2x + 8."
+      ]
+    ),
+    () => practiceResult(
+      "A line crosses the y-axis at 5 and rises 2 units for every 1 unit to the right. Write the equation.",
+      "y = 2x + 5",
+      ["2x+5", "f(x)=2x+5"],
+      [
+        "Rising 2 for every 1 right means the slope is 2.",
+        "Crossing the y-axis at 5 means b = 5.",
+        "The equation is y = 2x + 5."
+      ]
+    ),
+    () => practiceResult(
+      "For the table x: 0, 1, 2, 3 and y: -6, -1, 4, 9, write the linear rule.",
+      "y = 5x - 6",
+      ["5x-6", "f(x)=5x-6"],
+      [
+        "The outputs increase by 5, so the slope is 5.",
+        "When x = 0, y = -6, so the starting value is -6.",
+        "The rule is y = 5x - 6."
+      ]
+    )
+  ],
+  functionRepresentations: [
+    () => practiceResult(
+      "Is {(1, 4), (2, 5), (3, 5), (4, 8)} a function? Explain.",
+      "yes, it is a function",
+      ["yes", "function"],
+      [
+        "Check whether any input repeats with different outputs.",
+        "The inputs 1, 2, 3, and 4 each appear once.",
+        "Each input has exactly one output, so it is a function."
+      ]
+    ),
+    () => practiceResult(
+      "Is {(-2, 1), (0, 3), (-2, 6), (4, 9)} a function? Explain.",
+      "no, it is not a function",
+      ["no", "not a function"],
+      [
+        "Check whether any input repeats with different outputs.",
+        "Input -2 is paired with both 1 and 6.",
+        "One input cannot have two different outputs, so it is not a function."
+      ]
+    ),
+    () => practiceResult(
+      "A relation has points (0, 2), (1, 5), (3, 5), and (6, 8). State the domain.",
+      "{0, 1, 3, 6}",
+      ["0,1,3,6"],
+      [
+        "The domain is the set of input values.",
+        "Use the x-values from each point: 0, 1, 3, and 6."
+      ]
+    ),
+    () => practiceResult(
+      "A relation is shown as separate plotted points, not connected by line segments. Is it discrete or continuous?",
+      "discrete",
+      ["discrete relation"],
+      [
+        "Separate points represent individual values.",
+        "Because the graph is not connected, the relation is discrete."
+      ]
+    )
+  ],
+  contextLinear: [
+    () => practiceResult(
+      "A candle is 12 inches tall and burns 1.5 inches each hour. Write h(t), then find h(4).",
+      "h(t) = -1.5t + 12; h(4) = 6",
+      ["-1.5t+12;6", "h(4)=6", "6"],
+      [
+        "The starting height is 12, so the y-intercept is 12.",
+        "The candle loses height, so the slope is -1.5.",
+        "h(t) = -1.5t + 12 and h(4) = -1.5(4) + 12 = 6."
+      ]
+    ),
+    () => practiceResult(
+      "A gym charges a $20 sign-up fee plus $8 per class. Write C(x), then find C(5).",
+      "C(x) = 8x + 20; C(5) = 60",
+      ["8x+20;60", "c(5)=60", "$60", "60"],
+      [
+        "The fixed starting fee is 20.",
+        "Each class adds 8, so the slope is 8.",
+        "C(x) = 8x + 20 and C(5) = 8(5) + 20 = 60."
+      ]
+    ),
+    () => practiceResult(
+      "A pool starts with 40 gallons and drains 4 gallons per minute. When will it have 12 gallons left?",
+      "7 minutes",
+      ["7", "t = 7", "7 min"],
+      [
+        "Model the amount with A(t) = -4t + 40.",
+        "Set the amount equal to 12: 12 = -4t + 40.",
+        "-28 = -4t, so t = 7 minutes."
+      ]
+    ),
+    () => practiceResult(
+      "A phone battery starts at 85% and drops 5 percentage points per hour. Write B(t), then find B(6).",
+      "B(t) = -5t + 85; B(6) = 55",
+      ["-5t+85;55", "b(6)=55", "55%"],
+      [
+        "The starting battery level is 85.",
+        "Dropping 5 percentage points per hour gives a slope of -5.",
+        "B(t) = -5t + 85 and B(6) = 55."
+      ]
+    )
+  ]
+};
+
+let practiceCounters = {};
+
+function practiceTypeForProblem(problem) {
+  const title = (problem?.title || "").toLowerCase();
+  if (title.includes("domain") || title.includes("range") || title.includes("continuous graph")) return "domainRange";
+  if (title.includes("reading function") || title.includes("reading inputs") || title.includes("function notation")) return "functionValues";
+  if (title.includes("slope from") || title.includes("slope formula")) return "slope";
+  if (title.includes("context")) return "contextLinear";
+  if (title.includes("functions across") || title.includes("discrete") || title.includes("graph representation")) return "functionRepresentations";
+  return "linearRule";
+}
+
+function nextPractice(type, reset = false) {
+  const bank = practiceBanks[type] || practiceBanks.linearRule;
+  const key = `${state.selected || "none"}:${type}`;
+  if (reset) practiceCounters[key] = 0;
+  const index = practiceCounters[key] || 0;
+  practiceCounters[key] = index + 1;
+  return bank[index % bank.length]();
+}
+
+function renderPractice(type, reset = false) {
+  const item = nextPractice(type, reset);
   if (!item) return;
   $("practiceBox").classList.remove("hidden");
   $("practiceBox").innerHTML = `
     <h3>Similar Practice</h3>
-    <p class="practice-prompt"><strong>Try companion problem ${escapeHTML(item.id)}.</strong> ${escapeHTML(item.prompt || item.title)}</p>
-    <p class="practice-prompt">This problem appears on packet page ${item.page}.</p>
+    <p class="practice-prompt"><strong>New practice for this same skill.</strong> ${escapeHTML(item.prompt)}</p>
     <div class="answer-line"><input id="practiceInput" placeholder="Type your answer"><button class="primary" id="checkPractice">Check</button></div>
     <p class="practice-feedback" id="practiceFeedback"></p>
     <div class="action-row"><button class="soft" id="showPracticeAnswer">Show Answer</button><button class="ghost" id="newPractice">New Similar Problem</button></div>
@@ -513,15 +763,14 @@ function renderPractice(type, overrideId) {
   `;
   $("checkPractice").addEventListener("click", () => {
     const response = normalize($("practiceInput").value);
-    const ok = acceptedAnswers(item.answer).includes(response);
+    const accepted = [...acceptedAnswers(item.answer), ...item.accepted.map(normalize)];
+    const ok = accepted.includes(response);
     $("practiceFeedback").textContent = ok ? "Correct. Your answer matches this practice problem." : "Not yet. Compare notation, signs, coordinates, and units, then try again.";
     $("practiceFeedback").className = `practice-feedback ${ok ? "ok" : "no"}`;
   });
   $("showPracticeAnswer").addEventListener("click", () => $("practiceSteps").classList.remove("hidden"));
   $("newPractice").addEventListener("click", () => {
-    const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id && p.id !== item.id);
-    const next = sameTopic[0] || practiceCandidate(selected);
-    renderPractice(type, next.id);
+    renderPractice(type);
   });
 }
 
@@ -535,7 +784,7 @@ document.addEventListener("click", (event) => {
   if (event.target.id === "showAnswer") { $("answerText").classList.remove("hidden"); $("showAnswer").classList.add("hidden"); $("showSteps").classList.remove("hidden"); }
   if (event.target.id === "showSteps") { $("stepsBox").classList.remove("hidden"); $("showSteps").classList.add("hidden"); }
   if (event.target.id === "markChecked" && state.selected) { if (!state.checked.includes(state.selected)) state.checked.push(state.selected); saveProgress(); renderDashboard(); }
-  if (event.target.id === "startPractice" && state.selected) { renderPractice(PROBLEMS.find(p => p.id === state.selected).practiceType); }
+  if (event.target.id === "startPractice" && state.selected) { renderPractice(practiceTypeForProblem(PROBLEMS.find(p => p.id === state.selected)), true); }
   if (event.target.id === "showPacket") $("packetBox").classList.toggle("hidden");
   if (event.target.id === "resetProgress") { state.checked = []; saveProgress(); renderDashboard(); }
 });
