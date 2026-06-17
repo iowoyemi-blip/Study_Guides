@@ -466,21 +466,106 @@ function acceptedAnswers(answer) {
   return items.map(normalize);
 }
 
-function practiceCandidate(selected) {
-  if (selected.practiceId) return PROBLEMS.find(p => p.id === selected.practiceId);
-  const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id);
-  return sameTopic[0] || selected;
+function practiceResult(prompt, answer, accepted, steps) {
+  return { prompt, answer, accepted: accepted || [], steps };
 }
 
-function renderPractice(type, overrideId) {
-  const selected = PROBLEMS.find(p => p.id === state.selected);
-  const item = overrideId ? PROBLEMS.find(p => p.id === overrideId) : practiceCandidate(selected);
+const practiceBanks = {
+  yIntercepts: [
+    () => practiceResult("What is the y-intercept of f(x) = 3x^2 - 4x + 6?", "(0, 6)", ["0,6", "6"], ["The y-intercept occurs when x = 0.", "f(0) = 6, so the point is (0, 6)."]),
+    () => practiceResult("What is the y-intercept of g(x) = -2x^2 + 5x - 9?", "(0, -9)", ["0,-9", "-9"], ["Set x = 0.", "g(0) = -9."]),
+    () => practiceResult("What is the y-intercept of h(x) = x^2 + 8x + 10?", "(0, 10)", ["0,10", "10"], ["The constant term is the y-value when x = 0.", "So the y-intercept is (0, 10)."]),
+    () => practiceResult("What is the y-intercept of p(x) = -x^2 - 3x + 2?", "(0, 2)", ["0,2", "2"], ["Substitute x = 0.", "p(0) = 2."])
+  ],
+  axisSymmetry: [
+    () => practiceResult("Find the axis of symmetry of f(x) = x^2 - 8x + 3.", "x = 4", ["4"], ["Use x = -b/(2a).", "Here a = 1 and b = -8, so x = 8/2 = 4."]),
+    () => practiceResult("Find the axis of symmetry of f(x) = x^2 + 12x - 1.", "x = -6", ["-6"], ["Use x = -b/(2a).", "x = -12/2 = -6."]),
+    () => practiceResult("Find the axis of symmetry of f(x) = 2x^2 - 4x + 7.", "x = 1", ["1"], ["Use x = -b/(2a).", "x = -(-4)/(2(2)) = 4/4 = 1."]),
+    () => practiceResult("Find the axis of symmetry of f(x) = -x^2 + 6x - 2.", "x = 3", ["3"], ["Use x = -b/(2a).", "x = -6/(2(-1)) = 3."])
+  ],
+  vertexForm: [
+    () => practiceResult("What is the vertex of y = (x - 5)^2 + 3?", "(5, 3)", ["5,3"], ["Vertex form is y = a(x - h)^2 + k.", "The vertex is (h, k), so it is (5, 3)."]),
+    () => practiceResult("What is the vertex of y = (x + 2)^2 - 7?", "(-2, -7)", ["-2,-7"], ["x + 2 means h = -2.", "k = -7."]),
+    () => practiceResult("What is the vertex of y = -3(x - 1)^2 + 4?", "(1, 4)", ["1,4"], ["The value of a does not change the vertex location.", "h = 1 and k = 4."]),
+    () => practiceResult("What is the vertex of y = 2(x + 6)^2 - 9?", "(-6, -9)", ["-6,-9"], ["x + 6 means h = -6.", "k = -9."])
+  ],
+  openingDirection: [
+    () => practiceResult("Does y = -4x^2 + 3x - 1 open up or down?", "opens down", ["down", "opensdown"], ["The leading coefficient is negative.", "A negative a-value makes the parabola open downward."]),
+    () => practiceResult("Does y = 1/2x^2 - 5x + 8 open up or down?", "opens up", ["up", "opensup"], ["The leading coefficient is positive.", "A positive a-value makes the parabola open upward."]),
+    () => practiceResult("Which function opens downward: y = 2x^2 + 1, y = -x^2 + 6, or y = x^2 - 4x?", "y = -x^2 + 6", ["-x^2+6"], ["Look at the sign of the x^2 coefficient.", "Only y = -x^2 + 6 has a negative leading coefficient."]),
+    () => practiceResult("Which function opens upward: y = -3x^2 + x, y = x^2 - 7, or y = -x^2 - 2x?", "y = x^2 - 7", ["x^2-7"], ["A parabola opens upward when a is positive.", "The positive leading coefficient is in y = x^2 - 7."])
+  ],
+  xIntercepts: [
+    () => practiceResult("Find the x-intercepts of y = (x - 4)(x + 1).", "(4, 0) and (-1, 0)", ["4,0;-1,0", "-1,0;4,0"], ["Set each factor equal to zero.", "x = 4 or x = -1, so the intercepts are (4, 0) and (-1, 0)."]),
+    () => practiceResult("Find the x-intercepts of y = (x + 5)(x - 2).", "(-5, 0) and (2, 0)", ["-5,0;2,0", "2,0;-5,0"], ["Set x + 5 = 0 and x - 2 = 0.", "x = -5 or x = 2."]),
+    () => practiceResult("Find the x-intercepts of y = x(x - 6).", "(0, 0) and (6, 0)", ["0,0;6,0", "6,0;0,0"], ["Set each factor equal to zero.", "x = 0 or x = 6."]),
+    () => practiceResult("Find the x-intercepts of y = (x + 3)(x + 8).", "(-3, 0) and (-8, 0)", ["-3,0;-8,0", "-8,0;-3,0"], ["Set x + 3 = 0 and x + 8 = 0.", "x = -3 or x = -8."])
+  ],
+  factoringRoots: [
+    () => practiceResult("Solve x^2 + 6x + 8 = 0.", "x = -2 or x = -4", ["-2,-4", "-4,-2"], ["Factor: (x + 2)(x + 4) = 0.", "Set each factor equal to zero."]),
+    () => practiceResult("Solve x^2 - 7x + 12 = 0.", "x = 3 or x = 4", ["3,4", "4,3"], ["Factor: (x - 3)(x - 4) = 0.", "Set each factor equal to zero."]),
+    () => practiceResult("Solve x^2 + x - 20 = 0.", "x = -5 or x = 4", ["-5,4", "4,-5"], ["Factor: (x + 5)(x - 4) = 0.", "Set each factor equal to zero."]),
+    () => practiceResult("Solve x^2 - 2x - 15 = 0.", "x = -3 or x = 5", ["-3,5", "5,-3"], ["Factor: (x - 5)(x + 3) = 0.", "Set each factor equal to zero."])
+  ],
+  squareRootProperty: [
+    () => practiceResult("Solve x^2 = 64.", "x = -8 or x = 8", ["-8,8", "8,-8"], ["Take both square roots.", "x = +/-8."]),
+    () => practiceResult("Solve (x - 2)^2 = 36.", "x = -4 or x = 8", ["-4,8", "8,-4"], ["x - 2 = +/-6.", "Add 2 to both solutions."]),
+    () => practiceResult("Solve (x + 1)^2 = 49.", "x = -8 or x = 6", ["-8,6", "6,-8"], ["x + 1 = +/-7.", "Subtract 1 from both solutions."]),
+    () => practiceResult("Solve (x + 4)^2 = 25.", "x = -9 or x = 1", ["-9,1", "1,-9"], ["x + 4 = +/-5.", "Subtract 4 from both solutions."])
+  ],
+  formulaSetup: [
+    () => practiceResult("For 3x^2 + 7x - 2 = 0, identify a, b, and c.", "a = 3, b = 7, c = -2", ["3,7,-2"], ["Standard form is ax^2 + bx + c = 0.", "Keep the sign with each coefficient."]),
+    () => practiceResult("For -x^2 + 5x + 6 = 0, identify a, b, and c.", "a = -1, b = 5, c = 6", ["-1,5,6"], ["The coefficient of x^2 is -1.", "b = 5 and c = 6."]),
+    () => practiceResult("For 2x^2 - 9x + 4 = 0, identify a, b, and c.", "a = 2, b = -9, c = 4", ["2,-9,4"], ["Read coefficients from standard form.", "The sign belongs with the term."]),
+    () => practiceResult("For x^2 - 11x - 12 = 0, identify a, b, and c.", "a = 1, b = -11, c = -12", ["1,-11,-12"], ["If no coefficient is written on x^2, a = 1.", "b = -11 and c = -12."])
+  ],
+  quadraticFormula: [
+    () => practiceResult("Solve x^2 + 2x - 8 = 0 using the quadratic formula.", "x = 2 or x = -4", ["2,-4", "-4,2"], ["a = 1, b = 2, c = -8.", "x = (-2 +/- sqrt(4 + 32))/2 = (-2 +/- 6)/2.", "So x = 2 or x = -4."]),
+    () => practiceResult("Solve x^2 - 8x + 15 = 0 using the quadratic formula.", "x = 3 or x = 5", ["3,5", "5,3"], ["a = 1, b = -8, c = 15.", "x = (8 +/- sqrt(64 - 60))/2 = (8 +/- 2)/2.", "So x = 3 or x = 5."]),
+    () => practiceResult("Solve x^2 + 6x + 5 = 0 using the quadratic formula.", "x = -1 or x = -5", ["-1,-5", "-5,-1"], ["a = 1, b = 6, c = 5.", "x = (-6 +/- sqrt(36 - 20))/2 = (-6 +/- 4)/2.", "So x = -1 or x = -5."]),
+    () => practiceResult("Solve x^2 - 4x - 12 = 0 using the quadratic formula.", "x = -2 or x = 6", ["-2,6", "6,-2"], ["a = 1, b = -4, c = -12.", "x = (4 +/- sqrt(16 + 48))/2 = (4 +/- 8)/2.", "So x = -2 or x = 6."])
+  ],
+  graphingFeatures: [
+    () => practiceResult("For f(x) = x^2 - 6x + 5: find the axis, vertex, and opening direction.", "axis x = 3; vertex (3, -4); opens up", ["x=3;3,-4;up"], ["Axis: x = -b/(2a) = 6/2 = 3.", "f(3) = 9 - 18 + 5 = -4.", "a is positive, so it opens up."]),
+    () => practiceResult("For f(x) = -x^2 + 4x + 1: find the axis, vertex, and opening direction.", "axis x = 2; vertex (2, 5); opens down", ["x=2;2,5;down"], ["Axis: x = -4/(2(-1)) = 2.", "f(2) = -4 + 8 + 1 = 5.", "a is negative, so it opens down."]),
+    () => practiceResult("For f(x) = x^2 + 2x - 3: find the axis, vertex, and opening direction.", "axis x = -1; vertex (-1, -4); opens up", ["x=-1;-1,-4;up"], ["Axis: x = -2/2 = -1.", "f(-1) = 1 - 2 - 3 = -4.", "a is positive, so it opens up."]),
+    () => practiceResult("For f(x) = -2x^2 - 8x + 3: find the axis, vertex, and opening direction.", "axis x = -2; vertex (-2, 11); opens down", ["x=-2;-2,11;down"], ["Axis: x = -(-8)/(2(-2)) = -2.", "f(-2) = -8 + 16 + 3 = 11.", "a is negative, so it opens down."])
+  ]
+};
+
+let practiceCounters = {};
+
+function practiceTypeForProblem(problem) {
+  const title = (problem?.title || "").toLowerCase();
+  if (title.includes("y-intercepts")) return "yIntercepts";
+  if (title.includes("axis")) return "axisSymmetry";
+  if (title === "vertex") return "vertexForm";
+  if (title.includes("opening")) return "openingDirection";
+  if (title.includes("x-intercepts")) return "xIntercepts";
+  if (title.includes("factoring roots") || title.includes("solving by factoring")) return "factoringRoots";
+  if (title.includes("square root")) return "squareRootProperty";
+  if (title.includes("formula setup")) return "formulaSetup";
+  if (title === "quadratic formula") return "quadraticFormula";
+  if (title.includes("graphing quadratics")) return "graphingFeatures";
+  return "axisSymmetry";
+}
+
+function nextPractice(type, reset = false) {
+  const bank = practiceBanks[type] || practiceBanks.axisSymmetry;
+  const key = `${state.selected || "none"}:${type}`;
+  if (reset) practiceCounters[key] = 0;
+  const index = practiceCounters[key] || 0;
+  practiceCounters[key] = index + 1;
+  return bank[index % bank.length]();
+}
+
+function renderPractice(type, reset = false) {
+  const item = nextPractice(type, reset);
   if (!item) return;
   $("practiceBox").classList.remove("hidden");
   $("practiceBox").innerHTML = `
     <h3>Similar Practice</h3>
-    <p class="practice-prompt"><strong>Try companion problem ${escapeHTML(item.id)}.</strong> ${escapeHTML(item.prompt || item.title)}</p>
-    <p class="practice-prompt">This problem appears on packet page ${item.page}.</p>
+    <p class="practice-prompt"><strong>New practice for this same skill.</strong> ${escapeHTML(item.prompt)}</p>
     <div class="answer-line"><input id="practiceInput" placeholder="Type your answer"><button class="primary" id="checkPractice">Check</button></div>
     <p class="practice-feedback" id="practiceFeedback"></p>
     <div class="action-row"><button class="soft" id="showPracticeAnswer">Show Answer</button><button class="ghost" id="newPractice">New Similar Problem</button></div>
@@ -488,15 +573,14 @@ function renderPractice(type, overrideId) {
   `;
   $("checkPractice").addEventListener("click", () => {
     const response = normalize($("practiceInput").value);
-    const ok = acceptedAnswers(item.answer).includes(response);
+    const accepted = [...acceptedAnswers(item.answer), ...item.accepted.map(normalize)];
+    const ok = accepted.includes(response);
     $("practiceFeedback").textContent = ok ? "Correct. Your answer matches this practice problem." : "Not yet. Compare notation, signs, coordinates, and units, then try again.";
     $("practiceFeedback").className = `practice-feedback ${ok ? "ok" : "no"}`;
   });
   $("showPracticeAnswer").addEventListener("click", () => $("practiceSteps").classList.remove("hidden"));
   $("newPractice").addEventListener("click", () => {
-    const sameTopic = PROBLEMS.filter(p => p.topic === selected.topic && p.id !== selected.id && p.id !== item.id);
-    const next = sameTopic[0] || practiceCandidate(selected);
-    renderPractice(type, next.id);
+    renderPractice(type);
   });
 }
 
@@ -510,7 +594,7 @@ document.addEventListener("click", (event) => {
   if (event.target.id === "showAnswer") { $("answerText").classList.remove("hidden"); $("showAnswer").classList.add("hidden"); $("showSteps").classList.remove("hidden"); }
   if (event.target.id === "showSteps") { $("stepsBox").classList.remove("hidden"); $("showSteps").classList.add("hidden"); }
   if (event.target.id === "markChecked" && state.selected) { if (!state.checked.includes(state.selected)) state.checked.push(state.selected); saveProgress(); renderDashboard(); }
-  if (event.target.id === "startPractice" && state.selected) { renderPractice(PROBLEMS.find(p => p.id === state.selected).practiceType); }
+  if (event.target.id === "startPractice" && state.selected) { renderPractice(practiceTypeForProblem(PROBLEMS.find(p => p.id === state.selected)), true); }
   if (event.target.id === "showPacket") $("packetBox").classList.toggle("hidden");
   if (event.target.id === "resetProgress") { state.checked = []; saveProgress(); renderDashboard(); }
 });

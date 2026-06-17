@@ -17,7 +17,16 @@ The packet page preview uses rendered images from the 7-page student study guide
 
 ## Similar Practice
 
-The similar-practice section uses the matching Version A / Version B companion problem whenever one exists. This keeps the extra practice aligned with the packet structure students already see.
+The similar-practice section now generates outside-the-packet practice instead of routing students to the matching Version A / Version B companion problem.
+
+Each major Unit 7 quest skill has at least four similar prompts available through the `New Similar Problem` button:
+
+- y-intercepts, x-intercepts, vertices, axes of symmetry, and opening direction
+- solving quadratics by factoring
+- solving with the square root property
+- identifying quadratic formula coefficients
+- solving with the quadratic formula
+- combining graphing features for quadratics
 
 ## Answer-Key Notes
 
