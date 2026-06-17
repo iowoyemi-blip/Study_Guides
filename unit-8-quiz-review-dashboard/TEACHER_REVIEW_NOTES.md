@@ -17,7 +17,16 @@ The packet page preview uses rendered images from the 7-page student study guide
 
 ## Similar Practice
 
-The similar-practice section uses the matching Version A / Version B companion problem whenever one exists. This keeps the extra practice aligned with the packet structure students already see.
+The similar-practice section now generates outside-the-packet practice instead of routing students to the matching Version A / Version B companion problem.
+
+Each major Unit 8 quiz skill has at least four similar prompts available through the `New Similar Problem` button:
+
+- classifying tables as linear, quadratic, or exponential
+- identifying exponential growth and decay rates
+- writing exponential models in `y = ab^x` form
+- evaluating exponential models for predictions
+- depreciation and appreciation applications
+- linear and exponential prediction contexts
 
 ## Answer-Key Notes
 
