@@ -22,6 +22,18 @@ The app includes all 42 study guide problems:
 
 The packet page preview uses rendered images from the 14-page student study guide, including the answer-key pages.
 
+## Similar Practice
+
+The similar-practice section now generates outside-the-packet practice instead of routing students to nearby problems in the paper packet.
+
+Each major midterm review skill has at least four similar prompts available through the `New Similar Problem` button:
+
+- exponent rules and radical simplification
+- order of operations, equations, literal equations, and inequalities
+- translating expressions and solving rectangle/perimeter word problems
+- functions, domain/range, and function notation
+- slope, linear equations, special lines, intercepts, and linear contexts
+
 ## Answer-Key Notes
 
 The midterm study guide includes an embedded final-answer key on pages 12-14. Those final answers were used as the source of truth for the dashboard.
@@ -36,4 +48,4 @@ The typed checker for similar-practice items is intentionally lightweight. It ac
 2. Students click the problem number in the dashboard.
 3. Students reveal the final answer first.
 4. Students reveal guidance only after checking their own work.
-5. Students can use similar practice from a nearby problem in the same unit topic.
+5. Students can use generated similar practice for extra outside-the-packet repetition.
